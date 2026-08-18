@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}ສ້າງບັນຊີດ້ວຍ {{ account.get_provider.name }} | {{ store.name }}{% endblock %}
+{% block body_class %}auth-forest-page{% endblock %}
+{% block main_class %}auth-forest-main{% endblock %}
+
+{% block content %}
+<section class="oauth-completion-shell" aria-labelledby="oauth-signup-heading">
+  <div class="oauth-completion-card">
+    <div class="oauth-completion-banner">
+      <span class="oauth-provider-mark oauth-provider-{{ account.get_provider.id }}" aria-hidden="true">
+        {% if account.get_provider.id == "google" %}G{% elif account.get_provider.id == "facebook" %}f{% else %}✓{% endif %}
+      </span>
+      <div>
+        <p class="oauth-eyebrow">{{ account.get_provider.name }}</p>
+        <h1 id="oauth-signup-heading">ເກືອບສຳເລັດແລ້ວ</h1>
+      </div>
+    </div>
+
+    <div class="oauth-completion-body">
+      <p class="oauth-intro">ກຳນົດຊື່ຜູ້ໃຊ້ພຽງ 1 ຄັ້ງ ແລ້ວເຂົ້າໃຊ້ {{ store.name }} ດ້ວຍ {{ account.get_provider.name }} ໄດ້ທັນທີ.</p>
+
+      <div class="oauth-no-password-note" role="note">
+        <span aria-hidden="true">✓</span>
+        ບໍ່ຕ້ອງສ້າງ ຫຼື ຈື່ລະຫັດຜ່ານສຳລັບບັນຊີນີ້
+      </div>
+
+      {% url 'socialaccount_signup' as action_url %}
+      <form method="post" action="{{ action_url }}" class="oauth-signup-form" novalidate>
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        {% for field in form.visible_fields %}
+          <div class="oauth-field">
+            {% if field.name == "username" %}
+              <label for="{{ field.id_for_label }}">ຊື່ຜູ້ໃຊ້</label>
+              <p class="oauth-help">ໃຊ້ຕົວອັກສອນ, ຕົວເລກ ຫຼື `_` ແລະ ບໍ່ມີຊ່ອງຫວ່າງ.</p>
+            {% elif field.name == "email" %}
+              <label for="{{ field.id_for_label }}">ອີເມວຈາກ {{ account.get_provider.name }}</label>
+            {% else %}
+              {{ field.label_tag }}
+            {% endif %}
+            {{ field }}
+            {{ field.errors }}
+          </div>
+        {% endfor %}
+        {{ redirect_field }}
+
+        <button class="btn btn-primary oauth-completion-submit" type="submit">
+          ສ້າງບັນຊີ ແລະ ເຂົ້າລະບົບ
+          <span aria-hidden="true">→</span>
+        </button>
+      </form>
+
+      <p class="oauth-privacy-copy">ການສືບຕໍ່ໝາຍເຖິງທ່ານຍອມຮັບນະໂຍບາຍຂອງຮ້ານ.</p>
+    </div>
+  </div>
+</section>
+{% endblock %}

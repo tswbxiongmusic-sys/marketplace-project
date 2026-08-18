@@ -1,0 +1,47 @@
+:root{
+
+    /* ========= Colors ========= */
+
+    --primary:#2563eb;
+    --primary-dark:#1d4ed8;
+
+    --secondary:#64748b;
+
+    --success:#16a34a;
+    --danger:#dc2626;
+    --warning:#f59e0b;
+
+    --light:#f8fafc;
+    --white:#ffffff;
+
+    --dark:#0f172a;
+
+    --gray-100:#f1f5f9;
+    --gray-200:#e2e8f0;
+    --gray-300:#cbd5e1;
+    --gray-500:#64748b;
+    --gray-700:#334155;
+
+    /* ========= Radius ========= */
+
+    --radius-sm:8px;
+    --radius-md:14px;
+    --radius-lg:22px;
+
+    /* ========= Shadow ========= */
+
+    --shadow-sm:0 2px 8px rgba(0,0,0,.08);
+
+    --shadow-md:0 8px 20px rgba(0,0,0,.12);
+
+    --shadow-lg:0 20px 40px rgba(0,0,0,.18);
+
+    /* ========= Transition ========= */
+
+    --transition:.30s;
+
+    /* ========= Font ========= */
+
+    --font:"Noto Sans Lao","Phetsarath OT","Lao UI",sans-serif;
+
+}

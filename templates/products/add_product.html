@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}
+ເພີ່ມສິນຄ້າ | {{ store.name }}
+{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="fw-bold mb-1">ເພີ່ມສິນຄ້າ</h1>
+                <p class="text-muted mb-0">
+                    ສ້າງສິນຄ້າລາຍການໃໝ່ສຳລັບຮ້ານຂອງທ່ານ.
+                </p>
+            </div>
+
+            <a href="{% url 'seller_dashboard' %}" class="btn btn-outline-secondary">
+                ← ກັບໄປໜ້າຈັດການຮ້ານ
+            </a>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body p-4 p-md-5">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
+                    {% for field in form %}
+                        <div class="mb-4">
+                            <label for="{{ field.id_for_label }}" class="form-label fw-semibold">
+                                {{ field.label }}
+                            </label>
+
+                            {{ field }}
+
+                            {% if field.help_text %}
+                                <div class="form-text">
+                                    {{ field.help_text }}
+                                </div>
+                            {% endif %}
+
+                            {% if field.errors %}
+                                <div class="text-danger small mt-2">
+                                    {{ field.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <div class="mb-4"><label class="form-label fw-semibold" for="gallery_images">ຮູບສິນຄ້າເພີ່ມເຕີມ</label><input id="gallery_images" class="form-control" type="file" name="gallery_images" accept="image/*" multiple></div>
+
+                    <div class="seller-form-actions d-flex gap-2 pt-2">
+                        <a href="{% url 'seller_dashboard' %}" class="btn btn-outline-secondary">
+                            ຍົກເລີກ
+                        </a>
+
+                        <button type="submit" class="btn btn-primary">
+                            ບັນທຶກສິນຄ້າ
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}ນະໂຍບາຍຮ້ານ | {{ store.name }}{% endblock %}
+
+{% block content %}
+<div class="policy-page row justify-content-center py-3">
+    <div class="col-lg-9">
+        <div class="text-center mb-4 mb-md-5">
+            <span class="badge text-bg-primary rounded-pill px-3 py-2 mb-3">ຂໍ້ມູນສຳຄັນ</span>
+            <h1 class="fw-bold">ນະໂຍບາຍຮ້ານ</h1>
+            <p class="text-muted mb-0">ກະລຸນາອ່ານຂໍ້ມູນນີ້ກ່ອນສັ່ງຊື້ສິນຄ້າຈາກ {{ store.name }}.</p>
+        </div>
+
+        <div class="policy-navigation card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-body d-flex flex-wrap gap-2">
+                <a class="btn btn-outline-primary" href="#shipping">ການຈັດສົ່ງ</a>
+                <a class="btn btn-outline-primary" href="#returns">ການຄືນສິນຄ້າ</a>
+                <a class="btn btn-outline-primary" href="#privacy">ຂໍ້ມູນສ່ວນຕົວ</a>
+                <a class="btn btn-outline-primary" href="#contact">ການຕິດຕໍ່</a>
+            </div>
+        </div>
+
+        <section id="shipping" class="policy-section card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-body p-4 p-md-5">
+                <h2 class="h4 fw-bold">ການຈັດສົ່ງ</h2>
+                <ul class="mb-0">
+                    <li>ກວດສອບຂໍ້ມູນຜູ້ຮັບ, ເບີໂທ ແລະ ທີ່ຢູ່ໃຫ້ຖືກຕ້ອງກ່ອນຢືນຢັນຄຳສັ່ງຊື້.</li>
+                    <li>ໄລຍະເວລາ ແລະ ຄ່າຈັດສົ່ງ ອາດແຕກຕ່າງຕາມພື້ນທີ່ ແລະ ຜູ້ຂາຍ.</li>
+                    <li>ທ່ານສາມາດຕິດຕາມສະຖານະໄດ້ທີ່ເມນູ “ຄຳສັ່ງຊື້”.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="returns" class="policy-section card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-body p-4 p-md-5">
+                <h2 class="h4 fw-bold">ການຄືນສິນຄ້າ ແລະ ການຍົກເລີກ</h2>
+                <ul class="mb-0">
+                    <li>ລູກຄ້າສາມາດຍົກເລີກຄຳສັ່ງຊື້ໄດ້ ກ່ອນທີ່ສິນຄ້າຈະຖືກຈັດສົ່ງ.</li>
+                    <li>ຫາກໄດ້ຮັບສິນຄ້າຜິດ, ເສຍຫາຍ ຫຼື ບໍ່ຕາມລາຍລະອຽດ ກະລຸນາຕິດຕໍ່ຮ້ານໂດຍໄວ.</li>
+                    <li>ຫຼັກຖານເຊັ່ນ ຮູບຖ່າຍ ຫຼື ວິດີໂອ ຊ່ວຍໃຫ້ຮ້ານກວດສອບບັນຫາໄດ້ໄວຂຶ້ນ.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="privacy" class="policy-section card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-body p-4 p-md-5">
+                <h2 class="h4 fw-bold">ຂໍ້ມູນສ່ວນຕົວ</h2>
+                <ul class="mb-0">
+                    <li>ຮ້ານໃຊ້ຊື່, ເບີໂທ ແລະ ທີ່ຢູ່ຂອງທ່ານ ສະເພາະເພື່ອດຳເນີນການສັ່ງຊື້ ແລະ ຈັດສົ່ງ.</li>
+                    <li>ບໍ່ຄວນແບ່ງປັນລະຫັດຜ່ານ ຫຼື ຂໍ້ມູນບັດຊຳລະເງິນໃຫ້ຜູ້ອື່ນ.</li>
+                    <li>ຫາກຕ້ອງການແກ້ໄຂຂໍ້ມູນ ໃຫ້ໄປທີ່ເມນູ “ບັນຊີຂອງຂ້ອຍ”.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="contact" class="policy-section card border-0 shadow-sm rounded-4">
+            <div class="card-body p-4 p-md-5">
+                <h2 class="h4 fw-bold">ຕ້ອງການຄວາມຊ່ວຍເຫຼືອ?</h2>
+                <p class="mb-3">ກະລຸນາຕິດຕໍ່ {{ store.name }} ເພື່ອສອບຖາມເລື່ອງສິນຄ້າ, ການສັ່ງຊື້ ຫຼື ການຈັດສົ່ງ.</p>
+                <div class="d-flex flex-wrap gap-2">
+                    {% if store.phone %}<a class="btn btn-primary" href="tel:{{ store.phone }}">ໂທ {{ store.phone }}</a>{% endif %}
+                    {% if store.email %}<a class="btn btn-outline-primary" href="mailto:{{ store.email }}">ອີເມວຫາຮ້ານ</a>{% endif %}
+                    <a class="btn btn-outline-secondary" href="{% url 'store_info' %}">ເບິ່ງຂໍ້ມູນຕິດຕໍ່</a>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}

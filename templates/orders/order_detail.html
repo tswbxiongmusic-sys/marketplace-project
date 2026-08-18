@@ -1,0 +1,428 @@
+{% extends "base.html" %}
+
+{% block title %}{{ order.order_number }} | {{ store.name }}{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <!-- Back -->
+    <div class="mb-4">
+        <a href="{% url 'my_orders' %}" class="text-decoration-none">
+            ← ກັບໄປຄຳສັ່ງຊື້ຂອງຂ້ອຍ
+        </a>
+    </div>
+
+
+    <!-- Order Header -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-body p-4">
+
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+
+                <div>
+                    <small class="text-muted d-block mb-1">
+                        ເລກຄຳສັ່ງຊື້
+                    </small>
+
+                    <h2 class="fw-bold mb-2">
+                        {{ order.order_number }}
+                    </h2>
+
+                    <p class="text-muted mb-0">
+                        ສັ່ງຊື້ເມື່ອ {{ order.created_at|date:"d/m/Y, H:i" }}
+                    </p>
+                </div>
+
+
+                <div class="text-md-end">
+
+                    <small class="text-muted d-block mb-2">
+                        ສະຖານະຄຳສັ່ງຊື້
+                    </small>
+
+                    <span class="badge {{ order.get_status_badge_class }} px-3 py-2 rounded-pill">
+                        {{ order.get_status_display }}
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="row g-4">
+
+        <!-- LEFT COLUMN -->
+        <div class="col-lg-8">
+
+
+            <!-- Order Items -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+
+                <div class="card-body p-4">
+
+                    <h4 class="fw-bold mb-4">
+                        ລາຍການສິນຄ້າ
+                    </h4>
+
+
+                    <div class="border rounded-3 overflow-hidden">
+
+                        {% for item in order.items.all %}
+
+                        <div class="p-3 border-bottom">
+
+                            <div class="row align-items-center g-3">
+
+                                <!-- Product -->
+                                <div class="col-md-5">
+
+                                    <div class="fw-semibold">
+                                        {{ item.product_name }}
+                                    </div>
+
+                                </div>
+
+
+                                <!-- Quantity -->
+                                <div class="col-4 col-md-2">
+
+                                    <small class="text-muted d-block">
+                                        ຈຳນວນ
+                                    </small>
+
+                                    <span class="fw-semibold">
+                                        {{ item.quantity }}
+                                    </span>
+
+                                </div>
+
+
+                                <!-- Unit Price -->
+                                <div class="col-4 col-md-2">
+
+                                    <small class="text-muted d-block">
+                                        ລາຄາຕໍ່ໜ່ວຍ
+                                    </small>
+
+                                    <span>
+                                        ₭{{ item.unit_price }}
+                                    </span>
+
+                                </div>
+
+
+                                <!-- Total -->
+                                <div class="col-4 col-md-3 text-md-end">
+
+                                    <small class="text-muted d-block">
+                                        ລວມ
+                                    </small>
+
+                                    <span class="fw-bold text-primary">
+                                        ₭{{ item.total_price }}
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Shipping Information -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+
+                <div class="card-body p-4">
+
+                    <h4 class="fw-bold mb-4">
+                        ຂໍ້ມູນຈັດສົ່ງ
+                    </h4>
+
+
+                    <div class="row g-4">
+
+                        <div class="col-md-6">
+
+                            <small class="text-muted d-block mb-1">
+                                ຊື່ຜູ້ຮັບ
+                            </small>
+
+                            <strong>
+                                {{ order.recipient_name }}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <small class="text-muted d-block mb-1">
+                                ເບີໂທ
+                            </small>
+
+                            <strong>
+                                {{ order.phone }}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="col-12">
+
+                            <small class="text-muted d-block mb-1">
+                                ທີ່ຢູ່ຈັດສົ່ງ
+                            </small>
+
+                            <div class="bg-light rounded-3 p-3">
+                                {{ order.shipping_address|linebreaksbr }}
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6">
+                            <small class="text-muted d-block mb-1">ວິທີຈັດສົ່ງ</small>
+                            <strong>{{ order.shipping_method|default:"ບໍ່ໄດ້ບັນທຶກ" }}</strong>
+                        </div>
+
+                        <div class="col-md-6">
+                            <small class="text-muted d-block mb-1">ຄ່າຈັດສົ່ງ</small>
+                            <strong>₭{{ order.shipping_fee }}</strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Parcel tracking -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center gap-3 flex-wrap mb-4">
+                        <div>
+                            <h4 class="fw-bold mb-1">ຕິດຕາມພັດສະດຸ</h4>
+                            <p class="text-muted mb-0">ຜູ້ຂາຍຈະເພີ່ມເລກຕິດຕາມເມື່ອຈັດສົ່ງແລ້ວ.</p>
+                        </div>
+                        <span class="badge {{ order.get_status_badge_class }} px-3 py-2 rounded-pill">{{ order.get_status_display }}</span>
+                    </div>
+
+                    {% if order.shipments.all %}
+                        <div class="vstack gap-3">
+                            {% for shipment in order.shipments.all %}
+                                <div class="border rounded-3 p-3">
+                                    <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+                                        <div>
+                                            <div class="fw-semibold">ພັດສະດຸຈາກຮ້ານ: {{ shipment.seller.get_full_name|default:shipment.seller.username }}</div>
+                                            {% if shipment.carrier %}<small class="text-muted d-block mt-1">ຜູ້ໃຫ້ບໍລິການ: {{ shipment.carrier }}</small>{% endif %}
+                                            {% if shipment.tracking_number %}
+                                                <div class="mt-2"><small class="text-muted">ເລກຕິດຕາມ:</small> <code>{{ shipment.tracking_number }}</code></div>
+                                            {% else %}
+                                                <small class="text-muted d-block mt-2">ຍັງບໍ່ມີເລກຕິດຕາມ.</small>
+                                            {% endif %}
+                                        </div>
+                                        <div class="text-md-end">
+                                            <span class="badge {{ shipment.get_status_badge_class }}">{{ shipment.get_status_display }}</span>
+                                            {% if shipment.shipped_at %}<small class="text-muted d-block mt-2">ສົ່ງອອກ: {{ shipment.shipped_at|date:"d/m/Y, H:i" }}</small>{% endif %}
+                                            {% if shipment.delivered_at %}<small class="text-muted d-block mt-1">ສົ່ງຮອດ: {{ shipment.delivered_at|date:"d/m/Y, H:i" }}</small>{% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted mb-0">ຄຳສັ່ງຊື້ເກົ່ານີ້ຍັງບໍ່ມີຂໍ້ມູນພັດສະດຸ.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+
+            <!-- Payment Information -->
+            <div class="card border-0 shadow-sm rounded-4">
+
+                <div class="card-body p-4">
+
+                    <h4 class="fw-bold mb-4">
+                        ຂໍ້ມູນການຊຳລະ
+                    </h4>
+
+
+                    <div class="row g-4">
+
+                        <div class="col-md-6">
+
+                            <small class="text-muted d-block mb-1">
+                                ວິທີຊຳລະ
+                            </small>
+
+                            <strong>
+                                {{ order.get_payment_method_display }}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <small class="text-muted d-block mb-1">
+                                ສະຖານະການຊຳລະ
+                            </small>
+
+                            <strong>
+                                {{ order.get_payment_status_display }}
+                            </strong>
+
+                            {% if order.payment_receipt %}
+                            <a class="d-block mt-2" href="{{ order.payment_receipt.url }}" target="_blank">ເບິ່ງຫຼັກຖານການໂອນ</a>
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                    {% if order.payment_method == "bank_transfer" or order.payment_method == "qr_payment" %}
+                        {% if order.payment_status == "pending" %}
+                            <div class="alert alert-warning mt-4 mb-0 small">ຮ້ານໄດ້ຮັບຫຼັກຖານຂອງທ່ານແລ້ວ ແລະກຳລັງກວດສອບການໂອນເງິນ.</div>
+                        {% elif order.payment_status == "paid" %}
+                            <div class="alert alert-success mt-4 mb-0 small">ການຊຳລະຂອງທ່ານໄດ້ຮັບການຢືນຢັນແລ້ວ. ຮ້ານຈະດຳເນີນການຈັດສົ່ງຕໍ່ໄປ.</div>
+                        {% elif order.payment_status == "failed" %}
+                            <div class="alert alert-danger mt-4 mb-0 small">ການຊຳລະຍັງບໍ່ຜ່ານການກວດ. ກະລຸນາຕິດຕໍ່ຮ້ານເພື່ອສົ່ງຫຼັກຖານໃໝ່.</div>
+                        {% endif %}
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- RIGHT COLUMN -->
+        <div class="col-lg-4">
+
+
+            <!-- Order Summary -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+
+                <div class="card-body p-4">
+
+                    <h4 class="fw-bold mb-4">
+                        ສະຫຼຸບຄຳສັ່ງຊື້
+                    </h4>
+
+
+                    <div class="d-flex justify-content-between mb-3">
+
+                        <span class="text-muted">ລວມຄ່າສິນຄ້າ</span>
+                        <span class="fw-semibold">₭{{ order.items_total }}</span>
+
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-3">
+
+                        <span class="text-muted">ຄ່າຈັດສົ່ງ</span>
+                        <span class="fw-semibold">₭{{ order.shipping_fee }}</span>
+
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-3">
+
+                        <span class="text-muted">
+                            ຈຳນວນລາຍການ
+                        </span>
+
+                        <span class="fw-semibold">
+                            {{ order.items.count }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="d-flex justify-content-between mb-3">
+
+                        <span class="text-muted">
+                            ການຊຳລະ
+                        </span>
+
+                        <span class="fw-semibold">
+                            {{ order.get_payment_method_display }}
+                        </span>
+
+                    </div>
+
+
+                    <hr>
+
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <span class="fw-bold">
+                            ລວມທັງໝົດ
+                        </span>
+
+                        <span class="fs-4 fw-bold text-primary">
+                            ₭{{ order.total_price }}
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Actions -->
+            <div class="card border-0 shadow-sm rounded-4">
+
+                <div class="card-body p-4">
+
+                    <h5 class="fw-bold mb-3">
+                        ຕ້ອງການສິ່ງອື່ນອີກບໍ?
+                    </h5>
+
+                    <p class="text-muted small">
+                        ທ່ານສາມາດກັບໄປເບິ່ງຄຳສັ່ງຊື້ ຫຼື ເລືອກຊື້ຕໍ່.
+                    </p>
+
+
+                    <a
+                        href="{% url 'my_orders' %}"
+                        class="btn btn-outline-secondary w-100 mb-2"
+                    >
+                        ກັບໄປຄຳສັ່ງຊື້
+                    </a>
+
+
+                    <a
+                        href="{% url 'home' %}"
+                        class="btn btn-primary w-100"
+                    >
+                        ເລືອກຊື້ຕໍ່
+                    </a>
+
+                    {% if order.status == 'pending' or order.status == 'paid' %}
+                    <form method="post" action="{% url 'cancel_order' order.id %}" class="mt-2">{% csrf_token %}<button class="btn btn-outline-danger w-100">ຍົກເລີກຄຳສັ່ງຊື້</button></form>
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

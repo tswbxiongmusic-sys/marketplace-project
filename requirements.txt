@@ -1,0 +1,12 @@
+asgiref==3.12.1
+Django==5.2.16
+django-allauth[socialaccount]>=65.19,<66
+django-environ==0.14.0
+django-storages[s3]>=1.14,<2
+djangorestframework==3.17.1
+pillow==12.3.0
+psycopg==3.3.4
+psycopg-binary==3.3.4
+gunicorn>=23,<24
+sqlparse==0.5.5
+whitenoise>=6.8,<7

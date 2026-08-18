@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load socialaccount %}
+
+{% block title %}ສ້າງບັນຊີ | {{ store.name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-7 col-lg-5">
+    <section class="card card-body shadow-sm auth-card" aria-labelledby="register-heading">
+      <h1 id="register-heading" class="h3 mb-2">ສ້າງບັນຊີໃໝ່</h1>
+      <p class="text-muted mb-4">ສະໝັກດ້ວຍ Google ຫຼື Facebook ໄດ້ໂດຍບໍ່ຕ້ອງກຳນົດລະຫັດຜ່ານ.</p>
+
+      {% if social_login_providers.google or social_login_providers.facebook %}
+        <div class="social-login-list" aria-label="ສ້າງບັນຊີຜ່ານບັນຊີອື່ນ">
+          {% if social_login_providers.google %}
+            <form method="post" action="{% provider_login_url 'google' process='login' %}">
+              {% csrf_token %}
+              <button class="social-login-button social-login-google" type="submit">
+                <span class="social-login-mark" aria-hidden="true">G</span>
+                ສືບຕໍ່ດ້ວຍ Google
+              </button>
+            </form>
+          {% endif %}
+          {% if social_login_providers.facebook %}
+            <form method="post" action="{% provider_login_url 'facebook' process='login' %}">
+              {% csrf_token %}
+              <button class="social-login-button social-login-facebook" type="submit">
+                <span class="social-login-mark" aria-hidden="true">f</span>
+                ສືບຕໍ່ດ້ວຍ Facebook
+              </button>
+            </form>
+          {% endif %}
+        </div>
+        <div class="social-login-divider" aria-hidden="true"><span>ຫຼື</span></div>
+      {% endif %}
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        {% for field in form %}
+          <div class="mb-3">{{ field.label_tag }}{{ field }}{{ field.errors }}</div>
+        {% endfor %}
+        <button class="btn btn-primary w-100" type="submit">ສະໝັກສະມາຊິກດ້ວຍລະຫັດຜ່ານ</button>
+      </form>
+
+      <p class="text-center mt-4 mb-0">ມີບັນຊີແລ້ວ? <a href="{% url 'login' %}">ເຂົ້າລະບົບ</a></p>
+    </section>
+  </div>
+</div>
+{% endblock %}

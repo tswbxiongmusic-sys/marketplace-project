@@ -1,0 +1,444 @@
+/* Immersive sign-in screens */
+body.auth-forest-page {
+    min-height: 100vh;
+    background-color: #0d211e;
+    background-image:
+        linear-gradient(125deg, rgba(9, 34, 25, .20), rgba(5, 13, 18, .64)),
+        url("../images/login-forest-bg-v1.png");
+    background-position: center, center;
+    background-size: cover, cover;
+    background-attachment: fixed, fixed;
+}
+
+.auth-forest-page > header,
+.auth-forest-page > footer {
+    display: none;
+}
+
+.auth-forest-page .skip-link:focus {
+    background: #f8fafc;
+    color: #10211d;
+    border-radius: .5rem;
+}
+
+.auth-forest-main {
+    min-height: 100vh;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: clamp(1.25rem, 5vw, 4rem);
+}
+
+.auth-forest-main > .alert {
+    width: min(100%, 32rem);
+    margin: 0 auto 1rem;
+}
+
+.auth-forest-scene {
+    display: grid;
+    min-height: calc(100vh - clamp(2.5rem, 10vw, 8rem));
+    place-items: center;
+}
+
+.forest-login-card {
+    width: min(100%, 29rem);
+    padding: clamp(1.65rem, 5vw, 2.75rem);
+    border: 1px solid rgba(235, 255, 247, .48);
+    border-radius: clamp(1.75rem, 6vw, 2.5rem);
+    background: linear-gradient(135deg, rgba(213, 231, 220, .43), rgba(19, 31, 39, .72));
+    box-shadow: 0 1.75rem 4.5rem rgba(0, 0, 0, .42), inset 0 1px 0 rgba(255, 255, 255, .24);
+    color: #fff;
+    -webkit-backdrop-filter: blur(1.15rem) saturate(120%);
+    backdrop-filter: blur(1.15rem) saturate(120%);
+}
+
+.forest-login-kicker {
+    margin: 0 0 .7rem;
+    color: rgba(241, 255, 248, .8);
+    font-size: .78rem;
+    font-weight: 800;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+}
+
+.forest-login-title {
+    margin: 0;
+    color: #fff;
+    font-size: clamp(2rem, 6vw, 2.65rem);
+    font-weight: 900;
+    letter-spacing: -.045em;
+}
+
+.forest-login-description {
+    margin: .8rem 0 1.65rem;
+    color: rgba(248, 255, 251, .86);
+    font-size: .98rem;
+    line-height: 1.7;
+}
+
+.forest-login-form {
+    display: grid;
+    gap: 1rem;
+}
+
+.forest-form-field {
+    display: grid;
+    gap: .42rem;
+}
+
+.forest-form-field label {
+    color: rgba(255, 255, 255, .92);
+    font-size: .91rem;
+    font-weight: 800;
+}
+
+.forest-form-field .form-control {
+    min-height: 3.2rem;
+    border: 1px solid rgba(255, 255, 255, .42);
+    border-radius: 1rem;
+    background: rgba(250, 255, 252, .78);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .65);
+    color: #13221f;
+    font-size: 1rem;
+}
+
+.forest-form-field .form-control::placeholder {
+    color: #5f6b68;
+}
+
+.forest-form-field .form-control:focus {
+    border-color: rgba(255, 255, 255, .94);
+    background: rgba(255, 255, 255, .94);
+    box-shadow: 0 0 0 .25rem rgba(187, 235, 210, .25);
+}
+
+.forest-login-form .errorlist {
+    margin: 0;
+    padding-left: 1.1rem;
+    color: #fee2e2;
+    font-size: .86rem;
+}
+
+.forest-login-submit {
+    min-height: 3.25rem;
+    margin-top: .25rem;
+    border: 1px solid rgba(255, 255, 255, .34);
+    border-radius: 1rem;
+    background: linear-gradient(135deg, #217d67, #0b5e4b);
+    box-shadow: 0 .8rem 1.6rem rgba(1, 31, 22, .28), inset 0 1px 0 rgba(255, 255, 255, .22);
+    color: #fff;
+    font-weight: 800;
+    transition: transform .18s ease, filter .18s ease, box-shadow .18s ease;
+}
+
+.forest-login-submit:hover {
+    filter: brightness(1.1);
+    box-shadow: 0 1rem 2rem rgba(1, 31, 22, .4), inset 0 1px 0 rgba(255, 255, 255, .22);
+    transform: translateY(-1px);
+}
+
+.forest-login-submit:focus-visible,
+.forest-social-list .social-login-button:focus-visible {
+    outline: 3px solid #e0fff2;
+    outline-offset: 3px;
+}
+
+.forest-login-divider {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    margin: 1.45rem 0 1.1rem;
+    color: rgba(248, 255, 251, .78);
+    font-size: .85rem;
+    font-weight: 700;
+}
+
+.forest-login-divider::before,
+.forest-login-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: rgba(255, 255, 255, .28);
+}
+
+.forest-social-list {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.forest-social-list form {
+    margin: 0;
+}
+
+.forest-social-list .social-login-button {
+    width: 3.2rem;
+    min-height: 3.2rem;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, .44);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .86);
+    box-shadow: 0 .65rem 1.2rem rgba(0, 0, 0, .18);
+}
+
+.forest-social-list .social-login-button:hover {
+    border-color: #fff;
+    box-shadow: 0 .9rem 1.55rem rgba(0, 0, 0, .28);
+    transform: translateY(-2px);
+}
+
+.forest-social-list .social-login-mark {
+    width: auto;
+    height: auto;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    font-size: 1.7rem;
+}
+
+.forest-social-list .social-login-google .social-login-mark {
+    background: conic-gradient(from -40deg, #4285f4 0 25%, #34a853 25% 42%, #fbbc05 42% 64%, #ea4335 64% 82%, #4285f4 82% 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.forest-social-list .social-login-facebook {
+    background: #1877f2;
+}
+
+.forest-social-list .social-login-facebook .social-login-mark {
+    color: #fff;
+}
+
+.forest-signup-copy {
+    margin: 1.5rem 0 0;
+    color: rgba(248, 255, 251, .84);
+    font-size: .92rem;
+    text-align: center;
+}
+
+.forest-signup-copy a {
+    color: #fff;
+    font-weight: 800;
+    text-underline-offset: .18em;
+}
+
+/* The Google/Facebook final account-creation page uses the same visual system. */
+.auth-forest-page .oauth-completion-shell {
+    display: grid;
+    min-height: calc(100vh - clamp(2.5rem, 10vw, 8rem));
+    width: 100%;
+    place-items: center;
+    padding: 0;
+}
+
+.auth-forest-page .oauth-completion-card {
+    width: 100%;
+    max-width: 38.75rem;
+    margin: 0 auto;
+    overflow: hidden;
+    border: 1px solid rgba(235, 255, 247, .48);
+    border-radius: 1.7rem;
+    background: linear-gradient(135deg, rgba(213, 231, 220, .43), rgba(19, 31, 39, .72));
+    box-shadow: 0 1.75rem 4.5rem rgba(0, 0, 0, .42), inset 0 1px 0 rgba(255, 255, 255, .24);
+    color: #fff;
+    -webkit-backdrop-filter: blur(1.15rem) saturate(120%);
+    backdrop-filter: blur(1.15rem) saturate(120%);
+}
+
+.auth-forest-page .oauth-completion-banner {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: clamp(1.35rem, 4vw, 1.8rem);
+    background: rgba(4, 24, 19, .2);
+    border-bottom: 1px solid rgba(255, 255, 255, .2);
+}
+
+.auth-forest-page .oauth-completion-banner h1 {
+    margin: 0;
+    font-size: clamp(1.6rem, 4vw, 2.05rem);
+    font-weight: 900;
+    line-height: 1.35;
+}
+
+.auth-forest-page .oauth-completion-banner h1,
+.auth-forest-page .oauth-field label {
+    color: #fff;
+}
+
+.auth-forest-page .oauth-completion-body {
+    padding: clamp(1.35rem, 4vw, 1.9rem);
+}
+
+.auth-forest-page .oauth-eyebrow,
+.auth-forest-page .oauth-intro,
+.auth-forest-page .oauth-help,
+.auth-forest-page .oauth-privacy-copy {
+    color: rgba(248, 255, 251, .84);
+}
+
+.auth-forest-page .oauth-eyebrow {
+    margin: 0 0 .2rem;
+    font-size: .85rem;
+    font-weight: 800;
+}
+
+.auth-forest-page .oauth-intro {
+    margin: 0 0 1.1rem;
+    font-size: 1rem;
+    line-height: 1.75;
+}
+
+.auth-forest-page .oauth-provider-mark {
+    display: inline-grid;
+    width: 3.1rem;
+    height: 3.1rem;
+    flex: 0 0 auto;
+    place-items: center;
+    border-radius: .95rem;
+    border: 1px solid rgba(255, 255, 255, .45);
+    box-shadow: 0 .75rem 1.5rem rgba(0, 0, 0, .2);
+    color: #4285f4;
+    font-family: Arial, sans-serif;
+    font-size: 1.5rem;
+    font-weight: 800;
+}
+
+.auth-forest-page .oauth-provider-facebook {
+    background: #1877f2;
+    color: #fff;
+}
+
+.auth-forest-page .oauth-no-password-note {
+    display: flex;
+    align-items: flex-start;
+    gap: .6rem;
+    margin-bottom: 1.3rem;
+    padding: .85rem 1rem;
+    border: 1px solid rgba(187, 247, 208, .45);
+    border-radius: .9rem;
+    background: rgba(8, 59, 41, .54);
+    color: #e7fff0;
+    font-size: .93rem;
+    font-weight: 700;
+    line-height: 1.55;
+}
+
+.auth-forest-page .oauth-no-password-note span {
+    display: inline-grid;
+    width: 1.2rem;
+    height: 1.2rem;
+    flex: 0 0 auto;
+    place-items: center;
+    border-radius: 50%;
+    background: #16a34a;
+    color: #fff;
+    font-size: .75rem;
+}
+
+.auth-forest-page .oauth-signup-form {
+    display: grid;
+    gap: 1rem;
+}
+
+.auth-forest-page .oauth-field {
+    display: grid;
+    gap: .42rem;
+}
+
+.auth-forest-page .oauth-field label {
+    font-size: .93rem;
+    font-weight: 800;
+}
+
+.auth-forest-page .oauth-help {
+    margin: -.05rem 0 .1rem;
+    font-size: .84rem;
+    line-height: 1.55;
+}
+
+.auth-forest-page .oauth-field input {
+    width: 100%;
+    min-height: 3.1rem;
+    padding: .7rem .85rem;
+    border: 1px solid rgba(255, 255, 255, .42);
+    border-radius: .9rem;
+    background: rgba(250, 255, 252, .82);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .65);
+    color: #13221f;
+    font-size: 1rem;
+}
+
+.auth-forest-page .oauth-field input:focus {
+    border-color: #fff;
+    box-shadow: 0 0 0 .25rem rgba(187, 235, 210, .25);
+}
+
+.auth-forest-page .oauth-completion-submit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .6rem;
+    min-height: 3.25rem;
+    margin-top: .3rem;
+    border-radius: .9rem;
+    border: 1px solid rgba(255, 255, 255, .34);
+    background: linear-gradient(135deg, #217d67, #0b5e4b);
+    box-shadow: 0 .8rem 1.6rem rgba(1, 31, 22, .28), inset 0 1px 0 rgba(255, 255, 255, .22);
+    color: #fff;
+    font-weight: 800;
+}
+
+.auth-forest-page .oauth-completion-submit span {
+    font-size: 1.2rem;
+    line-height: 1;
+}
+
+.auth-forest-page .oauth-field ul.errorlist,
+.auth-forest-page .oauth-signup-form > ul.errorlist {
+    margin: 0;
+    padding-left: 1.1rem;
+    color: #fee2e2;
+    font-size: .85rem;
+}
+
+.auth-forest-page .oauth-privacy-copy {
+    margin: 1.15rem 0 0;
+    font-size: .79rem;
+    line-height: 1.55;
+    text-align: center;
+}
+
+@media (max-width: 576px) {
+    body.auth-forest-page {
+        background-position: 52% center, 52% center;
+        background-attachment: scroll, scroll;
+    }
+
+    .auth-forest-main {
+        padding: 1rem;
+    }
+
+    .auth-forest-scene,
+    .auth-forest-page .oauth-completion-shell {
+        min-height: calc(100vh - 2rem);
+    }
+
+    .forest-login-card {
+        padding: 1.5rem;
+        border-radius: 1.6rem;
+    }
+
+    .forest-login-description {
+        margin-bottom: 1.35rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .forest-login-submit,
+    .forest-social-list .social-login-button {
+        transition: none;
+    }
+}

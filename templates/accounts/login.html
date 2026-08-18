@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% load socialaccount %}
+
+{% block title %}ເຂົ້າລະບົບ | {{ store.name }}{% endblock %}
+{% block body_class %}auth-forest-page{% endblock %}
+{% block main_class %}auth-forest-main{% endblock %}
+
+{% block content %}
+<section class="auth-forest-scene" aria-labelledby="login-heading">
+  <div class="forest-login-card">
+    <p class="forest-login-kicker">{{ store.name }}</p>
+    <h1 id="login-heading" class="forest-login-title">ເຂົ້າລະບົບ</h1>
+    <p class="forest-login-description">ຍິນດີຕ້ອນຮັບກັບຄືນມາ. ເຂົ້າໃຊ້ເພື່ອເລີ່ມຊື້ ຫຼື ຂາຍສິນຄ້າ.</p>
+
+    <form method="post" class="forest-login-form" novalidate>
+      {% csrf_token %}
+      {% if request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
+      {{ form.non_field_errors }}
+      {% for field in form %}
+        <div class="forest-form-field">
+          {{ field.label_tag }}
+          {{ field }}
+          {{ field.errors }}
+        </div>
+      {% endfor %}
+      <button class="forest-login-submit" type="submit">ເຂົ້າລະບົບ</button>
+    </form>
+
+    {% if social_login_providers.google or social_login_providers.facebook %}
+      <div class="forest-login-divider" aria-hidden="true"><span>ຫຼື ເຂົ້າດ້ວຍ</span></div>
+      <div class="forest-social-list" aria-label="ເຂົ້າລະບົບຜ່ານບັນຊີອື່ນ">
+        {% if social_login_providers.google %}
+          <form method="post" action="{% provider_login_url 'google' process='login' %}">
+            {% csrf_token %}
+            <button class="social-login-button social-login-google" type="submit" aria-label="ສືບຕໍ່ດ້ວຍ Google" title="ສືບຕໍ່ດ້ວຍ Google">
+              <span class="social-login-mark" aria-hidden="true">G</span>
+              <span class="visually-hidden">ສືບຕໍ່ດ້ວຍ Google</span>
+            </button>
+          </form>
+        {% endif %}
+        {% if social_login_providers.facebook %}
+          <form method="post" action="{% provider_login_url 'facebook' process='login' %}">
+            {% csrf_token %}
+            <button class="social-login-button social-login-facebook" type="submit" aria-label="ສືບຕໍ່ດ້ວຍ Facebook" title="ສືບຕໍ່ດ້ວຍ Facebook">
+              <span class="social-login-mark" aria-hidden="true">f</span>
+              <span class="visually-hidden">ສືບຕໍ່ດ້ວຍ Facebook</span>
+            </button>
+          </form>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <p class="forest-signup-copy">ຍັງບໍ່ມີບັນຊີ? <a href="{% url 'register' %}">ສະໝັກສະມາຊິກ</a></p>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,325 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}?v=20260817-typography">
+{% endblock %}
+
+{% block content %}
+
+<div class="home-page">
+
+    <!-- =========================================
+         HERO / SEARCH
+    ========================================== -->
+    <section class="home-hero">
+
+        <div class="hero-content">
+
+            <span class="hero-badge">
+                🛍️ ຍິນດີຕ້ອນຮັບສູ່ {{ store.name }}
+            </span>
+
+            <h1>
+                ຄົ້ນຫາທຸກສິ່ງ
+                <span>ທີ່ເຈົ້າຕ້ອງການ</span>
+            </h1>
+
+            <p>
+                ເລືອກຊື້ສິນຄ້າຄຸນນະພາບ
+                ຈາກຜູ້ຂາຍທີ່ໜ້າເຊື່ອຖືໃນບ່ອນດຽວ.
+            </p>
+
+            <form
+                method="get"
+                action="{% url 'product_list' %}"
+                class="hero-search"
+            >
+
+                <input
+                    type="search"
+                    name="q"
+                    placeholder="ຄົ້ນຫາສິນຄ້າ..."
+                    value="{{ request.GET.q|default:'' }}"
+                >
+
+                <button type="submit">
+                    ຄົ້ນຫາ
+                </button>
+
+            </form>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================
+         CATEGORIES
+    ========================================== -->
+    <section class="home-section">
+
+        <div class="section-header">
+
+            <div>
+                <span class="section-label">
+                    ໝວດໝູ່
+                </span>
+
+                <h2>
+                    ເລືອກຊື້ຕາມໝວດໝູ່
+                </h2>
+            </div>
+
+            <a
+                href="{% url 'product_list' %}"
+                class="section-link"
+            >
+                ເບິ່ງທັງໝົດ →
+            </a>
+
+        </div>
+
+
+        <div class="category-grid">
+
+            {% for category in categories %}
+
+            <div class="category-card-wrap">
+                <a
+                    href="{% url 'product_list' %}?category={{ category.slug }}"
+                    class="category-card"
+                >
+                    <div class="category-icon" aria-hidden="true">{{ category.icon }}</div>
+                    <div>
+                        <h3>{{ category.name }}</h3>
+                        <p>ເບິ່ງສິນຄ້າ</p>
+                    </div>
+                </a>
+
+                {% if category.subcategories.all %}
+                <div class="subcategory-list">
+                    {% for subcategory in category.subcategories.all %}
+                    <a href="{% url 'product_list' %}?category={{ category.slug }}&subcategory={{ subcategory.slug }}">
+                        {{ subcategory.name }}
+                    </a>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            {% empty %}
+
+            <div class="empty-state">
+                <p>ຍັງບໍ່ມີໝວດໝູ່ສິນຄ້າ.</p>
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================
+         FEATURED PRODUCTS
+    ========================================== -->
+    <section class="home-section">
+
+        <div class="section-header">
+
+            <div>
+                <span class="section-label">
+                    ແນະນຳ
+                </span>
+
+                <h2>
+                    ສິນຄ້າແນະນຳ
+                </h2>
+            </div>
+
+            <a
+                href="{% url 'product_list' %}"
+                class="section-link"
+            >
+                ເບິ່ງທັງໝົດ →
+            </a>
+
+        </div>
+
+
+        <div class="product-grid">
+
+            {% for product in featured_products %}
+
+            <article class="product-card">
+
+                <a
+                    href="{% url 'product_detail' product.pk %}"
+                    class="product-image"
+                >
+
+                    {% if product.image %}
+
+                    <img
+                        src="{{ product.image.url }}"
+                        alt="{{ product.name }}"
+                    >
+
+                    {% else %}
+
+                    <div class="product-no-image" aria-label="{{ product.name }}">{{ product.fallback_icon }}</div>
+
+                    {% endif %}
+
+                </a>
+
+
+                <div class="product-info">
+
+                    <span class="product-category">
+                        {{ product.category.name }}
+                    </span>
+
+                    <h3>
+                        <a
+                            href="{% url 'product_detail' product.pk %}"
+                        >
+                            {{ product.name }}
+                        </a>
+                    </h3>
+
+                    <div class="product-bottom">
+
+                        <strong class="product-price">
+                            ₭{{ product.price }}
+                        </strong>
+
+                        <a
+                            href="{% url 'product_detail' product.pk %}"
+                            class="product-button"
+                        >
+                            ເບິ່ງ
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+            {% empty %}
+
+            <div class="empty-state">
+                <p>ຍັງບໍ່ມີສິນຄ້າແນະນຳ.</p>
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================
+         LATEST PRODUCTS
+    ========================================== -->
+    <section class="home-section">
+
+        <div class="section-header">
+
+            <div>
+                <span class="section-label">
+                    ມາໃໝ່
+                </span>
+
+                <h2>
+                    ສິນຄ້າລ່າສຸດ
+                </h2>
+            </div>
+
+            <a
+                href="{% url 'product_list' %}"
+                class="section-link"
+            >
+                ເບິ່ງທັງໝົດ →
+            </a>
+
+        </div>
+
+
+        <div class="product-grid">
+
+            {% for product in latest_products %}
+
+            <article class="product-card">
+
+                <a
+                    href="{% url 'product_detail' product.pk %}"
+                    class="product-image"
+                >
+
+                    {% if product.image %}
+
+                    <img
+                        src="{{ product.image.url }}"
+                        alt="{{ product.name }}"
+                    >
+
+                    {% else %}
+
+                    <div class="product-no-image" aria-label="{{ product.name }}">{{ product.fallback_icon }}</div>
+
+                    {% endif %}
+
+                </a>
+
+
+                <div class="product-info">
+
+                    <span class="product-category">
+                        {{ product.category.name }}
+                    </span>
+
+                    <h3>
+                        <a
+                            href="{% url 'product_detail' product.pk %}"
+                        >
+                            {{ product.name }}
+                        </a>
+                    </h3>
+
+                    <div class="product-bottom">
+
+                        <strong class="product-price">
+                            ₭{{ product.price }}
+                        </strong>
+
+                        <a
+                            href="{% url 'product_detail' product.pk %}"
+                            class="product-button"
+                        >
+                            ເບິ່ງ
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+            {% empty %}
+
+            <div class="empty-state">
+                <p>ຍັງບໍ່ມີສິນຄ້າ.</p>
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
+
+</div>
+
+{% endblock %}

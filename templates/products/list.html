@@ -1,0 +1,278 @@
+{% extends "base.html" %}
+
+{% block title %}
+ສິນຄ້າ | {{ store.name }}
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <!-- Header -->
+    <div class="mb-4">
+        <h1 class="fw-bold">ສິນຄ້າ</h1>
+
+        {% if query %}
+            <p class="text-muted">
+                ຜົນການຄົ້ນຫາສຳລັບ “{{ query }}”
+            </p>
+        {% else %}
+            <p class="text-muted">
+                ເລືອກເບິ່ງສິນຄ້າຈາກຮ້ານຂອງພວກເຮົາ.
+            </p>
+        {% endif %}
+    </div>
+
+
+    <div class="row g-4">
+
+        <!-- ========================= -->
+        <!-- CATEGORIES -->
+        <!-- ========================= -->
+
+        <div class="col-lg-3">
+
+            <form method="get" class="card border-0 shadow-sm rounded-4 mb-3"><div class="card-body"><h5 class="fw-bold">ຄົ້ນຫາ ແລະ ຈັດລຽງ</h5><input class="form-control mb-2" name="q" value="{{ query }}" placeholder="ຄົ້ນຫາສິນຄ້າ"><input class="form-control mb-2" type="number" step="0.01" name="min_price" value="{{ min_price }}" placeholder="ລາຄາຕ່ຳສຸດ"><input class="form-control mb-2" type="number" step="0.01" name="max_price" value="{{ max_price }}" placeholder="ລາຄາສູງສຸດ"><select class="form-select mb-2" name="sort"><option value="newest">ໃໝ່ລ່າສຸດ</option><option value="oldest" {% if sort == 'oldest' %}selected{% endif %}>ເກົ່າສຸດ</option><option value="price_low" {% if sort == 'price_low' %}selected{% endif %}>ລາຄາ: ຕ່ຳຫາສູງ</option><option value="price_high" {% if sort == 'price_high' %}selected{% endif %}>ລາຄາ: ສູງຫາຕ່ຳ</option></select><button class="btn btn-primary w-100">ນຳໃຊ້</button></div></form>
+
+            <div class="card border-0 shadow-sm rounded-4">
+
+                <div class="card-body">
+
+                    <h5 class="fw-bold mb-3">
+                        ໝວດໝູ່
+                    </h5>
+
+                    <!-- All Products -->
+
+                    <a
+                        href="{% url 'product_list' %}"
+                        class="list-group-item list-group-item-action
+                        {% if not selected_category %}active{% endif %}"
+                    >
+                        ສິນຄ້າທັງໝົດ
+                    </a>
+
+
+                    <!-- Categories -->
+
+                    {% for category in categories %}
+
+                        <div>
+                            <a
+                                href="{% url 'product_list' %}?category={{ category.slug }}"
+                                class="list-group-item list-group-item-action
+                                {% if selected_category == category.slug %}active{% endif %}"
+                            >
+                                {{ category.name }}
+                            </a>
+
+                            {% if category.subcategories.all %}
+                                <div class="ps-3 mt-2">
+                                    {% for subcategory in category.subcategories.all %}
+                                        <a
+                                            href="{% url 'product_list' %}?category={{ category.slug }}&subcategory={{ subcategory.slug }}"
+                                            class="d-block text-decoration-none small mb-1
+                                            {% if selected_subcategory == subcategory.slug and selected_category == category.slug %}text-primary fw-bold{% else %}text-muted{% endif %}"
+                                        >
+                                            - {{ subcategory.name }}
+                                        </a>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ========================= -->
+        <!-- PRODUCTS -->
+        <!-- ========================= -->
+
+        <div class="col-lg-9">
+
+            <div class="row g-4">
+
+                {% for product in products %}
+
+                    <div class="col-md-6 col-xl-4">
+
+                        <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+
+                            <!-- Product Image -->
+
+                            {% if product.image %}
+
+                                <img
+                                    src="{{ product.image.url }}"
+                                    alt="{{ product.name }}"
+                                    class="card-img-top"
+                                    style="height:220px; object-fit:cover;"
+                                >
+
+                            {% else %}
+
+                                <div
+                                    class="bg-light d-flex align-items-center justify-content-center"
+                                    style="height:220px;"
+                                >
+                                    <span class="display-4" aria-label="{{ product.name }}">{{ product.fallback_icon }}</span>
+                                </div>
+
+                            {% endif %}
+
+
+                            <!-- Product Information -->
+
+                            <div class="card-body d-flex flex-column">
+
+                                {% if product.category %}
+
+                                    <small class="text-muted mb-2 d-block">
+                                        {{ product.category.name }}
+                                        {% if product.subcategory %}
+                                            / {{ product.subcategory.name }}
+                                        {% endif %}
+                                    </small>
+
+                                {% endif %}
+
+
+                                <h5 class="fw-bold">
+                                    {{ product.name }}
+                                </h5>
+
+
+                                <p class="text-primary fw-bold fs-5 mt-auto">
+                                    ₭{{ product.price }}
+                                </p>
+
+
+                                <a
+                                    href="{% url 'product_detail' product.pk %}"
+                                    class="btn btn-primary w-100"
+                                >
+                                    ເບິ່ງລາຍລະອຽດ
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                {% empty %}
+
+                    <!-- No Products -->
+
+                    <div class="col-12">
+
+                        <div class="card border-0 shadow-sm rounded-4">
+
+                            <div class="card-body text-center py-5">
+
+                                <h4 class="fw-bold">
+                                    ບໍ່ພົບສິນຄ້າ
+                                </h4>
+
+                                <p class="text-muted">
+                                    ບໍ່ມີສິນຄ້າໃນໝວດໝູ່ນີ້.
+                                </p>
+
+                                <a
+                                    href="{% url 'product_list' %}"
+                                    class="btn btn-primary"
+                                >
+                                    ເບິ່ງສິນຄ້າທັງໝົດ
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+
+            <!-- ========================= -->
+            <!-- PAGINATION -->
+            <!-- ========================= -->
+
+            {% if page_obj.paginator.num_pages > 1 %}
+
+                <nav class="mt-5">
+
+                    <ul class="pagination justify-content-center">
+
+                        {% if page_obj.has_previous %}
+
+                            <li class="page-item">
+
+                                <a
+                                    class="page-link"
+                                    href="?q={{ query|urlencode }}&category={{ selected_category|urlencode }}&subcategory={{ selected_subcategory|urlencode }}&min_price={{ min_price|urlencode }}&max_price={{ max_price|urlencode }}&sort={{ sort|urlencode }}&page={{ page_obj.previous_page_number }}"
+                                >
+                                    ກ່ອນໜ້າ
+                                </a>
+
+                            </li>
+
+                        {% endif %}
+
+
+                        {% for page_number in page_obj.paginator.page_range %}
+
+                            <li
+                                class="page-item
+                                {% if page_number == page_obj.number %}active{% endif %}"
+                            >
+
+                                <a
+                                    class="page-link"
+                                    href="?q={{ query|urlencode }}&category={{ selected_category|urlencode }}&subcategory={{ selected_subcategory|urlencode }}&min_price={{ min_price|urlencode }}&max_price={{ max_price|urlencode }}&sort={{ sort|urlencode }}&page={{ page_number }}"
+                                >
+                                    {{ page_number }}
+                                </a>
+
+                            </li>
+
+                        {% endfor %}
+
+
+                        {% if page_obj.has_next %}
+
+                            <li class="page-item">
+
+                                <a
+                                    class="page-link"
+                                    href="?q={{ query|urlencode }}&category={{ selected_category|urlencode }}&subcategory={{ selected_subcategory|urlencode }}&min_price={{ min_price|urlencode }}&max_price={{ max_price|urlencode }}&sort={{ sort|urlencode }}&page={{ page_obj.next_page_number }}"
+                                >
+                                    ຕໍ່ໄປ
+                                </a>
+
+                            </li>
+
+                        {% endif %}
+
+                    </ul>
+
+                </nav>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

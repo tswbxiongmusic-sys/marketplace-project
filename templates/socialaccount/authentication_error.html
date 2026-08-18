@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}ເຂົ້າລະບົບບໍ່ສຳເລັດ | {{ store.name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-7 col-lg-5">
+    <section class="card card-body shadow-sm auth-card text-center" aria-labelledby="oauth-error-heading">
+      <h1 id="oauth-error-heading" class="h3">ບໍ່ສາມາດເຂົ້າລະບົບໄດ້</h1>
+      <p class="text-muted">ການຢືນຢັນກັບ Google ຫຼື Facebook ບໍ່ສຳເລັດ. ກະລຸນາລອງໃໝ່ ຫຼື ເລືອກວິທີອື່ນ.</p>
+      <a class="btn btn-primary" href="{% url 'login' %}">ກັບໄປໜ້າເຂົ້າລະບົບ</a>
+    </section>
+  </div>
+</div>
+{% endblock %}

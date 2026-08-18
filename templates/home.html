@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Marketplace | Home{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="home-page">
+    <div class="container py-4 py-lg-5">
+        <div class="row g-4">
+
+            <!-- Sidebar -->
+            <aside class="col-lg-3">
+                <div class="category-sidebar">
+                    <h2 class="sidebar-title">Categories</h2>
+
+                    <a href="{% url 'product_list' %}" class="category-link active">
+                        <span>All Products</span>
+                        <span>→</span>
+                    </a>
+
+                    <a href="{% url 'product_list' %}" class="category-link">
+                        <span>Electronics</span>
+                        <span>→</span>
+                    </a>
+
+                    <a href="{% url 'product_list' %}" class="category-link">
+                        <span>Fashion</span>
+                        <span>→</span>
+                    </a>
+
+                    <a href="{% url 'product_list' %}" class="category-link">
+                        <span>Home & Living</span>
+                        <span>→</span>
+                    </a>
+
+                    <a href="{% url 'product_list' %}" class="category-link">
+                        <span>Beauty & Health</span>
+                        <span>→</span>
+                    </a>
+
+                    <a href="{% url 'product_list' %}" class="category-link">
+                        <span>Sports</span>
+                        <span>→</span>
+                    </a>
+                </div>
+            </aside>
+
+            <main class="col-lg-9">
+
+                <!-- Hero and Search -->
+                <section class="hero-section">
+                    <div class="hero-content">
+                        <p class="hero-eyebrow">ONLINE MARKETPLACE</p>
+                        <h1>Find products you’ll love.</h1>
+                        <p class="hero-text">
+                            Discover great products from trusted sellers in one simple marketplace.
+                        </p>
+
+                        <form method="get" action="{% url 'product_list' %}" class="hero-search">
+                            <input
+                                type="search"
+                                name="q"
+                                placeholder="What are you looking for?"
+                                aria-label="Search products"
+                            >
+                            <button type="submit">Search</button>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- Categories -->
+                <section class="content-section">
+                    <div class="section-heading">
+                        <div>
+                            <p class="section-label">BROWSE</p>
+                            <h2>Shop by category</h2>
+                        </div>
+                        <a href="{% url 'product_list' %}" class="view-all">View all →</a>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-6 col-md-4">
+                            <a href="{% url 'product_list' %}" class="category-card">
+                                <span class="category-icon">💻</span>
+                                <span>Electronics</span>
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-4">
+                            <a href="{% url 'product_list' %}" class="category-card">
+                                <span class="category-icon">👕</span>
+                                <span>Fashion</span>
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-4">
+                            <a href="{% url 'product_list' %}" class="category-card">
+                                <span class="category-icon">🏠</span>
+                                <span>Home & Living</span>
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-4">
+                            <a href="{% url 'product_list' %}" class="category-card">
+                                <span class="category-icon">✨</span>
+                                <span>Beauty & Health</span>
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-4">
+                            <a href="{% url 'product_list' %}" class="category-card">
+                                <span class="category-icon">⚽</span>
+                                <span>Sports</span>
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-4">
+                            <a href="{% url 'product_list' %}" class="category-card">
+                                <span class="category-icon">🛍️</span>
+                                <span>More Products</span>
+                            </a>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Featured Products -->
+                <section class="content-section">
+                    <div class="section-heading">
+                        <div>
+                            <p class="section-label">POPULAR NOW</p>
+                            <h2>Featured products</h2>
+                        </div>
+                        <a href="{% url 'product_list' %}" class="view-all">View all →</a>
+                    </div>
+
+                    <div class="row g-3">
+                        {% for product in featured_products|default:None %}
+                        <div class="col-6 col-md-4">
+                            <article class="product-card">
+                                <div class="product-image">
+                                    {% if product.image %}
+                                        <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                                    {% else %}
+                                        <span>No image</span>
+                                    {% endif %}
+                                </div>
+                                <div class="product-details">
+                                    <h3>{{ product.name }}</h3>
+                                    <p class="product-price">${{ product.price }}</p>
+                                </div>
+                            </article>
+                        </div>
+                        {% empty %}
+                        <div class="col-12">
+                            <div class="empty-products">
+                                Featured products will appear here soon.
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </section>
+
+                <!-- Latest Products -->
+                <section class="content-section">
+                    <div class="section-heading">
+                        <div>
+                            <p class="section-label">JUST ARRIVED</p>
+                            <h2>Latest products</h2>
+                        </div>
+                        <a href="{% url 'product_list' %}" class="view-all">View all →</a>
+                    </div>
+
+                    <div class="row g-3">
+                        {% for product in latest_products|default:None %}
+                        <div class="col-6 col-md-4">
+                            <article class="product-card">
+                                <div class="product-image">
+                                    {% if product.image %}
+                                        <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                                    {% else %}
+                                        <span>No image</span>
+                                    {% endif %}
+                                </div>
+                                <div class="product-details">
+                                    <h3>{{ product.name }}</h3>
+                                    <p class="product-price">${{ product.price }}</p>
+                                </div>
+                            </article>
+                        </div>
+                        {% empty %}
+                        <div class="col-12">
+                            <div class="empty-products">
+                                New products will appear here soon.
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+</div>
+{% endblock %}

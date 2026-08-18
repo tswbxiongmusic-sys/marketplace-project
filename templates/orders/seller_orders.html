@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}
+ຈັດການພັດສະດຸ | {{ store.name }}
+{% endblock %}
+
+{% block content %}
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+        <h1 class="fw-bold mb-1">ຈັດການພັດສະດຸ</h1>
+        <p class="text-muted mb-0">
+            ອັບເດດການຈັດສົ່ງ ແລະ ເລກຕິດຕາມສຳລັບສິນຄ້າຂອງທ່ານ.
+        </p>
+    </div>
+
+    <a href="{% url 'seller_dashboard' %}" class="btn btn-outline-secondary">
+        ← ໜ້າຈັດການຮ້ານ
+    </a>
+</div>
+
+{% if shipments %}
+    <div class="row g-4">
+        {% for shipment in shipments %}
+            <div class="col-12">
+                <article class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                    <div class="card-header bg-white border-0 p-4 pb-0">
+                        <div class="d-flex flex-column flex-md-row justify-content-between gap-3">
+                            <div>
+                                <p class="small text-muted mb-1">ເລກຄຳສັ່ງຊື້</p>
+                                <h5 class="fw-bold mb-1">{{ shipment.order.order_number }}</h5>
+                                <p class="text-muted small mb-0">
+                                    ສັ່ງເມື່ອ {{ shipment.order.created_at|date:"d/m/Y, H:i" }}
+                                </p>
+                            </div>
+                            <div class="text-md-end">
+                                <span class="badge {{ shipment.get_status_badge_class }} px-3 py-2 rounded-pill">
+                                    {{ shipment.get_status_display }}
+                                </span>
+                                <p class="text-muted small mb-0 mt-2">
+                                    ສະຖານະຄຳສັ່ງ: {{ shipment.order.get_status_display }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body p-4">
+                        <div class="row g-4">
+                            <div class="col-lg-6">
+                                <h6 class="fw-bold mb-3">ສິນຄ້າທີ່ຕ້ອງຈັດສົ່ງ</h6>
+                                <div class="border rounded-3 overflow-hidden">
+                                    {% for item in shipment.order.seller_items %}
+                                        <div class="d-flex justify-content-between gap-3 p-3 {% if not forloop.last %}border-bottom{% endif %}">
+                                            <div>
+                                                <div class="fw-semibold">{{ item.product_name }}</div>
+                                                <small class="text-muted">ຈຳນວນ: {{ item.quantity }}</small>
+                                            </div>
+                                            <span class="fw-semibold">₭{{ item.total_price }}</span>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="mt-3 small text-muted">
+                                    <strong class="text-dark">ຜູ້ຮັບ:</strong> {{ shipment.order.recipient_name }} · {{ shipment.order.phone }}<br>
+                                    {{ shipment.order.shipping_address|linebreaksbr }}
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6">
+                                <div class="bg-light rounded-4 p-4 h-100">
+                                    <h6 class="fw-bold mb-3">ຂໍ້ມູນຕິດຕາມພັດສະດຸ</h6>
+
+                                    {% if shipment.status == 'cancelled' or shipment.status == 'delivered' or shipment.order.status == 'cancelled' %}
+                                        <p class="mb-2"><strong>ຜູ້ຂົນສົ່ງ:</strong> {{ shipment.carrier|default:"-" }}</p>
+                                        <p class="mb-2"><strong>ເລກຕິດຕາມ:</strong> {{ shipment.tracking_number|default:"-" }}</p>
+                                        {% if shipment.shipped_at %}<p class="small text-muted mb-1">ສົ່ງເມື່ອ {{ shipment.shipped_at|date:"d/m/Y, H:i" }}</p>{% endif %}
+                                        {% if shipment.delivered_at %}<p class="small text-muted mb-0">ຮອດປາຍທາງ {{ shipment.delivered_at|date:"d/m/Y, H:i" }}</p>{% endif %}
+                                    {% else %}
+                                        <form method="post" action="{% url 'update_shipment_status' shipment.id %}">
+                                            {% csrf_token %}
+                                            <div class="mb-3">
+                                                <label for="carrier-{{ shipment.id }}" class="form-label">ຜູ້ຂົນສົ່ງ</label>
+                                                <input id="carrier-{{ shipment.id }}" name="carrier" class="form-control" value="{{ shipment.carrier }}" placeholder="ເຊັ່ນ: ໄປສະນີ / ຂົນສົ່ງເອກະຊົນ">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="tracking-{{ shipment.id }}" class="form-label">ເລກຕິດຕາມ</label>
+                                                <input id="tracking-{{ shipment.id }}" name="tracking_number" class="form-control" value="{{ shipment.tracking_number }}" placeholder="ໃສ່ເລກ tracking ຖ້າມີ">
+                                            </div>
+                                            <div class="d-flex flex-column flex-sm-row gap-2">
+                                                <button class="btn btn-outline-primary flex-fill" name="status" value="shipping" type="submit">
+                                                    ຕັ້ງເປັນກຳລັງຈັດສົ່ງ
+                                                </button>
+                                                <button class="btn btn-success flex-fill" name="status" value="delivered" type="submit">
+                                                    ຕັ້ງວ່າສົ່ງຮອດແລ້ວ
+                                                </button>
+                                            </div>
+                                        </form>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body text-center py-5">
+            <h5 class="fw-bold">ຍັງບໍ່ມີພັດສະດຸໃຫ້ຈັດສົ່ງ</h5>
+            <p class="text-muted mb-0">ເມື່ອລູກຄ້າສັ່ງສິນຄ້າຈາກຮ້ານຂອງທ່ານ ລາຍການຈະສະແດງຢູ່ນີ້.</p>
+        </div>
+    </div>
+{% endif %}
+
+{% endblock %}

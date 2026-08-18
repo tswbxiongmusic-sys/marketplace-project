@@ -1,0 +1,21 @@
+.card{
+
+    border:none;
+
+    border-radius:var(--radius);
+
+    box-shadow:var(--shadow);
+
+}
+
+.product-card{
+
+    transition:.3s;
+
+}
+
+.product-card:hover{
+
+    transform:translateY(-8px);
+
+}

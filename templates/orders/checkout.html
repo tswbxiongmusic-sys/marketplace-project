@@ -1,0 +1,495 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+ສັ່ງຊື້ | {{ store.name }}
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <!-- Page Header -->
+    <div class="mb-5">
+
+        <a
+            href="{% url 'cart' %}"
+            class="text-decoration-none text-muted d-inline-block mb-3"
+        >
+            ← ກັບໄປກະຕ່າ
+        </a>
+
+        <h1 class="fw-bold mb-2">
+            ຢືນຢັນການສັ່ງຊື້
+        </h1>
+
+        <p class="text-muted mb-0">
+            ກະລຸນາກອກຂໍ້ມູນຈັດສົ່ງເພື່ອດຳເນີນຄຳສັ່ງຊື້.
+        </p>
+
+    </div>
+
+
+    {% if items %}
+
+    <form method="post" action="{% url 'place_order' %}" enctype="multipart/form-data">
+
+        {% csrf_token %}
+
+        <div class="row g-4">
+
+
+            <!-- ============================== -->
+            <!-- LEFT: DELIVERY INFORMATION -->
+            <!-- ============================== -->
+
+            <div class="col-lg-7">
+
+                <div class="card border-0 shadow-sm rounded-4">
+
+                    <div class="card-body p-4 p-md-5">
+
+                        <div class="d-flex align-items-center mb-4">
+
+                            <div
+                                class="bg-primary text-white rounded-circle
+                                       d-flex align-items-center justify-content-center
+                                       me-3"
+                                style="width:42px;height:42px;"
+                            >
+                                1
+                            </div>
+
+                            <div>
+
+                                <h4 class="fw-bold mb-1">
+                                    ຂໍ້ມູນຈັດສົ່ງ
+                                </h4>
+
+                                <p class="text-muted mb-0">
+                                    ລະບຸບ່ອນຈັດສົ່ງສິນຄ້າ.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Form Errors -->
+
+                        {% if form.non_field_errors %}
+
+                        <div class="alert alert-danger rounded-3">
+
+                            {{ form.non_field_errors }}
+
+                        </div>
+
+                        {% endif %}
+
+
+                        <!-- Recipient information -->
+                        {% for field in form %}
+                            {% if field.name == 'recipient_name' or field.name == 'phone' or field.name == 'shipping_address' %}
+                                <div class="mb-4">
+                                    {{ field.label_tag }}
+                                    {{ field }}
+                                    {% if field.errors %}
+                                        <div class="text-danger small mt-2">{{ field.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+
+                        <!-- Delivery method -->
+                        <div class="border-top pt-4 mt-4">
+                            <h5 class="fw-bold mb-1">ວິທີຈັດສົ່ງ</h5>
+                            <p class="text-muted small mb-3">ຄ່າຂົນສົ່ງຈະຖືກລວມໃນຍອດສຸດທ້າຍ.</p>
+
+                            {% if form.shipping_method.errors %}
+                                <div class="text-danger small mb-2">{{ form.shipping_method.errors }}</div>
+                            {% endif %}
+
+                            {% for radio in form.shipping_method %}
+                                <label class="delivery-option d-flex gap-3 align-items-start border rounded-3 p-3 mb-2" for="{{ radio.id_for_label }}">
+                                    {{ radio.tag }}
+                                    <span class="form-check-label fw-semibold">{{ radio.choice_label }}</span>
+                                </label>
+                            {% empty %}
+                                <div class="alert alert-warning mb-0">ຍັງບໍ່ມີວິທີຈັດສົ່ງ. ກະລຸນາໃຫ້ admin ເພີ່ມການຕັ້ງຄ່າກ່ອນ.</div>
+                            {% endfor %}
+                        </div>
+
+
+                        <div class="border-top pt-4 mt-4">
+                            <h5 class="fw-bold mb-1">ວິທີຊຳລະເງິນ</h5>
+                            <p class="text-muted small mb-3">ການໂອນເງິນຈະຖືກກວດສອບໂດຍຮ້ານກ່ອນຈັດສົ່ງ.</p>
+
+                            <label for="payment_cod" class="payment-option d-block border rounded-3 p-3 mb-2">
+                                <span class="form-check d-flex gap-2 align-items-start">
+                                    <input class="form-check-input mt-1" type="radio" name="payment_method" value="cash_on_delivery" id="payment_cod" {% if form.payment_method.value == "cash_on_delivery" or not form.payment_method.value %}checked{% endif %}>
+                                    <span class="form-check-label"><strong>ຈ່າຍເງິນປາຍທາງ</strong><span class="d-block text-muted small mt-1">ຊຳລະເມື່ອໄດ້ຮັບສິນຄ້າ.</span></span>
+                                </span>
+                            </label>
+
+                            <label for="payment_bank" class="payment-option d-block border rounded-3 p-3 mb-2">
+                                <span class="form-check d-flex gap-2 align-items-start">
+                                    <input class="form-check-input mt-1" type="radio" name="payment_method" value="bank_transfer" id="payment_bank" {% if form.payment_method.value == "bank_transfer" %}checked{% endif %}>
+                                    <span class="form-check-label"><strong>ໂອນຜ່ານທະນາຄານ</strong><span class="d-block text-muted small mt-1">ໂອນເຂົ້າບັນຊີຮ້ານ ແລ້ວອັບໂຫຼດຫຼັກຖານ.</span></span>
+                                </span>
+                            </label>
+
+                            <label for="payment_qr" class="payment-option d-block border rounded-3 p-3 mb-2">
+                                <span class="form-check d-flex gap-2 align-items-start">
+                                    <input class="form-check-input mt-1" type="radio" name="payment_method" value="qr_payment" id="payment_qr" {% if form.payment_method.value == "qr_payment" %}checked{% endif %}>
+                                    <span class="form-check-label"><strong>ສະແກນ QR ເພື່ອໂອນເງິນ</strong><span class="d-block text-muted small mt-1">ສະແກນ QR ຂອງຮ້ານ ແລະອັບໂຫຼດຫຼັກຖານ.</span></span>
+                                </span>
+                            </label>
+
+                            {% if form.payment_method.errors %}
+                                <div class="text-danger small mt-2">{{ form.payment_method.errors }}</div>
+                            {% endif %}
+
+                            <section class="payment-instructions" data-payment-panel="bank_transfer" hidden>
+                                <h6 class="fw-bold mb-3">ຂໍ້ມູນບັນຊີສຳລັບໂອນເງິນ</h6>
+                                {% if store.bank_account_number %}
+                                    <dl class="transfer-details mb-0">
+                                        {% if store.bank_name %}<div><dt>ທະນາຄານ</dt><dd>{{ store.bank_name }}</dd></div>{% endif %}
+                                        {% if store.bank_account_name %}<div><dt>ຊື່ບັນຊີ</dt><dd>{{ store.bank_account_name }}</dd></div>{% endif %}
+                                        <div><dt>ເລກບັນຊີ</dt><dd><code>{{ store.bank_account_number }}</code></dd></div>
+                                    </dl>
+                                {% else %}
+                                    <div class="alert alert-warning py-2 mb-0 small">ຮ້ານຍັງບໍ່ໄດ້ລະບຸຂໍ້ມູນບັນຊີ. ກະລຸນາຕິດຕໍ່ຮ້ານກ່ອນໂອນ.</div>
+                                {% endif %}
+                                {% if store.transfer_instructions %}<p class="small text-muted mt-3 mb-0">{{ store.transfer_instructions|linebreaksbr }}</p>{% endif %}
+                            </section>
+
+                            <section class="payment-instructions" data-payment-panel="qr_payment" hidden>
+                                <h6 class="fw-bold mb-3">ສະແກນ QR ຂອງຮ້ານ</h6>
+                                {% if store.payment_qr %}
+                                    <img class="payment-qr-image" src="{{ store.payment_qr.url }}" alt="QR ສຳລັບໂອນເງິນໃຫ້ {{ store.name }}">
+                                {% else %}
+                                    <div class="alert alert-warning py-2 small">ຮ້ານຍັງບໍ່ໄດ້ອັບໂຫຼດ QR. ກະລຸນາເລືອກໂອນຜ່ານທະນາຄານ ຫຼື ຕິດຕໍ່ຮ້ານ.</div>
+                                {% endif %}
+                                {% if store.bank_account_number %}<p class="small text-muted mb-0">ຫຼືໂອນເຂົ້າເລກບັນຊີ: <strong>{{ store.bank_account_number }}</strong></p>{% endif %}
+                                {% if store.transfer_instructions %}<p class="small text-muted mt-3 mb-0">{{ store.transfer_instructions|linebreaksbr }}</p>{% endif %}
+                            </section>
+
+                            <div id="payment-receipt-field" class="payment-receipt-field mt-3" hidden>
+                                {{ form.payment_receipt.label_tag }}
+                                {{ form.payment_receipt }}
+                                <div class="form-text">ຮອງຮັບຮູບພາບໃບໂອນ. ຮ້ານຈະກວດສອບກ່ອນຢືນຢັນການຊຳລະ.</div>
+                                {% if form.payment_receipt.errors %}
+                                    <div class="text-danger small mt-2">{{ form.payment_receipt.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ============================== -->
+            <!-- RIGHT: ORDER SUMMARY -->
+            <!-- ============================== -->
+
+            <div class="col-lg-5">
+
+                <div
+                    class="card border-0 shadow-sm rounded-4"
+                    style="position:sticky;top:90px;"
+                >
+
+                    <div class="card-body p-4">
+
+                        <div class="d-flex align-items-center mb-4">
+
+                            <div
+                                class="bg-primary text-white rounded-circle
+                                       d-flex align-items-center justify-content-center
+                                       me-3"
+                                style="width:42px;height:42px;"
+                            >
+                                2
+                            </div>
+
+                            <div>
+
+                                <h4 class="fw-bold mb-1">
+                                    ສະຫຼຸບຄຳສັ່ງຊື້
+                                </h4>
+
+                                <p class="text-muted mb-0">
+                                    ກວດເບິ່ງສິນຄ້າຂອງທ່ານ.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Products -->
+
+                        <div>
+
+                            {% for item in items %}
+
+                            <div class="d-flex align-items-center py-3 border-bottom">
+
+                                <!-- Product Image -->
+
+                                {% if item.product.image %}
+
+                                <img
+                                    src="{{ item.product.image.url }}"
+                                    alt="{{ item.product.name }}"
+                                    class="rounded-3"
+                                    style="
+                                        width:70px;
+                                        height:70px;
+                                        object-fit:cover;
+                                    "
+                                >
+
+                                {% else %}
+
+                                <div
+                                    class="bg-light rounded-3
+                                           d-flex align-items-center justify-content-center"
+                                    style="
+                                        width:70px;
+                                        height:70px;
+                                        font-size:28px;
+                                    "
+                                >
+                                    🛍️
+                                </div>
+
+                                {% endif %}
+
+
+                                <!-- Product Information -->
+
+                                <div class="flex-grow-1 ms-3">
+
+                                    <div class="fw-semibold">
+
+                                        {{ item.product.name }}
+
+                                    </div>
+
+                                    <small class="text-muted">
+
+                                        ຈຳນວນ: {{ item.quantity }}
+
+                                    </small>
+
+                                </div>
+
+
+                                <!-- Product Total -->
+
+                                <div class="fw-bold">
+
+                                    ₭{{ item.total_price }}
+
+                                </div>
+
+                            </div>
+
+                            {% endfor %}
+
+                        </div>
+
+
+                        <!-- Price Summary -->
+
+                        <div class="pt-4">
+
+                            <div
+                                class="d-flex justify-content-between
+                                       align-items-center mb-3"
+                            >
+
+                                <span class="text-muted">
+                                    ລວມຍ່ອຍ
+                                </span>
+
+                                <span class="fw-semibold">
+                                    ₭{{ total }}
+                                </span>
+
+                            </div>
+
+
+                            <div
+                                class="d-flex justify-content-between
+                                       align-items-center mb-3"
+                            >
+
+                                <span class="text-muted">
+                                    ຄ່າຈັດສົ່ງ
+                                </span>
+
+                                <span id="shipping-fee" class="fw-semibold">
+                                    ເລືອກວິທີສົ່ງ
+                                </span>
+
+                            </div>
+
+
+                            <hr>
+
+
+                            <div
+                                class="d-flex justify-content-between
+                                       align-items-center mt-3"
+                            >
+
+                                <span class="fw-bold fs-5">
+                                    ລວມທັງໝົດ
+                                </span>
+
+                                <span id="order-grand-total" data-subtotal="{{ total }}" class="fw-bold fs-3 text-primary">
+                                    ₭{{ total }}
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Confirm Order -->
+
+                        <button
+                            type="submit"
+                            class="order-action-btn btn btn-lg w-100 mt-4"
+                            aria-label="ຢືນຢັນຄຳສັ່ງຊື້"
+                        >
+                            <span class="btn-label">ຢືນຢັນຄຳສັ່ງຊື້</span>
+                            <span class="order-road" aria-hidden="true"></span>
+                            <span class="order-car car-1" aria-hidden="true">🚗</span>
+                            <span class="order-car car-2" aria-hidden="true">🚙</span>
+                            <span class="order-car car-3" aria-hidden="true">🚘</span>
+                        </button>
+
+
+                        <a
+                            href="{% url 'cart' %}"
+                            class="btn btn-outline-secondary w-100 mt-2 rounded-3"
+                        >
+
+                            ← ກັບໄປກະຕ່າ
+
+                        </a>
+
+
+                        <div class="text-center text-muted small mt-3">
+
+                            🔒 ຂໍ້ມູນຄຳສັ່ງຊື້ຂອງທ່ານຖືກປົກປ້ອງ.
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </form>
+
+
+    {% else %}
+
+    <!-- ============================== -->
+    <!-- EMPTY CART -->
+    <!-- ============================== -->
+
+    <div class="text-center py-5">
+
+        <div
+            class="bg-light rounded-circle mx-auto mb-4
+                   d-flex align-items-center justify-content-center"
+            style="width:110px;height:110px;font-size:50px;"
+        >
+            🛒
+        </div>
+
+
+        <h2 class="fw-bold">
+            ກະຕ່າຂອງທ່ານວ່າງ
+        </h2>
+
+
+        <p class="text-muted mb-4">
+            ກະລຸນາເພີ່ມສິນຄ້າໃສ່ກະຕ່າກ່ອນ.
+        </p>
+
+
+        <a
+            href="{% url 'home' %}"
+            class="btn btn-primary btn-lg rounded-3 px-4"
+        >
+
+            ເລືອກຊື້ຕໍ່
+
+        </a>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/checkout.css' %}?v=20260818-payment">
+{% endblock %}
+
+{% block extra_js %}
+{{ shipping_method_fees|json_script:"shipping-method-fees" }}
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const fees = JSON.parse(document.getElementById("shipping-method-fees").textContent);
+        const feeOutput = document.getElementById("shipping-fee");
+        const totalOutput = document.getElementById("order-grand-total");
+        const receiptField = document.getElementById("payment-receipt-field");
+        const paymentPanels = document.querySelectorAll("[data-payment-panel]");
+        const subtotal = Number(totalOutput.dataset.subtotal || 0);
+
+        const formatMoney = (amount) => `₭${new Intl.NumberFormat("lo-LA", {maximumFractionDigits: 0}).format(amount)}`;
+        const updateDeliveryTotal = () => {
+            const selected = document.querySelector('input[name="shipping_method"]:checked');
+            if (!selected || !(selected.value in fees)) {
+                feeOutput.textContent = "ເລືອກວິທີສົ່ງ";
+                totalOutput.textContent = formatMoney(subtotal);
+                return;
+            }
+            const fee = Number(fees[selected.value]);
+            feeOutput.textContent = fee === 0 ? "ຟຣີ" : formatMoney(fee);
+            totalOutput.textContent = formatMoney(subtotal + fee);
+        };
+
+        const updatePaymentDetails = () => {
+            const payment = document.querySelector('input[name="payment_method"]:checked');
+            const required = payment && ["bank_transfer", "qr_payment"].includes(payment.value);
+            if (receiptField) receiptField.hidden = !required;
+            paymentPanels.forEach((panel) => {
+                panel.hidden = !payment || panel.dataset.paymentPanel !== payment.value;
+            });
+        };
+
+        document.querySelectorAll('input[name="shipping_method"]').forEach((radio) => radio.addEventListener("change", updateDeliveryTotal));
+        document.querySelectorAll('input[name="payment_method"]').forEach((radio) => radio.addEventListener("change", updatePaymentDetails));
+        updateDeliveryTotal();
+        updatePaymentDetails();
+    });
+</script>
+{% endblock %}

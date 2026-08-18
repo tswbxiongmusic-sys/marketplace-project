@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}ກ່ຽວກັບຮ້ານ | {{ store.name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-3">
+    <div class="col-lg-8">
+        <div class="text-center mb-4">
+            {% if store.logo %}
+                <img src="{{ store.logo.url }}" alt="{{ store.name }}" class="rounded-circle shadow-sm mb-3" style="width:96px;height:96px;object-fit:contain;">
+            {% endif %}
+            <h1 class="fw-bold">{{ store.name }}</h1>
+            {% if store.tagline %}<p class="lead text-muted mb-0">{{ store.tagline }}</p>{% endif %}
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body p-4 p-md-5">
+                <h2 class="h4 fw-bold mb-4">ຂໍ້ມູນຕິດຕໍ່</h2>
+
+                {% if store.phone %}
+                    <p class="mb-3"><strong>ເບີໂທ:</strong> <a href="tel:{{ store.phone }}" class="text-decoration-none">{{ store.phone }}</a></p>
+                {% endif %}
+                {% if store.email %}
+                    <p class="mb-3"><strong>ອີເມວ:</strong> <a href="mailto:{{ store.email }}" class="text-decoration-none">{{ store.email }}</a></p>
+                {% endif %}
+                {% if store.address %}
+                    <p class="mb-3"><strong>ທີ່ຢູ່:</strong><br>{{ store.address|linebreaksbr }}</p>
+                {% endif %}
+                {% if store.facebook_url %}
+                    <p class="mb-0"><a class="btn btn-outline-primary" href="{{ store.facebook_url }}" target="_blank" rel="noopener">ເບິ່ງໜ້າ Facebook ຂອງຮ້ານ</a></p>
+                {% endif %}
+
+                {% if not store.phone and not store.email and not store.address and not store.facebook_url %}
+                    <p class="text-muted mb-0">ຜູ້ດູແລລະບົບຍັງບໍ່ໄດ້ເພີ່ມຂໍ້ມູນຕິດຕໍ່.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="alert {% if store.is_store_open %}alert-success{% else %}alert-secondary{% endif %} mt-4 mb-0">
+            {% if store.is_store_open %}ຮ້ານກຳລັງເປີດໃຫ້ບໍລິການ.{% else %}ຮ້ານປິດໃຫ້ບໍລິການຊົ່ວຄາວ.{% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
