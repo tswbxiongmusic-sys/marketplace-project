@@ -9,6 +9,20 @@
 
     <title>{% block title %}{{ store.name }}{% endblock %}</title>
 
+    <meta name="description" content="{% block meta_description %}{{ store.tagline }}{% endblock %}">
+
+    <!-- Open Graph / social sharing preview -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="{{ store.name }}">
+    <meta property="og:title" content="{% block og_title %}{{ store.name }}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}{{ store.tagline }}{% endblock %}">
+    {% block og_image %}{% if store.logo %}<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ store.logo.url }}">{% endif %}{% endblock %}
+    <meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{% block twitter_title %}{{ store.name }}{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}{{ store.tagline }}{% endblock %}">
+
     <!-- Favicon -->
     <link rel="icon" href="{% static 'images/favicon.png' %}" type="image/png">
 

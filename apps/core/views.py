@@ -1,5 +1,5 @@
 from django.db import connection
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators.http import require_GET
 
@@ -103,3 +103,10 @@ def health_check(request):
     except Exception:
         return JsonResponse({"status": "unavailable"}, status=503)
     return JsonResponse({"status": "ok"})
+
+
+@require_GET
+def robots_txt(request):
+    sitemap_url = request.build_absolute_uri("/sitemap.xml")
+    lines = ["User-agent: *", "Allow: /", "Disallow: /admin/", f"Sitemap: {sitemap_url}"]
+    return HttpResponse("\n".join(lines), content_type="text/plain")
