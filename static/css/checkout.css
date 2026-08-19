@@ -1,3 +1,8 @@
+.step-circle {
+    width: 42px;
+    height: 42px;
+}
+
 .delivery-option {
     cursor: pointer;
     transition: border-color .18s ease, background-color .18s ease, box-shadow .18s ease;

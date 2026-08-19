@@ -7,7 +7,7 @@
     <div class="col-lg-8">
         <div class="text-center mb-4">
             {% if store.logo %}
-                <img src="{{ store.logo.url }}" alt="{{ store.name }}" class="rounded-circle shadow-sm mb-3" style="width:96px;height:96px;object-fit:contain;">
+                <img src="{{ store.logo.url }}" alt="{{ store.name }}" class="rounded-circle shadow-sm mb-3 store-logo-lg">
             {% endif %}
             <h1 class="fw-bold">{{ store.name }}</h1>
             {% if store.tagline %}<p class="lead text-muted mb-0">{{ store.tagline }}</p>{% endif %}

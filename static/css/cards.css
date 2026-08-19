@@ -19,3 +19,24 @@
     transform:translateY(-8px);
 
 }
+
+.sticky-summary{
+
+    position:sticky;
+    top:90px;
+
+}
+
+.sticky-summary-offset{
+
+    top:90px;
+
+}
+
+.store-logo-lg{
+
+    width:96px;
+    height:96px;
+    object-fit:contain;
+
+}

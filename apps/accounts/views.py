@@ -11,6 +11,8 @@ def register(request):
     if request.user.is_authenticated:
         return redirect("home")
     form = SignUpForm(request.POST or None)
+    for field in form.fields.values():
+        field.widget.attrs["class"] = "form-control"
     if request.method == "POST" and form.is_valid():
         user = form.save()
         login(request, user, backend="django.contrib.auth.backends.ModelBackend")

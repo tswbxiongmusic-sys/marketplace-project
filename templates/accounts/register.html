@@ -2,49 +2,54 @@
 {% load socialaccount %}
 
 {% block title %}ສ້າງບັນຊີ | {{ store.name }}{% endblock %}
+{% block body_class %}auth-forest-page{% endblock %}
+{% block main_class %}auth-forest-main{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-  <div class="col-md-7 col-lg-5">
-    <section class="card card-body shadow-sm auth-card" aria-labelledby="register-heading">
-      <h1 id="register-heading" class="h3 mb-2">ສ້າງບັນຊີໃໝ່</h1>
-      <p class="text-muted mb-4">ສະໝັກດ້ວຍ Google ຫຼື Facebook ໄດ້ໂດຍບໍ່ຕ້ອງກຳນົດລະຫັດຜ່ານ.</p>
+<section class="auth-forest-scene" aria-labelledby="register-heading">
+  <div class="forest-login-card">
+    <p class="forest-login-kicker">{{ store.name }}</p>
+    <h1 id="register-heading" class="forest-login-title">ສ້າງບັນຊີໃໝ່</h1>
+    <p class="forest-login-description">ສະໝັກດ້ວຍ Google ຫຼື Facebook ໄດ້ໂດຍບໍ່ຕ້ອງກຳນົດລະຫັດຜ່ານ, ຫຼືສະໝັກດ້ວຍລະຫັດຜ່ານຂ້າງລຸ່ມ.</p>
 
-      {% if social_login_providers.google or social_login_providers.facebook %}
-        <div class="social-login-list" aria-label="ສ້າງບັນຊີຜ່ານບັນຊີອື່ນ">
-          {% if social_login_providers.google %}
-            <form method="post" action="{% provider_login_url 'google' process='login' %}">
-              {% csrf_token %}
-              <button class="social-login-button social-login-google" type="submit">
-                <span class="social-login-mark" aria-hidden="true">G</span>
-                ສືບຕໍ່ດ້ວຍ Google
-              </button>
-            </form>
-          {% endif %}
-          {% if social_login_providers.facebook %}
-            <form method="post" action="{% provider_login_url 'facebook' process='login' %}">
-              {% csrf_token %}
-              <button class="social-login-button social-login-facebook" type="submit">
-                <span class="social-login-mark" aria-hidden="true">f</span>
-                ສືບຕໍ່ດ້ວຍ Facebook
-              </button>
-            </form>
-          {% endif %}
+    <form method="post" class="forest-login-form" novalidate>
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+      {% for field in form %}
+        <div class="forest-form-field">
+          {{ field.label_tag }}
+          {{ field }}
+          {{ field.errors }}
         </div>
-        <div class="social-login-divider" aria-hidden="true"><span>ຫຼື</span></div>
-      {% endif %}
+      {% endfor %}
+      <button class="forest-login-submit" type="submit">ສະໝັກສະມາຊິກດ້ວຍລະຫັດຜ່ານ</button>
+    </form>
 
-      <form method="post" novalidate>
-        {% csrf_token %}
-        {{ form.non_field_errors }}
-        {% for field in form %}
-          <div class="mb-3">{{ field.label_tag }}{{ field }}{{ field.errors }}</div>
-        {% endfor %}
-        <button class="btn btn-primary w-100" type="submit">ສະໝັກສະມາຊິກດ້ວຍລະຫັດຜ່ານ</button>
-      </form>
+    {% if social_login_providers.google or social_login_providers.facebook %}
+      <div class="forest-login-divider" aria-hidden="true"><span>ຫຼື ສະໝັກດ້ວຍ</span></div>
+      <div class="forest-social-list" aria-label="ສ້າງບັນຊີຜ່ານບັນຊີອື່ນ">
+        {% if social_login_providers.google %}
+          <form method="post" action="{% provider_login_url 'google' process='login' %}">
+            {% csrf_token %}
+            <button class="social-login-button social-login-google" type="submit" aria-label="ສືບຕໍ່ດ້ວຍ Google" title="ສືບຕໍ່ດ້ວຍ Google">
+              <span class="social-login-mark" aria-hidden="true">G</span>
+              <span class="visually-hidden">ສືບຕໍ່ດ້ວຍ Google</span>
+            </button>
+          </form>
+        {% endif %}
+        {% if social_login_providers.facebook %}
+          <form method="post" action="{% provider_login_url 'facebook' process='login' %}">
+            {% csrf_token %}
+            <button class="social-login-button social-login-facebook" type="submit" aria-label="ສືບຕໍ່ດ້ວຍ Facebook" title="ສືບຕໍ່ດ້ວຍ Facebook">
+              <span class="social-login-mark" aria-hidden="true">f</span>
+              <span class="visually-hidden">ສືບຕໍ່ດ້ວຍ Facebook</span>
+            </button>
+          </form>
+        {% endif %}
+      </div>
+    {% endif %}
 
-      <p class="text-center mt-4 mb-0">ມີບັນຊີແລ້ວ? <a href="{% url 'login' %}">ເຂົ້າລະບົບ</a></p>
-    </section>
+    <p class="forest-signup-copy">ມີບັນຊີແລ້ວ? <a href="{% url 'login' %}">ເຂົ້າລະບົບ</a></p>
   </div>
-</div>
+</section>
 {% endblock %}
