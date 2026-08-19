@@ -3,6 +3,8 @@ Django==5.2.16
 django-allauth[socialaccount]>=65.19,<66
 django-environ==0.14.0
 django-storages[s3]>=1.14,<2
+django-cloudinary-storage>=0.3,<1
+cloudinary>=1.40,<2
 djangorestframework==3.17.1
 pillow==12.3.0
 psycopg==3.3.4

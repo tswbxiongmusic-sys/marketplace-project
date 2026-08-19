@@ -6,7 +6,7 @@
 2. Copy `.env.example` to the hosting platform's **secret environment-variable** settings. Never upload `.env` or commit real secrets.
 3. Generate a secret key with `python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"` and use it only once in production.
 4. Set the real domain in `ALLOWED_HOSTS` and its HTTPS URL in `CSRF_TRUSTED_ORIGINS`. Leave `SECURE_HSTS_PRELOAD=True` only when the root domain and every active subdomain support HTTPS.
-5. Create an R2/S3 bucket for media uploads. Configure private credentials in the host, enable bucket encryption, and use the media domain only after it has HTTPS.
+5. Create a media storage bucket for uploads — either an R2/S3 bucket (requires a payment method on file, though R2 itself stays free under 10GB) or a Cloudinary account (free tier, no payment method required). Configure private credentials in the host, enable bucket encryption if using R2/S3, and use the media domain only after it has HTTPS.
 6. Configure an SMTP provider and verify `DEFAULT_FROM_EMAIL` with that provider.
 7. If social sign-in is enabled, create Google and/or Facebook OAuth applications, add the exact HTTPS callback URLs from `SOCIAL_LOGIN_SETUP.md`, and set their credentials as secret environment variables.
 
