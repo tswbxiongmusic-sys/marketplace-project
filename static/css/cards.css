@@ -10,7 +10,7 @@
 
 .product-card{
 
-    transition:.3s;
+    transition:transform var(--transition) ease;
 
 }
 

@@ -1,13 +1,9 @@
 /* Immersive sign-in screens */
 body.auth-forest-page {
     min-height: 100vh;
-    background-color: #0d211e;
+    background-color: #0b1730;
     background-image:
-        linear-gradient(125deg, rgba(9, 34, 25, .20), rgba(5, 13, 18, .64)),
-        url("../images/login-forest-bg-v1.png");
-    background-position: center, center;
-    background-size: cover, cover;
-    background-attachment: fixed, fixed;
+        linear-gradient(135deg, #0f2557 0%, #17357f 45%, #1d4ed8 100%);
 }
 
 .auth-forest-page > header,
@@ -17,7 +13,7 @@ body.auth-forest-page {
 
 .auth-forest-page .skip-link:focus {
     background: #f8fafc;
-    color: #10211d;
+    color: #0f172a;
     border-radius: .5rem;
 }
 
@@ -45,7 +41,7 @@ body.auth-forest-page {
     padding: clamp(1.65rem, 5vw, 2.75rem);
     border: 1px solid rgba(235, 255, 247, .48);
     border-radius: clamp(1.75rem, 6vw, 2.5rem);
-    background: linear-gradient(135deg, rgba(213, 231, 220, .43), rgba(19, 31, 39, .72));
+    background: linear-gradient(135deg, rgba(219, 234, 254, .35), rgba(15, 23, 42, .72));
     box-shadow: 0 1.75rem 4.5rem rgba(0, 0, 0, .42), inset 0 1px 0 rgba(255, 255, 255, .24);
     color: #fff;
     -webkit-backdrop-filter: blur(1.15rem) saturate(120%);
@@ -124,7 +120,7 @@ body.auth-forest-page {
     margin-top: .25rem;
     border: 1px solid rgba(255, 255, 255, .34);
     border-radius: 1rem;
-    background: linear-gradient(135deg, #217d67, #0b5e4b);
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
     box-shadow: 0 .8rem 1.6rem rgba(1, 31, 22, .28), inset 0 1px 0 rgba(255, 255, 255, .22);
     color: #fff;
     font-weight: 800;
@@ -240,7 +236,7 @@ body.auth-forest-page {
     overflow: hidden;
     border: 1px solid rgba(235, 255, 247, .48);
     border-radius: 1.7rem;
-    background: linear-gradient(135deg, rgba(213, 231, 220, .43), rgba(19, 31, 39, .72));
+    background: linear-gradient(135deg, rgba(219, 234, 254, .35), rgba(15, 23, 42, .72));
     box-shadow: 0 1.75rem 4.5rem rgba(0, 0, 0, .42), inset 0 1px 0 rgba(255, 255, 255, .24);
     color: #fff;
     -webkit-backdrop-filter: blur(1.15rem) saturate(120%);
@@ -385,7 +381,7 @@ body.auth-forest-page {
     margin-top: .3rem;
     border-radius: .9rem;
     border: 1px solid rgba(255, 255, 255, .34);
-    background: linear-gradient(135deg, #217d67, #0b5e4b);
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
     box-shadow: 0 .8rem 1.6rem rgba(1, 31, 22, .28), inset 0 1px 0 rgba(255, 255, 255, .22);
     color: #fff;
     font-weight: 800;
@@ -412,11 +408,6 @@ body.auth-forest-page {
 }
 
 @media (max-width: 576px) {
-    body.auth-forest-page {
-        background-position: 52% center, 52% center;
-        background-attachment: scroll, scroll;
-    }
-
     .auth-forest-main {
         padding: 1rem;
     }
