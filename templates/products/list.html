@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load humanize %}
 
 {% block title %}
 ສິນຄ້າ | {{ store.name }}
@@ -149,7 +150,7 @@
 
 
                                 <p class="text-primary fw-bold fs-5 mt-auto">
-                                    ₭{{ product.price }}
+                                    ₭{{ product.price|floatformat:0|intcomma }}
                                 </p>
 
 

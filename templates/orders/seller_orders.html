@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load humanize %}
 
 {% block title %}
 ຈັດການພັດສະດຸ | {{ store.name }}
@@ -55,7 +56,7 @@
                                                 <div class="fw-semibold">{{ item.product_name }}</div>
                                                 <small class="text-muted">ຈຳນວນ: {{ item.quantity }}</small>
                                             </div>
-                                            <span class="fw-semibold">₭{{ item.total_price }}</span>
+                                            <span class="fw-semibold">₭{{ item.total_price|floatformat:0|intcomma }}</span>
                                         </div>
                                     {% endfor %}
                                 </div>

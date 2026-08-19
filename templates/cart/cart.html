@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load humanize %}
 
 {% block title %}
 ກະຕ່າສິນຄ້າ | {{ store.name }}
@@ -88,7 +89,7 @@
                                         </h5>
 
                                         <p class="text-muted small mb-0">
-                                            ₭{{ item.product.price }} / ຊິ້ນ
+                                            ₭{{ item.product.price|floatformat:0|intcomma }} / ຊິ້ນ
                                         </p>
 
                                     </div>
@@ -134,7 +135,7 @@
                             <div class="col-6 col-md-2">
 
                                 <span class="fw-bold text-primary">
-                                    ₭{{ item.total_price }}
+                                    ₭{{ item.total_price|floatformat:0|intcomma }}
                                 </span>
 
                             </div>
@@ -146,6 +147,7 @@
                                 <form
                                     method="post"
                                     action="{% url 'remove_cart_item' item.pk %}"
+                                    onsubmit="return confirm('ຢືນຢັນລຶບ {{ item.product.name|escapejs }} ອອກຈາກກະຕ່າ?');"
                                 >
 
                                     {% csrf_token %}
@@ -199,7 +201,7 @@
                         </span>
 
                         <span class="fw-semibold">
-                            ₭{{ total }}
+                            ₭{{ total|floatformat:0|intcomma }}
                         </span>
 
                     </div>
@@ -228,7 +230,7 @@
                         </span>
 
                         <span class="fw-bold fs-4 text-primary">
-                            ₭{{ total }}
+                            ₭{{ total|floatformat:0|intcomma }}
                         </span>
 
                     </div>

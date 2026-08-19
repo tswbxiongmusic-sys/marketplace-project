@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load humanize %}
 
 {% block title %}{{ order.order_number }} | {{ store.name }}{% endblock %}
 
@@ -109,7 +110,7 @@
                                     </small>
 
                                     <span>
-                                        ₭{{ item.unit_price }}
+                                        ₭{{ item.unit_price|floatformat:0|intcomma }}
                                     </span>
 
                                 </div>
@@ -123,7 +124,7 @@
                                     </small>
 
                                     <span class="fw-bold text-primary">
-                                        ₭{{ item.total_price }}
+                                        ₭{{ item.total_price|floatformat:0|intcomma }}
                                     </span>
 
                                 </div>
@@ -198,7 +199,7 @@
 
                         <div class="col-md-6">
                             <small class="text-muted d-block mb-1">ຄ່າຈັດສົ່ງ</small>
-                            <strong>₭{{ order.shipping_fee }}</strong>
+                            <strong>₭{{ order.shipping_fee|floatformat:0|intcomma }}</strong>
                         </div>
 
                     </div>
@@ -325,14 +326,14 @@
                     <div class="d-flex justify-content-between mb-3">
 
                         <span class="text-muted">ລວມຄ່າສິນຄ້າ</span>
-                        <span class="fw-semibold">₭{{ order.items_total }}</span>
+                        <span class="fw-semibold">₭{{ order.items_total|floatformat:0|intcomma }}</span>
 
                     </div>
 
                     <div class="d-flex justify-content-between mb-3">
 
                         <span class="text-muted">ຄ່າຈັດສົ່ງ</span>
-                        <span class="fw-semibold">₭{{ order.shipping_fee }}</span>
+                        <span class="fw-semibold">₭{{ order.shipping_fee|floatformat:0|intcomma }}</span>
 
                     </div>
 
@@ -372,7 +373,7 @@
                         </span>
 
                         <span class="fs-4 fw-bold text-primary">
-                            ₭{{ order.total_price }}
+                            ₭{{ order.total_price|floatformat:0|intcomma }}
                         </span>
 
                     </div>

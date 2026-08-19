@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load humanize %}
 
 {% block title %}ຄຳສັ່ງຊື້ຂອງຂ້ອຍ | {{ store.name }}{% endblock %}
 
@@ -105,7 +106,7 @@
                                     <p class="text-muted mb-0 mt-1">
                                         <strong>ວິທີຈັດສົ່ງ:</strong>
                                         {% if order.shipping_method %}
-                                            {{ order.shipping_method.name }} (₭{{ order.shipping_fee }})
+                                            {{ order.shipping_method.name }} (₭{{ order.shipping_fee|floatformat:0|intcomma }})
                                         {% else %}
                                             ບໍ່ລະບຸ
                                         {% endif %}
@@ -140,7 +141,7 @@
                                             </div>
 
                                             <div class="fw-bold">
-                                                ₭{{ item.total_price }}
+                                                ₭{{ item.total_price|floatformat:0|intcomma }}
                                             </div>
 
                                         </div>
@@ -180,12 +181,12 @@
 
                                     <div class="d-flex justify-content-between align-items-center mb-2 text-muted">
                                         <span>ຄ່າສິນຄ້າ</span>
-                                        <span>₭{{ order.items_total }}</span>
+                                        <span>₭{{ order.items_total|floatformat:0|intcomma }}</span>
                                     </div>
 
                                     <div class="d-flex justify-content-between align-items-center mb-3 text-muted">
                                         <span>ຄ່າຂົນສົ່ງ</span>
-                                        <span>₭{{ order.shipping_fee }}</span>
+                                        <span>₭{{ order.shipping_fee|floatformat:0|intcomma }}</span>
                                     </div>
 
 
@@ -196,7 +197,7 @@
                                         </span>
 
                                         <span class="fs-5 fw-bold text-primary">
-                                            ₭{{ order.total_price }}
+                                            ₭{{ order.total_price|floatformat:0|intcomma }}
                                         </span>
 
                                     </div>
