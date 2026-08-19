@@ -71,6 +71,9 @@ class ProfileForm(forms.ModelForm):
             "avatar": forms.ClearableFileInput(
                 attrs={"class": "form-control"}
             ),
+            "address": forms.Textarea(
+                attrs={"class": "form-control", "rows": 3}
+            ),
         }
 
         labels = {
@@ -80,4 +83,7 @@ class ProfileForm(forms.ModelForm):
 
 
 class SellerApplicationForm(forms.Form):
-    confirm = forms.BooleanField(label="ຂ້ອຍຍອມຮັບວ່າຈະຂາຍສິນຄ້າຢ່າງຮັບຜິດຊອບ.")
+    confirm = forms.BooleanField(
+        label="ຂ້ອຍຍອມຮັບວ່າຈະຂາຍສິນຄ້າຢ່າງຮັບຜິດຊອບ.",
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
+    )
