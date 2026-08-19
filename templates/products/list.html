@@ -107,25 +107,35 @@
 
                             <!-- Product Image -->
 
-                            {% if product.image %}
+                            <div class="position-relative">
 
-                                <img
-                                    src="{{ product.image.url }}"
-                                    alt="{{ product.name }}"
-                                    class="card-img-top"
-                                    style="height:220px; object-fit:cover;"
-                                >
+                                {% if product.image %}
 
-                            {% else %}
+                                    <img
+                                        src="{{ product.image.url }}"
+                                        alt="{{ product.name }}"
+                                        class="card-img-top"
+                                        style="height:220px; object-fit:cover;"
+                                    >
 
-                                <div
-                                    class="bg-light d-flex align-items-center justify-content-center"
-                                    style="height:220px;"
-                                >
-                                    <span class="display-4" aria-label="{{ product.name }}">{{ product.fallback_icon }}</span>
-                                </div>
+                                {% else %}
 
-                            {% endif %}
+                                    <div
+                                        class="bg-light d-flex align-items-center justify-content-center"
+                                        style="height:220px;"
+                                    >
+                                        <span class="display-4" aria-label="{{ product.name }}">{{ product.fallback_icon }}</span>
+                                    </div>
+
+                                {% endif %}
+
+                                {% if product.stock <= 0 %}
+                                    <span class="badge bg-danger position-absolute top-0 start-0 m-2">ໝົດແລ້ວ</span>
+                                {% elif product.stock <= 5 %}
+                                    <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-2">ເຫຼືອ {{ product.stock }} ຊິ້ນ</span>
+                                {% endif %}
+
+                            </div>
 
 
                             <!-- Product Information -->
@@ -143,6 +153,12 @@
 
                                 {% endif %}
 
+                                {% if product.average_rating %}
+                                <div class="d-flex align-items-center gap-1 mb-2 small text-muted">
+                                    {% for i in "12345" %}<i class="bi {% if forloop.counter <= product.average_rating %}bi-star-fill text-warning{% else %}bi-star{% endif %}" style="font-size:.7rem;"></i>{% endfor %}
+                                    <span>{{ product.average_rating|floatformat:1 }}</span>
+                                </div>
+                                {% endif %}
 
                                 <h5 class="fw-bold">
                                     {{ product.name }}

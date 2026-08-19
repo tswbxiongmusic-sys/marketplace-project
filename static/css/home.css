@@ -278,6 +278,27 @@
     font-size: 14px;
 }
 
+.stock-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 2;
+    padding: 4px 10px;
+    border-radius: var(--radius-sm);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.stock-badge.stock-out {
+    background: var(--danger);
+}
+
+.stock-badge.stock-low {
+    background: var(--warning);
+    color: #78350f;
+}
+
 
 /* =========================================================
    PRODUCT INFO
@@ -293,6 +314,27 @@
     color: #6b7280;
     font-size: 12px;
     font-weight: 600;
+}
+
+.product-rating {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 8px;
+    color: var(--gray-500);
+    font-size: 12px;
+}
+
+.product-rating .bi-star-fill {
+    color: var(--warning);
+}
+
+.product-rating .bi-star {
+    color: var(--gray-300);
+}
+
+.product-rating .rating-stars i {
+    font-size: 11px;
 }
 
 .product-info h3 {
