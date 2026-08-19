@@ -50,7 +50,7 @@
 
 .navbar .form-control{
 
-    width:300px;
+    width:220px;
 
     border-radius:30px;
 
@@ -62,10 +62,22 @@
 
     border-radius:30px;
 
+    white-space:nowrap;
+
 }
 
 .navbar-toggler{
 
     border:none;
+
+}
+
+/* At in-between widths the nav links + search + action buttons don't all
+   fit on one line; wrap the row instead of letting flexbox shrink each
+   button until its own text wraps. */
+.navbar-collapse{
+
+    flex-wrap:wrap;
+    row-gap:.6rem;
 
 }
