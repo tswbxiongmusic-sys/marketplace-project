@@ -9,14 +9,14 @@
 }
 
 .delivery-option:hover {
-    border-color: var(--primary, #0d6efd) !important;
-    background: rgba(13, 110, 253, .04);
+    border-color: var(--primary) !important;
+    background: rgba(37, 99, 235, .04);
 }
 
 .delivery-option:has(input:checked) {
-    border-color: var(--primary, #0d6efd) !important;
-    background: rgba(13, 110, 253, .08);
-    box-shadow: 0 0 0 .2rem rgba(13, 110, 253, .1);
+    border-color: var(--primary) !important;
+    background: rgba(37, 99, 235, .08);
+    box-shadow: 0 0 0 .2rem rgba(37, 99, 235, .1);
 }
 
 .payment-option {
@@ -26,20 +26,20 @@
 
 .payment-option:hover,
 .payment-option:has(input:checked) {
-    border-color: var(--primary, #0d6efd) !important;
-    background: rgba(13, 110, 253, .06);
+    border-color: var(--primary) !important;
+    background: rgba(37, 99, 235, .06);
 }
 
 .payment-option:has(input:checked) {
-    box-shadow: 0 0 0 .2rem rgba(13, 110, 253, .1);
+    box-shadow: 0 0 0 .2rem rgba(37, 99, 235, .1);
 }
 
 .payment-instructions {
     margin-top: 1rem;
     padding: 1rem;
-    border: 1px solid rgba(13, 110, 253, .18);
+    border: 1px solid rgba(37, 99, 235, .18);
     border-radius: 1rem;
-    background: rgba(13, 110, 253, .04);
+    background: rgba(37, 99, 235, .04);
 }
 
 .transfer-details {
@@ -66,7 +66,7 @@
 }
 
 .transfer-details code {
-    color: #0d6efd;
+    color: var(--primary);
     font-size: 1rem;
 }
 
