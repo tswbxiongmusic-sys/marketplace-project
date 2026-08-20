@@ -91,6 +91,12 @@ class Product(models.Model):
         null=True
     )
 
+    video = models.FileField(
+        upload_to="products/videos/",
+        blank=True,
+        null=True
+    )
+
     is_active = models.BooleanField(default=True)
 
     created_at = models.DateTimeField(auto_now_add=True)

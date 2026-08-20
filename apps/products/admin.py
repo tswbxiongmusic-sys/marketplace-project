@@ -46,8 +46,22 @@ class SubCategoryAdmin(LaoAdminMixin, admin.ModelAdmin):
         return obj.slug
 
 
+class ProductImageInline(admin.TabularInline):
+    model = ProductImage
+    extra = 3
+    fields = ("image", "alt_text", "image_preview")
+    readonly_fields = ("image_preview",)
+
+    def image_preview(self, obj):
+        if obj.image:
+            return format_html('<img src="{}" style="max-height: 80px; max-width: 120px;" />', obj.image.url)
+        return "ບໍ່ມີຮູບ"
+    image_preview.short_description = "ຕົວຢ່າງຮູບ"
+
+
 @admin.register(Product)
 class ProductAdmin(LaoAdminMixin, admin.ModelAdmin):
+    inlines = (ProductImageInline,)
     list_display = (
         "id",
         "name_display",
@@ -92,6 +106,7 @@ class ProductAdmin(LaoAdminMixin, admin.ModelAdmin):
                 "is_active",
                 "image",
                 "image_preview",
+                "video",
             )
         }),
         ("ເວລາບັນທຶກ", {
@@ -109,6 +124,7 @@ class ProductAdmin(LaoAdminMixin, admin.ModelAdmin):
         "stock": "ຈຳນວນໃນສາງ",
         "is_active": "ສະແດງໃນຮ້ານ",
         "image": "ຮູບຫຼັກ",
+        "video": "ວິດີໂອອະທິບາຍສິນຄ້າ",
     }
 
     @admin.display(description="ຊື່ສິນຄ້າ", ordering="name")
