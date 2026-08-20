@@ -176,7 +176,10 @@ else:
         }
     }
 
-if env.bool("DATABASE_SSL_REQUIRE", default=not DEBUG):
+if (
+    DATABASES["default"]["ENGINE"] == "django.db.backends.postgresql"
+    and env.bool("DATABASE_SSL_REQUIRE", default=not DEBUG)
+):
     DATABASES["default"].setdefault("OPTIONS", {})["sslmode"] = "require"
 
 # ---------------------------------------------------
