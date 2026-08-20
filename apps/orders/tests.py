@@ -52,12 +52,12 @@ class CheckoutTests(TestCase):
                 "payment_method": "cash_on_delivery",
             },
         )
-        self.assertRedirects(response, reverse("my_orders"))
+        order = Order.objects.get()
+        self.assertRedirects(response, reverse("order_detail", args=[order.id]))
         self.assertEqual(Order.objects.count(), 1)
         self.product.refresh_from_db()
         self.assertEqual(self.product.stock, 0)
         self.assertFalse(CartItem.objects.exists())
-        order = Order.objects.get()
         self.assertTrue(order.order_number.startswith("ORD-"))
         self.assertEqual(order.shipping_method, self.shipping_method)
         self.assertEqual(order.shipping_fee, Decimal("20000.00"))
@@ -147,8 +147,8 @@ class CheckoutTests(TestCase):
                 },
             )
 
-        self.assertRedirects(response, reverse("my_orders"))
         order = Order.objects.get()
+        self.assertRedirects(response, reverse("order_detail", args=[order.id]))
         self.assertEqual(order.payment_method, "qr_payment")
         self.assertEqual(order.payment_status, "pending")
         self.assertTrue(order.payment_receipt.name)

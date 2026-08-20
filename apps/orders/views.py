@@ -161,7 +161,7 @@ def place_order(request):
         messages.success(request, "ສັ່ງຊື້ສຳເລັດແລ້ວ.")
         notify_order(order, f"ຄຳສັ່ງຊື້ {order.order_number} ຂອງທ່ານຖືກສ້າງແລ້ວ.")
 
-    return redirect("my_orders")
+    return redirect("order_detail", order_id=order.id)
 
 
 @login_required
