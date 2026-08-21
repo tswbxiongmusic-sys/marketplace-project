@@ -2,7 +2,7 @@
 {% load static humanize %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/home.css' %}?v=20260821-categories">
+<link rel="stylesheet" href="{% static 'css/home.css' %}?v=20260821-flashsale">
 {% endblock %}
 
 {% block content %}
@@ -79,6 +79,61 @@
         </div>
 
     </section>
+
+
+    <!-- =========================================
+         FLASH SALE
+    ========================================== -->
+    {% if flash_sale_products %}
+    <section class="flash-sale-strip" data-sale-end="{{ flash_sale_ends_at|date:'c' }}">
+
+        <div class="flash-sale-header">
+            <div class="flash-sale-title">
+                <i class="bi bi-lightning-charge-fill"></i>
+                <span>FLASH SALE</span>
+            </div>
+
+            <div class="flash-sale-countdown" aria-live="polite">
+                <div class="countdown-box"><span class="countdown-value" data-unit="hours">00</span><span class="countdown-label">ຊມ</span></div>
+                <span class="countdown-sep">:</span>
+                <div class="countdown-box"><span class="countdown-value" data-unit="minutes">00</span><span class="countdown-label">ນທ</span></div>
+                <span class="countdown-sep">:</span>
+                <div class="countdown-box"><span class="countdown-value" data-unit="seconds">00</span><span class="countdown-label">ວິ</span></div>
+            </div>
+
+            <a href="{% url 'product_list' %}" class="flash-sale-link">ເບິ່ງທັງໝົດ →</a>
+        </div>
+
+        <div class="flash-sale-grid">
+
+            {% for product in flash_sale_products %}
+            <a href="{% url 'product_detail' product.pk %}" class="flash-sale-card">
+
+                <span class="flash-sale-badge">-{{ product.discount_percent }}%</span>
+
+                <div class="flash-sale-image">
+                    {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                    {% else %}
+                    <div class="product-no-image">{{ product.fallback_icon }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="flash-sale-info">
+                    <h4>{{ product.name }}</h4>
+                    <div class="flash-sale-prices">
+                        <strong>₭{{ product.sale_price|floatformat:0|intcomma }}</strong>
+                        <span>₭{{ product.price|floatformat:0|intcomma }}</span>
+                    </div>
+                </div>
+
+            </a>
+            {% endfor %}
+
+        </div>
+
+    </section>
+    {% endif %}
 
 
     <!-- =========================================
@@ -360,4 +415,37 @@
 
 </div>
 
+{% endblock %}
+
+{% block extra_js %}
+{% if flash_sale_products %}
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const strip = document.querySelector(".flash-sale-strip");
+        if (!strip) return;
+
+        const endTime = new Date(strip.dataset.saleEnd).getTime();
+        const hoursEl = strip.querySelector('[data-unit="hours"]');
+        const minutesEl = strip.querySelector('[data-unit="minutes"]');
+        const secondsEl = strip.querySelector('[data-unit="seconds"]');
+        const pad = (value) => String(value).padStart(2, "0");
+
+        const tick = () => {
+            const remaining = endTime - Date.now();
+            if (remaining <= 0) {
+                strip.hidden = true;
+                clearInterval(timer);
+                return;
+            }
+            const totalSeconds = Math.floor(remaining / 1000);
+            hoursEl.textContent = pad(Math.floor(totalSeconds / 3600));
+            minutesEl.textContent = pad(Math.floor((totalSeconds % 3600) / 60));
+            secondsEl.textContent = pad(totalSeconds % 60);
+        };
+
+        tick();
+        const timer = setInterval(tick, 1000);
+    });
+</script>
+{% endif %}
 {% endblock %}

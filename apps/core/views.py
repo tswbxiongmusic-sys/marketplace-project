@@ -1,6 +1,8 @@
 from django.db import connection
+from django.db.models import F
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404
+from django.utils import timezone
 from django.views.decorators.http import require_GET
 
 from apps.products.models import Product, Category
@@ -53,6 +55,19 @@ def home(request):
     )[:12]
 
 
+    # -----------------------------------------
+    # Flash Sale
+    # -----------------------------------------
+    flash_sale_products = list(
+        products.filter(
+            sale_price__isnull=False,
+            sale_price__lt=F("price"),
+            sale_ends_at__gt=timezone.now(),
+        ).order_by("sale_ends_at")[:5]
+    )
+    flash_sale_ends_at = flash_sale_products[0].sale_ends_at if flash_sale_products else None
+
+
     return render(
         request,
         "core/home.html",
@@ -60,6 +75,8 @@ def home(request):
             "categories": categories,
             "featured_products": featured_products,
             "latest_products": latest_products,
+            "flash_sale_products": flash_sale_products,
+            "flash_sale_ends_at": flash_sale_ends_at,
             "search": search,
         },
     )

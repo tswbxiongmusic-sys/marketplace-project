@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models import Avg
 from django.conf import settings
+from django.utils import timezone
 from django.utils.text import slugify
 
 
@@ -83,6 +84,20 @@ class Product(models.Model):
         decimal_places=2
     )
 
+    sale_price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        help_text="ໃສ່ລາຄາຫຼຸດ ຖ້າຢາກໃຫ້ສິນຄ້ານີ້ຂຶ້ນໃນແຖບ Flash Sale.",
+    )
+
+    sale_ends_at = models.DateTimeField(
+        blank=True,
+        null=True,
+        help_text="ເວລາທີ່ Flash Sale ຈະສິ້ນສຸດ.",
+    )
+
     stock = models.PositiveIntegerField(default=0)
 
     image = models.ImageField(
@@ -119,6 +134,21 @@ class Product(models.Model):
     @property
     def average_rating(self):
         return self.reviews.aggregate(value=Avg("rating"))["value"] or 0
+
+    @property
+    def is_on_sale(self):
+        return bool(
+            self.sale_price
+            and self.sale_price < self.price
+            and self.sale_ends_at
+            and self.sale_ends_at > timezone.now()
+        )
+
+    @property
+    def discount_percent(self):
+        if not self.is_on_sale:
+            return 0
+        return round((1 - (self.sale_price / self.price)) * 100)
 
     @property
     def fallback_icon(self):

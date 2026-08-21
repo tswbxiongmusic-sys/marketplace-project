@@ -109,6 +109,10 @@ class ProductAdmin(LaoAdminMixin, admin.ModelAdmin):
                 "video",
             )
         }),
+        ("Flash Sale (ບໍ່ບັງຄັບ)", {
+            "fields": ("sale_price", "sale_ends_at"),
+            "description": "ໃສ່ທັງ 2 ຊ່ອງນີ້ ຖ້າຢາກໃຫ້ສິນຄ້ານີ້ຂຶ້ນໃນແຖບ Flash Sale ໜ້າຫຼັກ.",
+        }),
         ("ເວລາບັນທຶກ", {
             "fields": ("created_at", "updated_at"),
         }),
@@ -125,6 +129,8 @@ class ProductAdmin(LaoAdminMixin, admin.ModelAdmin):
         "is_active": "ສະແດງໃນຮ້ານ",
         "image": "ຮູບຫຼັກ",
         "video": "ວິດີໂອອະທິບາຍສິນຄ້າ",
+        "sale_price": "ລາຄາຫຼຸດ (Flash Sale)",
+        "sale_ends_at": "ວັນ-ເວລາສິ້ນສຸດ Sale",
     }
 
     @admin.display(description="ຊື່ສິນຄ້າ", ordering="name")
