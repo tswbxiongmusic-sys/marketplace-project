@@ -178,6 +178,7 @@
     justify-content: center;
     width: 34px;
     height: 34px;
+    min-height: 0;
     margin-top: -17px;
     border: none;
     border-radius: 50%;
@@ -215,6 +216,8 @@
 .hero-carousel-dot {
     width: 7px;
     height: 7px;
+    min-height: 0;
+    min-width: 0;
     border: none;
     border-radius: 999px;
     background: #cbd5e1;
@@ -620,6 +623,7 @@
     justify-content: center;
     width: 34px;
     height: 34px;
+    min-height: 0;
     border: none;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.92);
@@ -803,6 +807,7 @@
     flex: 0 0 auto;
     width: 36px;
     height: 36px;
+    min-height: 0;
     border: none;
     border-radius: 50%;
     background: #eff6ff;
