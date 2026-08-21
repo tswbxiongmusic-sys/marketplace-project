@@ -2,7 +2,7 @@
 {% load static humanize %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/home.css' %}?v=20260821-mobilegrid">
+<link rel="stylesheet" href="{% static 'css/home.css' %}?v=20260821-heroanim">
 {% endblock %}
 
 {% block content %}
@@ -62,15 +62,15 @@
 
             </div>
 
-            <div class="hero-visual" aria-hidden="true">
+            <div class="hero-visual">
                 {% for product in featured_products|slice:":3" %}
-                    <div class="hero-visual-card hero-visual-card-{{ forloop.counter }}">
+                    <a href="{% url 'product_detail' product.pk %}" class="hero-visual-card hero-visual-card-{{ forloop.counter }}">
                         {% if product.image %}
-                        <img src="{{ product.image.url }}" alt="">
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}">
                         {% else %}
                         <div class="hero-visual-fallback">{{ product.fallback_icon }}</div>
                         {% endif %}
-                    </div>
+                    </a>
                 {% empty %}
                     <div class="hero-visual-placeholder"><i class="bi bi-bag-heart"></i></div>
                 {% endfor %}
