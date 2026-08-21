@@ -119,12 +119,21 @@
 ========================================================= */
 
 .hero-carousel {
-    position: relative;
+    display: flex;
+    flex-direction: column;
     height: clamp(220px, 26vw, 320px);
     border-radius: 18px;
     overflow: hidden;
     box-shadow: 0 20px 45px rgba(0, 0, 0, 0.28);
     border: 4px solid rgba(255, 255, 255, 0.9);
+    background: #ffffff;
+}
+
+.hero-carousel-media {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
 }
 
 .hero-carousel-track {
@@ -194,17 +203,13 @@
 }
 
 .hero-carousel-dots {
-    position: absolute;
-    left: 50%;
-    bottom: 10px;
-    z-index: 2;
+    flex: 0 0 auto;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 6px;
-    padding: 5px 8px;
-    border-radius: 999px;
-    background: rgba(17, 24, 39, 0.4);
-    transform: translateX(-50%);
+    padding: 8px 0;
+    background: #f1f5f9;
 }
 
 .hero-carousel-dot {
@@ -212,7 +217,7 @@
     height: 7px;
     border: none;
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.55);
+    background: #cbd5e1;
     cursor: pointer;
     transition: 0.2s ease;
     padding: 0;
@@ -220,7 +225,7 @@
 
 .hero-carousel-dot.is-active {
     width: 18px;
-    background: #ffffff;
+    background: var(--primary);
 }
 
 

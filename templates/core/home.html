@@ -2,7 +2,7 @@
 {% load static humanize %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/home.css' %}?v=20260821-herodots">
+<link rel="stylesheet" href="{% static 'css/home.css' %}?v=20260821-herodotsbar">
 {% endblock %}
 
 {% block content %}
@@ -64,28 +64,34 @@
 
             <div class="hero-carousel" id="hero-carousel">
 
-                <div class="hero-carousel-track">
-                    {% for product in featured_products|slice:":5" %}
-                        <a href="{% url 'product_detail' product.pk %}" class="hero-carousel-slide">
-                            {% if product.image %}
-                            <img src="{{ product.image.url }}" alt="{{ product.name }}">
-                            {% else %}
-                            <div class="hero-visual-fallback">{{ product.fallback_icon }}</div>
-                            {% endif %}
-                        </a>
-                    {% empty %}
-                        <div class="hero-carousel-slide hero-visual-placeholder"><i class="bi bi-bag-heart"></i></div>
-                    {% endfor %}
+                <div class="hero-carousel-media">
+
+                    <div class="hero-carousel-track">
+                        {% for product in featured_products|slice:":5" %}
+                            <a href="{% url 'product_detail' product.pk %}" class="hero-carousel-slide">
+                                {% if product.image %}
+                                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                                {% else %}
+                                <div class="hero-visual-fallback">{{ product.fallback_icon }}</div>
+                                {% endif %}
+                            </a>
+                        {% empty %}
+                            <div class="hero-carousel-slide hero-visual-placeholder"><i class="bi bi-bag-heart"></i></div>
+                        {% endfor %}
+                    </div>
+
+                    {% if featured_products|length > 1 %}
+                    <button type="button" class="hero-carousel-arrow hero-carousel-prev" aria-label="ຮູບກ່ອນໜ້າ">
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+                    <button type="button" class="hero-carousel-arrow hero-carousel-next" aria-label="ຮູບຕໍ່ໄປ">
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                    {% endif %}
+
                 </div>
 
                 {% if featured_products|length > 1 %}
-                <button type="button" class="hero-carousel-arrow hero-carousel-prev" aria-label="ຮູບກ່ອນໜ້າ">
-                    <i class="bi bi-chevron-left"></i>
-                </button>
-                <button type="button" class="hero-carousel-arrow hero-carousel-next" aria-label="ຮູບຕໍ່ໄປ">
-                    <i class="bi bi-chevron-right"></i>
-                </button>
-
                 <div class="hero-carousel-dots">
                     {% for product in featured_products|slice:":5" %}
                         <button type="button" class="hero-carousel-dot{% if forloop.first %} is-active{% endif %}" aria-label="ໄປຫາຮູບທີ {{ forloop.counter }}"></button>
