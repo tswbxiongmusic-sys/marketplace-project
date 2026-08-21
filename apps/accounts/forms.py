@@ -68,7 +68,7 @@ class ProfileForm(forms.ModelForm):
             "phone": forms.TextInput(
                 attrs={"class": "form-control"}
             ),
-            "avatar": forms.ClearableFileInput(
+            "avatar": forms.FileInput(
                 attrs={"class": "form-control"}
             ),
             "address": forms.Textarea(
