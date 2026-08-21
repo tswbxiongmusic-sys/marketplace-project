@@ -533,13 +533,62 @@
    PRODUCT IMAGE
 ========================================================= */
 
+.product-image-wrap {
+    position: relative;
+}
+
 .product-image {
     display: block;
     position: relative;
-    height: 230px;
+    height: 270px;
     overflow: hidden;
     background: #f3f4f6;
     text-decoration: none;
+}
+
+.discount-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 2;
+    padding: 4px 10px;
+    border-radius: var(--radius-sm);
+    background: #dc2626;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.wishlist-toggle-form {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 3;
+}
+
+.wishlist-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.92);
+    color: #6b7280;
+    font-size: 16px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.wishlist-btn:hover {
+    color: #dc2626;
+    transform: scale(1.08);
+}
+
+.wishlist-btn.is-active {
+    color: #dc2626;
 }
 
 .product-image img {
@@ -646,29 +695,55 @@
     gap: 10px;
 }
 
+.add-to-cart-form {
+    display: contents;
+}
+
+.product-price-group {
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
+    flex-wrap: wrap;
+    min-width: 0;
+}
+
 .product-price {
     color: #2563eb;
     font-size: 18px;
     font-weight: 800;
 }
 
-.product-button {
+.product-price-old {
+    color: #9ca3af;
+    font-size: 12.5px;
+    text-decoration: line-through;
+}
+
+.add-to-cart-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 8px 14px;
-    border-radius: 10px;
-    background: #2563eb;
-    color: #ffffff;
-    font-size: 13px;
-    font-weight: 700;
+    flex: 0 0 auto;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 50%;
+    background: #eff6ff;
+    color: #2563eb;
+    font-size: 15px;
     text-decoration: none;
+    cursor: pointer;
     transition: 0.2s ease;
 }
 
-.product-button:hover {
-    background: #1d4ed8;
+.add-to-cart-btn:hover {
+    background: #2563eb;
     color: #ffffff;
+}
+
+.add-to-cart-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 

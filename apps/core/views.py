@@ -68,6 +68,14 @@ def home(request):
     flash_sale_ends_at = flash_sale_products[0].sale_ends_at if flash_sale_products else None
 
 
+    # -----------------------------------------
+    # Wishlist state (for heart icon on cards)
+    # -----------------------------------------
+    wishlisted_ids = set(
+        Wishlist.objects.filter(user=request.user).values_list("product_id", flat=True)
+    ) if request.user.is_authenticated else set()
+
+
     return render(
         request,
         "core/home.html",
@@ -77,6 +85,7 @@ def home(request):
             "latest_products": latest_products,
             "flash_sale_products": flash_sale_products,
             "flash_sale_ends_at": flash_sale_ends_at,
+            "wishlisted_ids": wishlisted_ids,
             "search": search,
         },
     )

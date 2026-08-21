@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
 from .forms import ProductForm, ReviewForm
@@ -49,6 +50,10 @@ def product_list(request):
     paginator = Paginator(products, 9)
     page_obj = paginator.get_page(request.GET.get("page"))
 
+    wishlisted_ids = set(
+        Wishlist.objects.filter(user=request.user).values_list("product_id", flat=True)
+    ) if request.user.is_authenticated else set()
+
     return render(
         request,
         "products/list.html",
@@ -60,6 +65,7 @@ def product_list(request):
             "selected_subcategory": selected_subcategory,
             "page_obj": page_obj,
             "min_price": min_price, "max_price": max_price, "sort": sort,
+            "wishlisted_ids": wishlisted_ids,
         },
     )
 
@@ -203,6 +209,10 @@ def toggle_wishlist(request, pk):
     else:
         item.delete()
         messages.info(request, "ນຳອອກຈາກລາຍການທີ່ມັກແລ້ວ.")
+
+    next_url = request.POST.get("next")
+    if next_url and url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
+        return redirect(next_url)
     return redirect("product_detail", pk=pk)
 
 

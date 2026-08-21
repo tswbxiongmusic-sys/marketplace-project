@@ -2,7 +2,7 @@
 {% load static humanize %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/home.css' %}?v=20260821-flashsale">
+<link rel="stylesheet" href="{% static 'css/home.css' %}?v=20260821-cards">
 {% endblock %}
 
 {% block content %}
@@ -218,76 +218,7 @@
         <div class="product-grid">
 
             {% for product in featured_products %}
-
-            <article class="product-card">
-
-                <a
-                    href="{% url 'product_detail' product.pk %}"
-                    class="product-image"
-                >
-
-                    {% if product.stock <= 0 %}
-                    <span class="stock-badge stock-out">ໝົດແລ້ວ</span>
-                    {% elif product.stock <= 5 %}
-                    <span class="stock-badge stock-low">ເຫຼືອ {{ product.stock }} ຊິ້ນ</span>
-                    {% endif %}
-
-                    {% if product.image %}
-
-                    <img
-                        src="{{ product.image.url }}"
-                        alt="{{ product.name }}"
-                    >
-
-                    {% else %}
-
-                    <div class="product-no-image" aria-label="{{ product.name }}">{{ product.fallback_icon }}</div>
-
-                    {% endif %}
-
-                </a>
-
-
-                <div class="product-info">
-
-                    <span class="product-category">
-                        {{ product.category.name }}
-                    </span>
-
-                    {% if product.average_rating %}
-                    <div class="product-rating">
-                        <span class="rating-stars">{% for i in "12345" %}<i class="bi {% if forloop.counter <= product.average_rating %}bi-star-fill{% else %}bi-star{% endif %}"></i>{% endfor %}</span>
-                        <span>{{ product.average_rating|floatformat:1 }}</span>
-                    </div>
-                    {% endif %}
-
-                    <h3>
-                        <a
-                            href="{% url 'product_detail' product.pk %}"
-                        >
-                            {{ product.name }}
-                        </a>
-                    </h3>
-
-                    <div class="product-bottom">
-
-                        <strong class="product-price">
-                            ₭{{ product.price|floatformat:0|intcomma }}
-                        </strong>
-
-                        <a
-                            href="{% url 'product_detail' product.pk %}"
-                            class="product-button"
-                        >
-                            ເບິ່ງ
-                        </a>
-
-                    </div>
-
-                </div>
-
-            </article>
-
+                {% include "products/_card.html" %}
             {% empty %}
 
             <div class="empty-state">
@@ -331,76 +262,7 @@
         <div class="product-grid">
 
             {% for product in latest_products %}
-
-            <article class="product-card">
-
-                <a
-                    href="{% url 'product_detail' product.pk %}"
-                    class="product-image"
-                >
-
-                    {% if product.stock <= 0 %}
-                    <span class="stock-badge stock-out">ໝົດແລ້ວ</span>
-                    {% elif product.stock <= 5 %}
-                    <span class="stock-badge stock-low">ເຫຼືອ {{ product.stock }} ຊິ້ນ</span>
-                    {% endif %}
-
-                    {% if product.image %}
-
-                    <img
-                        src="{{ product.image.url }}"
-                        alt="{{ product.name }}"
-                    >
-
-                    {% else %}
-
-                    <div class="product-no-image" aria-label="{{ product.name }}">{{ product.fallback_icon }}</div>
-
-                    {% endif %}
-
-                </a>
-
-
-                <div class="product-info">
-
-                    <span class="product-category">
-                        {{ product.category.name }}
-                    </span>
-
-                    {% if product.average_rating %}
-                    <div class="product-rating">
-                        <span class="rating-stars">{% for i in "12345" %}<i class="bi {% if forloop.counter <= product.average_rating %}bi-star-fill{% else %}bi-star{% endif %}"></i>{% endfor %}</span>
-                        <span>{{ product.average_rating|floatformat:1 }}</span>
-                    </div>
-                    {% endif %}
-
-                    <h3>
-                        <a
-                            href="{% url 'product_detail' product.pk %}"
-                        >
-                            {{ product.name }}
-                        </a>
-                    </h3>
-
-                    <div class="product-bottom">
-
-                        <strong class="product-price">
-                            ₭{{ product.price|floatformat:0|intcomma }}
-                        </strong>
-
-                        <a
-                            href="{% url 'product_detail' product.pk %}"
-                            class="product-button"
-                        >
-                            ເບິ່ງ
-                        </a>
-
-                    </div>
-
-                </div>
-
-            </article>
-
+                {% include "products/_card.html" %}
             {% empty %}
 
             <div class="empty-state">

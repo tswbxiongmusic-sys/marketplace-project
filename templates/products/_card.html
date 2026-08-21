@@ -1,0 +1,88 @@
+{% load humanize %}
+<article class="product-card">
+
+    <div class="product-image-wrap">
+
+        <a href="{% url 'product_detail' product.pk %}" class="product-image">
+
+            {% if product.is_on_sale %}
+                <span class="discount-badge">-{{ product.discount_percent }}%</span>
+            {% elif product.stock <= 0 %}
+                <span class="stock-badge stock-out">ໝົດແລ້ວ</span>
+            {% elif product.stock <= 5 %}
+                <span class="stock-badge stock-low">ເຫຼືອ {{ product.stock }} ຊິ້ນ</span>
+            {% endif %}
+
+            {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+            {% else %}
+            <div class="product-no-image" aria-label="{{ product.name }}">{{ product.fallback_icon }}</div>
+            {% endif %}
+
+        </a>
+
+        {% if user.is_authenticated %}
+        <form method="post" action="{% url 'toggle_wishlist' product.pk %}" class="wishlist-toggle-form">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <button
+                type="submit"
+                class="wishlist-btn {% if product.pk in wishlisted_ids %}is-active{% endif %}"
+                aria-label="ລາຍການທີ່ມັກ"
+            >
+                <i class="bi {% if product.pk in wishlisted_ids %}bi-heart-fill{% else %}bi-heart{% endif %}"></i>
+            </button>
+        </form>
+        {% endif %}
+
+    </div>
+
+    <div class="product-info">
+
+        <span class="product-category">{{ product.category.name }}</span>
+
+        {% if product.average_rating %}
+        <div class="product-rating">
+            <span class="rating-stars">{% for i in "12345" %}<i class="bi {% if forloop.counter <= product.average_rating %}bi-star-fill{% else %}bi-star{% endif %}"></i>{% endfor %}</span>
+            <span>{{ product.average_rating|floatformat:1 }}</span>
+        </div>
+        {% endif %}
+
+        <h3>
+            <a href="{% url 'product_detail' product.pk %}">{{ product.name }}</a>
+        </h3>
+
+        <div class="product-bottom">
+
+            <div class="product-price-group">
+                {% if product.is_on_sale %}
+                    <strong class="product-price">₭{{ product.sale_price|floatformat:0|intcomma }}</strong>
+                    <span class="product-price-old">₭{{ product.price|floatformat:0|intcomma }}</span>
+                {% else %}
+                    <strong class="product-price">₭{{ product.price|floatformat:0|intcomma }}</strong>
+                {% endif %}
+            </div>
+
+            {% if user.is_authenticated %}
+            <form method="post" action="{% url 'add_to_cart' product.pk %}" class="add-to-cart-form">
+                {% csrf_token %}
+                <button
+                    type="submit"
+                    class="add-to-cart-btn"
+                    aria-label="ເພີ່ມໃສ່ກະຕ່າ"
+                    {% if product.stock <= 0 %}disabled{% endif %}
+                >
+                    <i class="bi bi-cart-plus"></i>
+                </button>
+            </form>
+            {% else %}
+            <a href="{% url 'login' %}?next={{ request.path }}" class="add-to-cart-btn" aria-label="ເຂົ້າລະບົບເພື່ອຊື້">
+                <i class="bi bi-cart-plus"></i>
+            </a>
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</article>
