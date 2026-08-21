@@ -3,3 +3,67 @@ footer{
     margin-top:80px;
 
 }
+
+
+/* =========================================================
+   TRUST STRIP
+========================================================= */
+
+.trust-strip {
+    margin-top: 56px;
+    padding: 32px 0;
+    background: #f8fafc;
+    border-top: 1px solid #e5e7eb;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.trust-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 24px;
+}
+
+.trust-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.trust-item i {
+    flex: 0 0 auto;
+    font-size: 1.6rem;
+    color: var(--primary, #2563eb);
+}
+
+.trust-item div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.trust-item strong {
+    font-size: 14px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.trust-item span {
+    font-size: 12.5px;
+    color: #6b7280;
+}
+
+@media (max-width: 768px) {
+    .trust-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+    }
+}
+
+@media (max-width: 420px) {
+    .trust-item {
+        flex-direction: column;
+        text-align: center;
+        gap: 6px;
+    }
+}
