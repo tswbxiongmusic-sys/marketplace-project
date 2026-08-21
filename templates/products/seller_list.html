@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}ຮ້ານຄ້າທັງໝົດ | {{ store.name }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/sellers.css' %}?v=1">
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-4 py-lg-5">
+
+    <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-4">
+        <div>
+            <h1 class="fw-bold mb-1">ຮ້ານຄ້າທັງໝົດ</h1>
+            <p class="text-muted mb-0">ເລືອກຮ້ານຄ້າທີ່ທ່ານສົນໃຈ ເພື່ອເບິ່ງສິນຄ້າຂອງຮ້ານນັ້ນ.</p>
+        </div>
+
+        <form method="get" class="seller-search-form">
+            <i class="bi bi-search"></i>
+            <input type="search" name="q" value="{{ query }}" placeholder="ຄົ້ນຫາຮ້ານຄ້າ...">
+        </form>
+    </div>
+
+    {% if sellers %}
+    <div class="seller-grid">
+
+        {% for seller in sellers %}
+        <div class="seller-card">
+
+            <div class="seller-card-top">
+                <span class="seller-status-badge">ເປີດຂາຍ</span>
+
+                {% if seller.avatar %}
+                <img src="{{ seller.avatar.url }}" alt="{{ seller.username }}" class="seller-avatar">
+                {% else %}
+                <div class="seller-avatar seller-avatar-placeholder">{{ seller.username|slice:":1"|upper }}</div>
+                {% endif %}
+
+                <h3 class="seller-name">{{ seller.username }}</h3>
+                <span class="seller-role-label">ຜູ້ຂາຍ</span>
+            </div>
+
+            <div class="seller-card-stats">
+                <div>
+                    <span>ສິນຄ້າ</span>
+                    <strong>{{ seller.product_count }}</strong>
+                </div>
+                <div>
+                    <span>ເປັນຜູ້ຂາຍຕັ້ງແຕ່</span>
+                    <strong>{{ seller.seller_approved_at|date:"d/m/Y"|default:"—" }}</strong>
+                </div>
+            </div>
+
+            <a href="{% url 'product_list' %}?seller={{ seller.pk }}" class="btn btn-primary w-100">
+                <i class="bi bi-shop me-2"></i>ເບິ່ງຮ້ານ
+            </a>
+
+        </div>
+        {% endfor %}
+
+    </div>
+
+    {% if page_obj.paginator.num_pages > 1 %}
+    <nav class="mt-5">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?q={{ query|urlencode }}&page={{ page_obj.previous_page_number }}">ກ່ອນໜ້າ</a>
+            </li>
+            {% endif %}
+            {% for page_number in page_obj.paginator.page_range %}
+            <li class="page-item {% if page_number == page_obj.number %}active{% endif %}">
+                <a class="page-link" href="?q={{ query|urlencode }}&page={{ page_number }}">{{ page_number }}</a>
+            </li>
+            {% endfor %}
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?q={{ query|urlencode }}&page={{ page_obj.next_page_number }}">ຕໍ່ໄປ</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <div class="empty-state">
+        <p>ຍັງບໍ່ມີຮ້ານຄ້າໃນລະບົບ.</p>
+    </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}

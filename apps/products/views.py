@@ -1,13 +1,16 @@
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
 from .forms import ProductForm, ReviewForm
 from .models import Category, Product, ProductImage, Review, Wishlist
+
+User = get_user_model()
 
 
 def product_list(request):
@@ -22,6 +25,7 @@ def product_list(request):
     query = request.GET.get("q", "").strip()
     selected_category = request.GET.get("category", "").strip()
     selected_subcategory = request.GET.get("subcategory", "").strip()
+    selected_seller = request.GET.get("seller", "").strip()
     min_price = request.GET.get("min_price", "").strip()
     max_price = request.GET.get("max_price", "").strip()
     sort = request.GET.get("sort", "newest")
@@ -41,6 +45,12 @@ def product_list(request):
         products = products.filter(
             subcategory__slug=selected_subcategory
         )
+
+    seller_store = None
+    if selected_seller:
+        seller_store = get_object_or_404(User, pk=selected_seller, role=User.Role.SELLER)
+        products = products.filter(seller_id=selected_seller)
+
     if min_price:
         products = products.filter(price__gte=min_price)
     if max_price:
@@ -63,9 +73,37 @@ def product_list(request):
             "query": query,
             "selected_category": selected_category,
             "selected_subcategory": selected_subcategory,
+            "selected_seller": selected_seller,
+            "seller_store": seller_store,
             "page_obj": page_obj,
             "min_price": min_price, "max_price": max_price, "sort": sort,
             "wishlisted_ids": wishlisted_ids,
+        },
+    )
+
+
+def seller_list(request):
+    query = request.GET.get("q", "").strip()
+
+    sellers = (
+        User.objects.filter(role=User.Role.SELLER, is_active=True)
+        .annotate(product_count=Count("products", filter=Q(products__is_active=True)))
+        .order_by("-seller_approved_at", "username")
+    )
+
+    if query:
+        sellers = sellers.filter(username__icontains=query)
+
+    paginator = Paginator(sellers, 12)
+    page_obj = paginator.get_page(request.GET.get("page"))
+
+    return render(
+        request,
+        "products/seller_list.html",
+        {
+            "sellers": page_obj,
+            "page_obj": page_obj,
+            "query": query,
         },
     )
 
