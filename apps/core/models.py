@@ -11,6 +11,8 @@ class StoreSettings(models.Model):
     email = models.EmailField(blank=True)
     address = models.TextField(blank=True)
     facebook_url = models.URLField(blank=True)
+    tiktok_url = models.URLField(blank=True)
+    youtube_url = models.URLField(blank=True)
     bank_name = models.CharField(max_length=120, blank=True)
     bank_account_name = models.CharField(max_length=160, blank=True)
     bank_account_number = models.CharField(max_length=80, blank=True)

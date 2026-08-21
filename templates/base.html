@@ -202,32 +202,62 @@
 <footer class="footer bg-dark text-white mt-5">
     <div class="container py-5">
         <div class="row gy-4">
-            <div class="col-lg-4">
-                <h4 class="fw-bold">{{ store.name }}</h4>
-                <p class="text-light">{{ store.tagline }}</p>
+
+            <div class="col-lg-4 col-md-6">
+                <div class="footer-brand">
+                    {% if store.logo %}<img src="{{ store.logo.url }}" alt="{{ store.name }}">{% endif %}
+                    <h4 class="fw-bold mb-0">{{ store.name }}</h4>
+                </div>
+                <p class="footer-tagline">{{ store.tagline }}</p>
+
+                {% if store.facebook_url or store.tiktok_url or store.youtube_url %}
+                <div class="footer-social">
+                    {% if store.facebook_url %}<a href="{{ store.facebook_url }}" target="_blank" rel="noopener" aria-label="Facebook"><i class="bi bi-facebook"></i></a>{% endif %}
+                    {% if store.tiktok_url %}<a href="{{ store.tiktok_url }}" target="_blank" rel="noopener" aria-label="TikTok"><i class="bi bi-tiktok"></i></a>{% endif %}
+                    {% if store.youtube_url %}<a href="{{ store.youtube_url }}" target="_blank" rel="noopener" aria-label="YouTube"><i class="bi bi-youtube"></i></a>{% endif %}
+                </div>
+                {% endif %}
             </div>
 
-            <div class="col-lg-4">
-                <h5>ລິ້ງດ່ວນ</h5>
-                <ul class="list-unstyled">
-                    <li><a class="footer-link text-decoration-none text-light" href="{% url 'home' %}">ໜ້າຫຼັກ</a></li>
-                    <li><a class="footer-link text-decoration-none text-light" href="{% url 'product_list' %}">ສິນຄ້າ</a></li>
-                    <li><a class="footer-link text-decoration-none text-light" href="{% url 'store_info' %}">ກ່ຽວກັບຮ້ານ</a></li>
-                    <li><a class="footer-link text-decoration-none text-light" href="{% url 'store_policies' %}">ນະໂຍບາຍຮ້ານ</a></li>
+            <div class="col-lg-3 col-md-6">
+                <h5>ບໍລິການລູກຄ້າ</h5>
+                <ul class="footer-links list-unstyled">
+                    <li><a href="{% url 'my_orders' %}">ຄຳສັ່ງຊື້ຂອງຂ້ອຍ</a></li>
+                    <li><a href="{% url 'wishlist' %}">ລາຍການທີ່ມັກ</a></li>
+                    <li><a href="{% url 'store_policies' %}">ນະໂຍບາຍຮ້ານ</a></li>
+                    <li><a href="{% url 'store_info' %}">ຕິດຕໍ່ຮ້ານ</a></li>
                 </ul>
             </div>
 
-            <div class="col-lg-4">
-                <h5>ຕິດຕໍ່</h5>
-                {% if store.email %}<p>ອີເມວ: {{ store.email }}</p>{% endif %}
-                {% if store.phone %}<p>ໂທ: {{ store.phone }}</p>{% endif %}
-                {% if store.address %}<p>{{ store.address }}</p>{% endif %}
+            <div class="col-lg-2 col-md-6">
+                <h5>ກ່ຽວກັບ {{ store.name }}</h5>
+                <ul class="footer-links list-unstyled">
+                    <li><a href="{% url 'store_info' %}">ກ່ຽວກັບຮ້ານ</a></li>
+                    <li><a href="{% url 'product_list' %}">ສິນຄ້າທັງໝົດ</a></li>
+                    <li><a href="{% url 'seller_application' %}">ສະໝັກເປັນຜູ້ຂາຍ</a></li>
+                </ul>
             </div>
+
+            <div class="col-lg-3 col-md-6">
+                <h5>ຕິດຕໍ່</h5>
+                {% if store.phone %}<p><i class="bi bi-telephone me-2"></i>{{ store.phone }}</p>{% endif %}
+                {% if store.email %}<p><i class="bi bi-envelope me-2"></i>{{ store.email }}</p>{% endif %}
+                {% if store.address %}<p><i class="bi bi-geo-alt me-2"></i>{{ store.address }}</p>{% endif %}
+            </div>
+
         </div>
 
         <hr>
 
-        <div class="text-center">&copy; {% now "Y" %} {{ store.name }}. ສະຫງວນລິຂະສິດ.</div>
+        <div class="footer-bottom">
+            <div class="footer-payments">
+                <span class="footer-payments-label">ຊ່ອງທາງຊຳລະ:</span>
+                <span class="payment-chip"><i class="bi bi-cash-coin"></i>ຈ່າຍປາຍທາງ</span>
+                <span class="payment-chip"><i class="bi bi-bank"></i>ໂອນທະນາຄານ</span>
+                <span class="payment-chip"><i class="bi bi-qr-code"></i>ສະແກນ QR</span>
+            </div>
+            <div class="footer-copyright">&copy; {% now "Y" %} {{ store.name }}. ສະຫງວນລິຂະສິດ.</div>
+        </div>
     </div>
 </footer>
 

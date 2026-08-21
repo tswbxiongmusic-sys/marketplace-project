@@ -4,6 +4,122 @@ footer{
 
 }
 
+.footer h5 {
+    margin-bottom: 16px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.footer p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+}
+
+.footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.footer-brand img {
+    height: 34px;
+    width: 34px;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.footer-tagline {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.footer-social {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.footer-social a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+    font-size: 16px;
+    text-decoration: none;
+    transition: 0.2s ease;
+}
+
+.footer-social a:hover {
+    background: var(--primary, #2563eb);
+    color: #ffffff;
+}
+
+.footer-links li {
+    margin-bottom: 10px;
+}
+
+.footer-links a {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+    text-decoration: none;
+    transition: 0.15s ease;
+}
+
+.footer-links a:hover {
+    color: #ffffff;
+}
+
+.footer-bottom {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.footer-payments {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+.footer-payments-label {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 13px;
+}
+
+.payment-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 12.5px;
+    font-weight: 600;
+}
+
+.footer-copyright {
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 13px;
+}
+
+@media (max-width: 576px) {
+    .footer-bottom {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
 
 /* =========================================================
    TRUST STRIP

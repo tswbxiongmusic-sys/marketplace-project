@@ -9,7 +9,7 @@ class StoreSettingsAdmin(LaoAdminMixin, admin.ModelAdmin):
     list_display = ("store_name", "phone_number", "email_address", "open_status")
     fieldsets = (
         ("ຂໍ້ມູນພື້ນຖານ", {"fields": ("name", "tagline", "logo", "is_store_open")} ),
-        ("ຂໍ້ມູນຕິດຕໍ່", {"fields": ("phone", "email", "address", "facebook_url")} ),
+        ("ຂໍ້ມູນຕິດຕໍ່", {"fields": ("phone", "email", "address", "facebook_url", "tiktok_url", "youtube_url")} ),
         ("ຂໍ້ມູນຮັບຊຳລະ", {
             "description": "ໃສ່ຂໍ້ມູນນີ້ເພື່ອສະແດງໃນໜ້າຊຳລະເງິນ. ອັບໂຫຼດ QR ຂອງຮ້ານຖ້າຕ້ອງການຮັບໂອນດ້ວຍ QR.",
             "fields": (
@@ -30,6 +30,8 @@ class StoreSettingsAdmin(LaoAdminMixin, admin.ModelAdmin):
         "email": "ອີເມວ",
         "address": "ທີ່ຢູ່",
         "facebook_url": "ລິ້ງ Facebook",
+        "tiktok_url": "ລິ້ງ TikTok",
+        "youtube_url": "ລິ້ງ YouTube",
         "bank_name": "ຊື່ທະນາຄານ",
         "bank_account_name": "ຊື່ບັນຊີ",
         "bank_account_number": "ເລກບັນຊີ",
