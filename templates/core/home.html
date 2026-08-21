@@ -2,7 +2,7 @@
 {% load static humanize %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/home.css' %}?v=20260817-typography">
+<link rel="stylesheet" href="{% static 'css/home.css' %}?v=20260821-hero">
 {% endblock %}
 
 {% block content %}
@@ -14,40 +14,67 @@
     ========================================== -->
     <section class="home-hero">
 
-        <div class="hero-content">
+        <div class="hero-grid">
 
-            <span class="hero-badge">
-                <i class="bi bi-bag-check-fill"></i> ຍິນດີຕ້ອນຮັບສູ່ {{ store.name }}
-            </span>
+            <div class="hero-content">
 
-            <h1>
-                ຄົ້ນຫາທຸກສິ່ງ
-                <span>ທີ່ເຈົ້າຕ້ອງການ</span>
-            </h1>
+                <span class="hero-badge">
+                    <i class="bi bi-bag-check-fill"></i> ຍິນດີຕ້ອນຮັບສູ່ {{ store.name }}
+                </span>
 
-            <p>
-                ເລືອກຊື້ສິນຄ້າຄຸນນະພາບ
-                ຈາກຜູ້ຂາຍທີ່ໜ້າເຊື່ອຖືໃນບ່ອນດຽວ.
-            </p>
+                <h1>
+                    ຄົ້ນຫາທຸກສິ່ງ
+                    <span>ທີ່ເຈົ້າຕ້ອງການ</span>
+                </h1>
 
-            <form
-                method="get"
-                action="{% url 'product_list' %}"
-                class="hero-search"
-            >
+                <p>
+                    ເລືອກຊື້ສິນຄ້າຄຸນນະພາບ
+                    ຈາກຜູ້ຂາຍທີ່ໜ້າເຊື່ອຖືໃນບ່ອນດຽວ.
+                </p>
 
-                <input
-                    type="search"
-                    name="q"
-                    placeholder="ຄົ້ນຫາສິນຄ້າ..."
-                    value="{{ request.GET.q|default:'' }}"
+                <form
+                    method="get"
+                    action="{% url 'product_list' %}"
+                    class="hero-search"
                 >
 
-                <button type="submit">
-                    ຄົ້ນຫາ
-                </button>
+                    <input
+                        type="search"
+                        name="q"
+                        placeholder="ຄົ້ນຫາສິນຄ້າ..."
+                        value="{{ request.GET.q|default:'' }}"
+                    >
 
-            </form>
+                    <button type="submit">
+                        ຄົ້ນຫາ
+                    </button>
+
+                </form>
+
+                <div class="hero-cta">
+                    <a href="{% url 'product_list' %}" class="hero-cta-primary">
+                        <i class="bi bi-bag-fill me-2"></i>ຊື້ສິນຄ້າ
+                    </a>
+                    <a href="#featured-products" class="hero-cta-secondary">
+                        <i class="bi bi-stars me-2"></i>ເບິ່ງ Promotion
+                    </a>
+                </div>
+
+            </div>
+
+            <div class="hero-visual" aria-hidden="true">
+                {% for product in featured_products|slice:":3" %}
+                    <div class="hero-visual-card hero-visual-card-{{ forloop.counter }}">
+                        {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="">
+                        {% else %}
+                        <div class="hero-visual-fallback">{{ product.fallback_icon }}</div>
+                        {% endif %}
+                    </div>
+                {% empty %}
+                    <div class="hero-visual-placeholder"><i class="bi bi-bag-heart"></i></div>
+                {% endfor %}
+            </div>
 
         </div>
 
@@ -124,7 +151,7 @@
     <!-- =========================================
          FEATURED PRODUCTS
     ========================================== -->
-    <section class="home-section">
+    <section class="home-section" id="featured-products">
 
         <div class="section-header">
 
