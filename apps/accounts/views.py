@@ -1,11 +1,21 @@
 from django.contrib import messages
-from django.contrib.auth import login, logout
+from django.contrib.auth import login, logout, update_session_auth_hash
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.shortcuts import redirect, render
 
+from allauth.account.models import EmailAddress
+
 from .forms import ProfileForm, SellerApplicationForm, SignUpForm
+
+
+def _stylize(form, labels=None):
+    for name, field in form.fields.items():
+        field.widget.attrs["class"] = "form-control"
+        if labels and name in labels:
+            field.label = labels[name]
+    return form
 
 def register(request):
     if request.user.is_authenticated:
@@ -43,14 +53,48 @@ def user_logout(request):
     return redirect("home")
 
 
+PASSWORD_FORM_LABELS = {
+    "old_password": "ລະຫັດຜ່ານປັດຈຸບັນ",
+    "new_password1": "ລະຫັດຜ່ານໃໝ່",
+    "new_password2": "ຢືນຢັນລະຫັດຜ່ານໃໝ່",
+}
+
+
 @login_required
 def profile(request):
-    form = ProfileForm(request.POST or None, request.FILES or None, instance=request.user)
-    if request.method == "POST" and form.is_valid():
-        form.save()
-        messages.success(request, "Your profile has been updated.")
-        return redirect("profile")
-    return render(request, "accounts/profile.html", {"form": form})
+    form = ProfileForm(instance=request.user)
+    password_form = _stylize(PasswordChangeForm(user=request.user), PASSWORD_FORM_LABELS)
+
+    if request.method == "POST" and request.POST.get("form_name") == "password":
+        password_form = _stylize(
+            PasswordChangeForm(user=request.user, data=request.POST),
+            PASSWORD_FORM_LABELS,
+        )
+        if password_form.is_valid():
+            user = password_form.save()
+            update_session_auth_hash(request, user)
+            messages.success(request, "ປ່ຽນລະຫັດຜ່ານສຳເລັດແລ້ວ.")
+            return redirect("profile")
+    elif request.method == "POST":
+        form = ProfileForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "ບັນທຶກຂໍ້ມູນສຳເລັດແລ້ວ.")
+            return redirect("profile")
+
+    email_verified = EmailAddress.objects.filter(
+        user=request.user, email=request.user.email, verified=True
+    ).exists()
+
+    return render(
+        request,
+        "accounts/profile.html",
+        {
+            "form": form,
+            "password_form": password_form,
+            "email_verified": email_verified,
+        },
+    )
 
 
 @login_required

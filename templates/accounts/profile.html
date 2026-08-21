@@ -1,86 +1,227 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}
 ບັນຊີຂອງຂ້ອຍ | {{ store.name }}
 {% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/profile.css' %}?v=1">
+{% endblock %}
+
 {% block content %}
 
-<div class="container py-4 py-lg-5">
+<div class="container py-4 py-lg-5 profile-page">
 
-    <div class="row justify-content-center">
-        <div class="col-lg-7">
+    <h1 class="fw-bold mb-4">ບັນຊີຂອງຂ້ອຍ</h1>
 
-            <h1 class="fw-bold mb-4">ບັນຊີຂອງຂ້ອຍ</h1>
+    <!-- ============================= -->
+    <!-- PROFILE INFORMATION -->
+    <!-- ============================= -->
 
-            <div class="card border-0 shadow-sm rounded-4">
-                <div class="card-body p-4 p-md-5">
+    <div class="profile-card mb-4">
 
+        <div class="profile-card-header">
+            <h2>ຂໍ້ມູນສ່ວນຕົວ</h2>
+            <p>ຈັດການຂໍ້ມູນສ່ວນຕົວ ແລະ ລາຍລະອຽດບັນຊີຂອງທ່ານ.</p>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="profile-info-layout">
+            {% csrf_token %}
+            <input type="hidden" name="form_name" value="profile">
+
+            <div class="profile-avatar-block">
+                <div class="profile-avatar-wrap">
                     {% if user.avatar %}
-                        <div class="d-flex align-items-center gap-3 mb-4">
-                            <img
-                                src="{{ user.avatar.url }}"
-                                alt="{{ user.username }}"
-                                class="rounded-circle"
-                                style="width:72px;height:72px;object-fit:cover;"
-                            >
-                            <div>
-                                <div class="fw-bold">{{ user.username }}</div>
-                                <div class="text-muted small">{{ user.email }}</div>
-                            </div>
-                        </div>
+                    <img src="{{ user.avatar.url }}" alt="{{ user.username }}" class="profile-avatar-img" id="avatar-preview">
+                    {% else %}
+                    <div class="profile-avatar-placeholder" id="avatar-preview">{{ user.username|slice:":1"|upper }}</div>
                     {% endif %}
-
-                    <form method="post" enctype="multipart/form-data">
-                        {% csrf_token %}
-
-                        {% if form.non_field_errors %}
-                            <div class="alert alert-danger">
-                                {{ form.non_field_errors }}
-                            </div>
-                        {% endif %}
-
-                        {% for field in form %}
-                            <div class="mb-4">
-                                <label for="{{ field.id_for_label }}" class="form-label fw-semibold">
-                                    {{ field.label }}
-                                </label>
-
-                                {{ field }}
-
-                                {% if field.help_text %}
-                                    <div class="form-text">
-                                        {{ field.help_text }}
-                                    </div>
-                                {% endif %}
-
-                                {% if field.errors %}
-                                    <div class="text-danger small mt-2">
-                                        {{ field.errors }}
-                                    </div>
-                                {% endif %}
-                            </div>
-                        {% endfor %}
-
-                        <button type="submit" class="btn btn-primary">
-                            ບັນທຶກຂໍ້ມູນ
-                        </button>
-                    </form>
-
+                    <label for="{{ form.avatar.id_for_label }}" class="profile-avatar-edit" aria-label="ປ່ຽນຮູບໂປຣໄຟລ໌">
+                        <i class="bi bi-camera-fill"></i>
+                    </label>
+                    {{ form.avatar }}
                 </div>
+                <div class="profile-avatar-name">{{ user.username }}</div>
+                <span class="profile-role-badge">{{ user.get_role_display }}</span>
             </div>
 
-            {% if user.role == "CUSTOMER" %}
-                <div class="mt-3">
-                    <a class="btn btn-outline-primary" href="{% url 'seller_application' %}">
-                        <i class="bi bi-shop"></i> ສະໝັກເປັນຜູ້ຂາຍ
-                    </a>
-                </div>
-            {% endif %}
+            <div class="profile-info-fields">
 
-        </div>
+                {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+
+                <div class="profile-field-grid">
+                    <div class="profile-field">
+                        <label for="{{ form.first_name.id_for_label }}">{{ form.first_name.label }}</label>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}<div class="text-danger small mt-1">{{ form.first_name.errors }}</div>{% endif %}
+                    </div>
+                    <div class="profile-field">
+                        <label for="{{ form.last_name.id_for_label }}">{{ form.last_name.label }}</label>
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}<div class="text-danger small mt-1">{{ form.last_name.errors }}</div>{% endif %}
+                    </div>
+                    <div class="profile-field">
+                        <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}<div class="text-danger small mt-1">{{ form.email.errors }}</div>{% endif %}
+                    </div>
+                    <div class="profile-field">
+                        <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+                        {{ form.phone }}
+                        {% if form.phone.errors %}<div class="text-danger small mt-1">{{ form.phone.errors }}</div>{% endif %}
+                    </div>
+                    <div class="profile-field profile-field-full">
+                        <label for="{{ form.address.id_for_label }}">{{ form.address.label }}</label>
+                        {{ form.address }}
+                        {% if form.address.errors %}<div class="text-danger small mt-1">{{ form.address.errors }}</div>{% endif %}
+                    </div>
+                </div>
+
+                <div class="profile-form-actions">
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-check2-circle me-2"></i>ບັນທຶກຂໍ້ມູນ</button>
+                </div>
+
+            </div>
+
+        </form>
+
     </div>
+
+
+    <div class="row g-4 mb-4">
+
+        <!-- ============================= -->
+        <!-- CHANGE PASSWORD -->
+        <!-- ============================= -->
+
+        <div class="col-lg-6">
+            <div class="profile-card h-100">
+
+                <div class="profile-card-header">
+                    <h2><i class="bi bi-shield-lock me-2"></i>ປ່ຽນລະຫັດຜ່ານ</h2>
+                    <p>ອັບເດດລະຫັດຜ່ານເພື່ອຄວາມປອດໄພຂອງບັນຊີ.</p>
+                </div>
+
+                <form method="post" class="profile-password-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="form_name" value="password">
+
+                    {% if password_form.non_field_errors %}<div class="alert alert-danger">{{ password_form.non_field_errors }}</div>{% endif %}
+
+                    {% for field in password_form %}
+                    <div class="profile-field mb-3">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        <div class="profile-password-input">
+                            {{ field }}
+                            <button type="button" class="profile-password-toggle" aria-label="ສະແດງ/ເຊື່ອງລະຫັດຜ່ານ"><i class="bi bi-eye"></i></button>
+                        </div>
+                        {% if field.help_text %}<div class="form-text">{{ field.help_text|safe }}</div>{% endif %}
+                        {% if field.errors %}<div class="text-danger small mt-1">{{ field.errors }}</div>{% endif %}
+                    </div>
+                    {% endfor %}
+
+                    <button type="submit" class="btn btn-primary w-100"><i class="bi bi-shield-lock-fill me-2"></i>ອັບເດດລະຫັດຜ່ານ</button>
+                </form>
+
+            </div>
+        </div>
+
+
+        <!-- ============================= -->
+        <!-- ACCOUNT DETAILS -->
+        <!-- ============================= -->
+
+        <div class="col-lg-6">
+            <div class="profile-card h-100">
+
+                <div class="profile-card-header">
+                    <h2><i class="bi bi-info-circle me-2"></i>ລາຍລະອຽດບັນຊີ</h2>
+                    <p>ຂໍ້ມູນ ແລະ ສະຖານະບັນຊີຂອງທ່ານ.</p>
+                </div>
+
+                <div class="profile-details-list">
+
+                    <div class="profile-detail-row">
+                        <div class="profile-detail-icon"><i class="bi bi-envelope"></i></div>
+                        <div><span>ອີເມວ</span><strong>{{ user.email|default:"—" }}</strong></div>
+                    </div>
+
+                    <div class="profile-detail-row">
+                        <div class="profile-detail-icon"><i class="bi bi-telephone"></i></div>
+                        <div><span>ເບີໂທ</span><strong>{{ user.phone|default:"—" }}</strong></div>
+                    </div>
+
+                    <div class="profile-detail-row">
+                        <div class="profile-detail-icon"><i class="bi bi-calendar3"></i></div>
+                        <div><span>ເປັນສະມາຊິກຕັ້ງແຕ່</span><strong>{{ user.date_joined|date:"d/m/Y" }}</strong></div>
+                    </div>
+
+                    <div class="profile-detail-row">
+                        <div class="profile-detail-icon"><i class="bi bi-person-badge"></i></div>
+                        <div><span>ບົດບາດ</span><strong>{{ user.get_role_display }}</strong></div>
+                    </div>
+
+                    <div class="profile-detail-row">
+                        <div class="profile-detail-icon"><i class="bi bi-toggle2-on"></i></div>
+                        <div><span>ສະຖານະບັນຊີ</span><strong class="{% if user.is_active %}text-success{% else %}text-danger{% endif %}">{% if user.is_active %}ໃຊ້ງານໄດ້{% else %}ຖືກລະງັບ{% endif %}</strong></div>
+                    </div>
+
+                    <div class="profile-detail-row">
+                        <div class="profile-detail-icon"><i class="bi bi-patch-check"></i></div>
+                        <div><span>ອີເມວຢືນຢັນ</span><strong class="{% if email_verified %}text-success{% else %}text-warning{% endif %}">{% if email_verified %}ຢືນຢັນແລ້ວ{% else %}ຍັງບໍ່ຢືນຢັນ{% endif %}</strong></div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+
+    {% if user.role == "CUSTOMER" %}
+        <a class="btn btn-outline-primary" href="{% url 'seller_application' %}">
+            <i class="bi bi-shop me-2"></i>ສະໝັກເປັນຜູ້ຂາຍ
+        </a>
+    {% endif %}
 
 </div>
 
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const avatarInput = document.getElementById("{{ form.avatar.id_for_label }}");
+        if (avatarInput) {
+            avatarInput.addEventListener("change", () => {
+                const file = avatarInput.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    let preview = document.getElementById("avatar-preview");
+                    if (preview.tagName !== "IMG") {
+                        const img = document.createElement("img");
+                        img.className = "profile-avatar-img";
+                        img.id = "avatar-preview";
+                        preview.replaceWith(img);
+                        preview = img;
+                    }
+                    preview.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        document.querySelectorAll(".profile-password-toggle").forEach((btn) => {
+            btn.addEventListener("click", () => {
+                const input = btn.previousElementSibling;
+                const isPassword = input.type === "password";
+                input.type = isPassword ? "text" : "password";
+                btn.innerHTML = isPassword ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
+            });
+        });
+    });
+</script>
 {% endblock %}
