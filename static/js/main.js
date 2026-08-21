@@ -66,4 +66,53 @@ document.addEventListener('DOMContentLoaded', function () {
       frames[index].classList.add('is-active');
     }, 2500);
   });
+
+  // Hero carousel: slides left-to-right, with arrow + dot controls.
+  const heroCarousel = document.getElementById('hero-carousel');
+  if (heroCarousel) {
+    const track = heroCarousel.querySelector('.hero-carousel-track');
+    const slides = heroCarousel.querySelectorAll('.hero-carousel-slide');
+    const dots = heroCarousel.querySelectorAll('.hero-carousel-dot');
+    const prevBtn = heroCarousel.querySelector('.hero-carousel-prev');
+    const nextBtn = heroCarousel.querySelector('.hero-carousel-next');
+    let current = 0;
+    let timer = null;
+
+    function goTo(i) {
+      current = (i + slides.length) % slides.length;
+      track.style.transform = 'translateX(-' + (current * 100) + '%)';
+      dots.forEach(function (dot, dotIndex) {
+        dot.classList.toggle('is-active', dotIndex === current);
+      });
+    }
+
+    function startAutoplay() {
+      window.clearInterval(timer);
+      timer = window.setInterval(function () {
+        goTo(current + 1);
+      }, 3500);
+    }
+
+    if (slides.length > 1) {
+      if (prevBtn) {
+        prevBtn.addEventListener('click', function () {
+          goTo(current - 1);
+          startAutoplay();
+        });
+      }
+      if (nextBtn) {
+        nextBtn.addEventListener('click', function () {
+          goTo(current + 1);
+          startAutoplay();
+        });
+      }
+      dots.forEach(function (dot, dotIndex) {
+        dot.addEventListener('click', function () {
+          goTo(dotIndex);
+          startAutoplay();
+        });
+      });
+      startAutoplay();
+    }
+  }
 });
