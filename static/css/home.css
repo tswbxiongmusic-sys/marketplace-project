@@ -748,6 +748,97 @@
 
 
 /* =========================================================
+   MINI BANNER
+========================================================= */
+
+.mini-banner {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 56px;
+    padding: 18px 22px;
+    border-radius: 16px;
+}
+
+.mini-banner-blue {
+    background: linear-gradient(120deg, #eff6ff 0%, #dbeafe 100%);
+}
+
+.mini-banner-orange {
+    background: linear-gradient(120deg, #fff7ed 0%, #ffedd5 100%);
+}
+
+.mini-banner-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 46px;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.75);
+    font-size: 20px;
+}
+
+.mini-banner-blue .mini-banner-icon {
+    color: #2563eb;
+}
+
+.mini-banner-orange .mini-banner-icon {
+    color: #ea580c;
+}
+
+.mini-banner-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.mini-banner-text strong {
+    font-size: 15.5px;
+    font-weight: 800;
+    color: #111827;
+}
+
+.mini-banner-text span {
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.mini-banner-link {
+    flex: 0 0 auto;
+    font-size: 13.5px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.mini-banner-blue .mini-banner-link {
+    color: #1d4ed8;
+}
+
+.mini-banner-orange .mini-banner-link {
+    color: #c2410c;
+}
+
+.mini-banner-link:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+    .mini-banner {
+        flex-wrap: wrap;
+    }
+
+    .mini-banner-link {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+
+/* =========================================================
    EMPTY STATE
 ========================================================= */
 

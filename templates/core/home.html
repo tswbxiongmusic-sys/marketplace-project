@@ -2,7 +2,7 @@
 {% load static humanize %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/home.css' %}?v=20260821-cards">
+<link rel="stylesheet" href="{% static 'css/home.css' %}?v=20260821-banners">
 {% endblock %}
 
 {% block content %}
@@ -201,6 +201,12 @@
 
 
     <!-- =========================================
+         MINI BANNER — FREE SHIPPING
+    ========================================== -->
+    {% include "core/_mini_banner.html" with variant="blue" icon="bi-truck" title="ຊື້ຄົບ ₭300,000 ສົ່ງຟຣີ!" subtitle="ທົ່ວປະເທດ ບໍ່ມີຄ່າສົ່ງເພີ່ມ" link_name="product_list" link_text="ຊື້ເລີຍ →" %}
+
+
+    <!-- =========================================
          LATEST PRODUCTS
     ========================================== -->
     {% include "products/_section.html" with label="ມາໃໝ່" title="ສິນຄ້າລ່າສຸດ" products=latest_products empty_message="ຍັງບໍ່ມີສິນຄ້າ." %}
@@ -210,6 +216,14 @@
          ON SALE
     ========================================== -->
     {% include "products/_section.html" with label="ຫຼຸດລາຄາ" title="ສິນຄ້າລົດລາຄາ" products=on_sale_products empty_message="ຍັງບໍ່ມີສິນຄ້າຫຼຸດລາຄາ." %}
+
+
+    <!-- =========================================
+         MINI BANNER — NEW MEMBER COUPON
+    ========================================== -->
+    {% if not user.is_authenticated %}
+    {% include "core/_mini_banner.html" with variant="orange" icon="bi-gift-fill" title="ສະມາຊິກໃໝ່ຮັບຄູປອງ 10%" subtitle="ສະໝັກສະມາຊິກມື້ນີ້ ຮັບສ່ວນຫຼຸດທັນທີ" link_name="register" link_text="ສະໝັກເລີຍ →" %}
+    {% endif %}
 
 
     <!-- =========================================

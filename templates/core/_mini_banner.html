@@ -1,0 +1,16 @@
+<div class="mini-banner mini-banner-{{ variant|default:'blue' }}">
+
+    <div class="mini-banner-icon" aria-hidden="true">
+        <i class="bi {{ icon }}"></i>
+    </div>
+
+    <div class="mini-banner-text">
+        <strong>{{ title }}</strong>
+        {% if subtitle %}<span>{{ subtitle }}</span>{% endif %}
+    </div>
+
+    {% if link_name %}
+    <a href="{% url link_name %}" class="mini-banner-link">{{ link_text }}</a>
+    {% endif %}
+
+</div>
