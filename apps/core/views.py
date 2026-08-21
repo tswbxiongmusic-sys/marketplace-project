@@ -26,7 +26,7 @@ def home(request):
     products = (
         Product.objects
         .filter(is_active=True)
-        .select_related("category", "subcategory")
+        .select_related("category", "subcategory").prefetch_related("images")
     )
 
 

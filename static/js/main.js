@@ -52,4 +52,18 @@ document.addEventListener('DOMContentLoaded', function () {
       }, 1850);
     });
   });
+
+  // Cycle through a product card's photos automatically when it has more than one.
+  document.querySelectorAll('.product-image-frames').forEach(function (wrap) {
+    const frames = wrap.querySelectorAll('.product-image-frame');
+    if (frames.length < 2) {
+      return;
+    }
+    let index = 0;
+    window.setInterval(function () {
+      frames[index].classList.remove('is-active');
+      index = (index + 1) % frames.length;
+      frames[index].classList.add('is-active');
+    }, 2500);
+  });
 });

@@ -13,8 +13,15 @@
                 <span class="stock-badge stock-low">ເຫຼືອ {{ product.stock }} ຊິ້ນ</span>
             {% endif %}
 
-            {% if product.image %}
-            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+            {% if product.image or product.images.all %}
+            <div class="product-image-frames">
+                {% if product.image %}
+                <img class="product-image-frame is-active" src="{{ product.image.url }}" alt="{{ product.name }}">
+                {% endif %}
+                {% for gallery_image in product.images.all|slice:":3" %}
+                <img class="product-image-frame{% if not product.image and forloop.first %} is-active{% endif %}" src="{{ gallery_image.image.url }}" alt="{{ product.name }}">
+                {% endfor %}
+            </div>
             {% else %}
             <div class="product-no-image" aria-label="{{ product.name }}">{{ product.fallback_icon }}</div>
             {% endif %}

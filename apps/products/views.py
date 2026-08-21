@@ -16,7 +16,7 @@ User = get_user_model()
 def product_list(request):
     products = (
         Product.objects.filter(is_active=True)
-        .select_related("category", "subcategory")
+        .select_related("category", "subcategory").prefetch_related("images")
         .order_by("-created_at")
     )
 
