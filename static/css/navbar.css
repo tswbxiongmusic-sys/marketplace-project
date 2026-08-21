@@ -81,3 +81,53 @@
     row-gap:.6rem;
 
 }
+
+.nav-icon-btn{
+    position:relative;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    color:#fff;
+    font-size:1.25rem;
+    text-decoration:none;
+    margin-left:.25rem;
+    transition:var(--transition);
+}
+
+.nav-icon-btn:hover{
+    background:rgba(255,255,255,.12);
+    color:#93c5fd;
+}
+
+.nav-icon-btn::after{
+    display:none;
+}
+
+.nav-icon-badge{
+    position:absolute;
+    top:2px;
+    right:2px;
+    min-width:16px;
+    height:16px;
+    padding:0 4px;
+    border-radius:8px;
+    background:var(--danger,#dc2626);
+    color:#fff;
+    font-size:.65rem;
+    line-height:16px;
+    text-align:center;
+}
+
+.navbar .dropdown-menu{
+    border:none;
+    border-radius:var(--radius-md,10px);
+    box-shadow:var(--shadow-md,0 8px 24px rgba(0,0,0,.15));
+    margin-top:.5rem;
+}
+
+.navbar .dropdown-item i{
+    width:1.1rem;
+}

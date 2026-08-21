@@ -1,6 +1,7 @@
 from django.conf import settings
 
 from apps.cart.models import CartItem
+from apps.products.models import Category
 from .models import StoreSettings
 
 
@@ -14,6 +15,7 @@ def cart_count(request):
         "cart_count": 0,
         "unread_notifications": 0,
         "store": store,
+        "categories": Category.objects.order_by("name"),
         "social_login_providers": {
             "google": getattr(settings, "GOOGLE_LOGIN_ENABLED", False),
             "facebook": getattr(settings, "FACEBOOK_LOGIN_ENABLED", False),

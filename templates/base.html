@@ -39,7 +39,7 @@
     <link rel="stylesheet" href="{% static 'css/variables.css' %}?v=20260819-polish">
     <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20260819-polish">
     <link rel="stylesheet" href="{% static 'css/buttons.css' %}">
-    <link rel="stylesheet" href="{% static 'css/navbar.css' %}?v=20260819-wrap">
+    <link rel="stylesheet" href="{% static 'css/navbar.css' %}?v=20260821-icons">
     <link rel="stylesheet" href="{% static 'css/cards.css' %}">
     <link rel="stylesheet" href="{% static 'css/footer.css' %}">
     <link rel="stylesheet" href="{% static 'css/auth.css' %}">
@@ -72,11 +72,16 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">ໜ້າຫຼັກ</a></li>
-                   <li class="nav-item">
-    <a class="nav-link" href="{% url 'product_list' %}">
-        ສິນຄ້າ
-    </a>
-</li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="{% url 'product_list' %}" id="categoriesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">ໝວດໝູ່</a>
+                        <ul class="dropdown-menu" aria-labelledby="categoriesDropdown">
+                            <li><a class="dropdown-item" href="{% url 'product_list' %}">ເບິ່ງສິນຄ້າທັງໝົດ</a></li>
+                            {% if categories %}<li><hr class="dropdown-divider"></li>{% endif %}
+                            {% for category in categories %}
+                                <li><a class="dropdown-item" href="{% url 'product_list' %}?category={{ category.slug }}">{{ category.name }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </li>
                 </ul>
 
                 <form class="navbar-search d-flex me-3"
@@ -85,28 +90,44 @@
       role="search"
       aria-label="ຄົ້ນຫາສິນຄ້າ">
                     <input class="form-control me-2" type="search" name="q" placeholder="ຄົ້ນຫາສິນຄ້າ..." aria-label="ຄົ້ນຫາ" value="{{ request.GET.q|default:'' }}">
-                    <button class="btn btn-outline-light" type="submit">ຄົ້ນຫາ</button>
+                    <button class="btn btn-outline-light" type="submit"><i class="bi bi-search"></i></button>
                 </form>
 
                 <div class="nav-actions d-flex align-items-center">
                     {% if user.is_authenticated %}
-                        <a href="{% url 'cart' %}" class="btn btn-outline-light me-2">ກະຕ່າ{% if cart_count %} ({{ cart_count }}){% endif %}</a>
-                        <a href="{% url 'my_orders' %}" class="btn btn-outline-light me-2">ຄຳສັ່ງຊື້</a>
-                        <a href="{% url 'wishlist' %}" class="btn btn-outline-light me-2">ລາຍການທີ່ມັກ</a>
-                        <a href="{% url 'notifications' %}" class="btn btn-outline-light me-2">ແຈ້ງເຕືອນ{% if unread_notifications %} ({{ unread_notifications }}){% endif %}</a>
-                        <a href="{% url 'profile' %}" class="btn btn-outline-light me-2">ບັນຊີຂອງຂ້ອຍ</a>
-                        {% if user.is_staff %}
-                            <a href="{% url 'admin:index' %}" class="btn btn-warning me-2">ຈັດການລະບົບ</a>
-                        {% endif %}
-                        {% if user.role == "SELLER" %}
-    <a href="{% url 'seller_dashboard' %}" class="btn btn-outline-light me-2">
-        ໜ້າຈັດການຮ້ານ
-    </a>
-{% endif %}
-                        <form method="post" action="{% url 'logout' %}" class="d-inline">
-                            {% csrf_token %}
-                            <button class="btn btn-primary" type="submit">ອອກຈາກລະບົບ</button>
-                        </form>
+                        <a href="{% url 'wishlist' %}" class="nav-icon-btn" aria-label="ລາຍການທີ່ມັກ" title="ລາຍການທີ່ມັກ"><i class="bi bi-heart"></i></a>
+                        <a href="{% url 'cart' %}" class="nav-icon-btn" aria-label="ກະຕ່າ" title="ກະຕ່າ">
+                            <i class="bi bi-cart3"></i>
+                            {% if cart_count %}<span class="nav-icon-badge">{{ cart_count }}</span>{% endif %}
+                        </a>
+
+                        <div class="dropdown">
+                            <a class="nav-icon-btn dropdown-toggle" href="#" id="accountDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="ບັນຊີຂອງຂ້ອຍ" title="ບັນຊີຂອງຂ້ອຍ">
+                                <i class="bi bi-person-circle"></i>
+                                {% if unread_notifications %}<span class="nav-icon-badge">{{ unread_notifications }}</span>{% endif %}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown">
+                                <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="bi bi-person me-2"></i>ບັນຊີຂອງຂ້ອຍ</a></li>
+                                <li><a class="dropdown-item" href="{% url 'my_orders' %}"><i class="bi bi-bag-check me-2"></i>ຄຳສັ່ງຊື້</a></li>
+                                <li><a class="dropdown-item" href="{% url 'notifications' %}"><i class="bi bi-bell me-2"></i>ແຈ້ງເຕືອນ{% if unread_notifications %} ({{ unread_notifications }}){% endif %}</a></li>
+                                {% if user.is_staff or user.role == "SELLER" %}
+                                    <li><hr class="dropdown-divider"></li>
+                                {% endif %}
+                                {% if user.role == "SELLER" %}
+                                    <li><a class="dropdown-item" href="{% url 'seller_dashboard' %}"><i class="bi bi-shop me-2"></i>ໜ້າຈັດການຮ້ານ</a></li>
+                                {% endif %}
+                                {% if user.is_staff %}
+                                    <li><a class="dropdown-item" href="{% url 'admin:index' %}"><i class="bi bi-gear me-2"></i>ຈັດການລະບົບ</a></li>
+                                {% endif %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form method="post" action="{% url 'logout' %}">
+                                        {% csrf_token %}
+                                        <button class="dropdown-item" type="submit"><i class="bi bi-box-arrow-right me-2"></i>ອອກຈາກລະບົບ</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
                     {% else %}
                         <a href="{% url 'login' %}" class="btn btn-outline-light me-2">ເຂົ້າລະບົບ</a>
                         <a href="{% url 'register' %}" class="btn btn-primary">ສະໝັກສະມາຊິກ</a>
