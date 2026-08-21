@@ -8,11 +8,11 @@ class ProductionSecurityHeadersMiddleware:
         response = self.get_response(request)
         response["Content-Security-Policy"] = (
             "default-src 'self'; "
-            "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
-            "script-src 'self' https://cdn.jsdelivr.net; "
+            "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; "
+            "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
             "img-src 'self' data: https:; "
-            "font-src 'self' data: https://cdn.jsdelivr.net; "
-            "connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+            "font-src 'self' data: https://cdn.jsdelivr.net https://fonts.gstatic.com; "
+            "connect-src 'self' https://cdn.jsdelivr.net; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
         )
         response["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
         return response
