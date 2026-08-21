@@ -1,5 +1,5 @@
 from django.db import connection
-from django.db.models import F
+from django.db.models import Avg, F, Sum
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
@@ -40,11 +40,19 @@ def home(request):
 
 
     # -----------------------------------------
-    # Featured Products
+    # Featured Products — highest rated, newest as tiebreaker
     # -----------------------------------------
-    featured_products = products.order_by(
-        "-created_at"
-    )[:8]
+    featured_products = products.annotate(
+        rating_avg=Avg("reviews__rating")
+    ).order_by("-rating_avg", "-created_at")[:5]
+
+
+    # -----------------------------------------
+    # Best Sellers — most units sold historically
+    # -----------------------------------------
+    bestseller_products = products.annotate(
+        units_sold=Sum("orderitem__quantity")
+    ).filter(units_sold__gt=0).order_by("-units_sold")[:5]
 
 
     # -----------------------------------------
@@ -52,20 +60,27 @@ def home(request):
     # -----------------------------------------
     latest_products = products.order_by(
         "-created_at"
-    )[:12]
+    )[:5]
 
 
     # -----------------------------------------
     # Flash Sale
     # -----------------------------------------
-    flash_sale_products = list(
+    on_sale_products = list(
         products.filter(
             sale_price__isnull=False,
             sale_price__lt=F("price"),
             sale_ends_at__gt=timezone.now(),
-        ).order_by("sale_ends_at")[:5]
+        ).order_by("sale_ends_at")
     )
+    flash_sale_products = on_sale_products[:5]
     flash_sale_ends_at = flash_sale_products[0].sale_ends_at if flash_sale_products else None
+
+
+    # -----------------------------------------
+    # You Might Like — a rotating random sample
+    # -----------------------------------------
+    recommended_products = products.order_by("?")[:5]
 
 
     # -----------------------------------------
@@ -82,7 +97,10 @@ def home(request):
         {
             "categories": categories,
             "featured_products": featured_products,
+            "bestseller_products": bestseller_products,
             "latest_products": latest_products,
+            "on_sale_products": on_sale_products[:5],
+            "recommended_products": recommended_products,
             "flash_sale_products": flash_sale_products,
             "flash_sale_ends_at": flash_sale_ends_at,
             "wishlisted_ids": wishlisted_ids,

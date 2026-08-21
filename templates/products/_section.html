@@ -1,0 +1,29 @@
+<section class="home-section"{% if section_id %} id="{{ section_id }}"{% endif %}>
+
+    <div class="section-header">
+
+        <div>
+            <span class="section-label">{{ label }}</span>
+            <h2>{{ title }}</h2>
+        </div>
+
+        <a href="{% url 'product_list' %}" class="section-link">ເບິ່ງທັງໝົດ →</a>
+
+    </div>
+
+
+    <div class="product-grid">
+
+        {% for product in products %}
+            {% include "products/_card.html" %}
+        {% empty %}
+
+        <div class="empty-state">
+            <p>{{ empty_message }}</p>
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</section>

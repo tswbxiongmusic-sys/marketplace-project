@@ -191,89 +191,31 @@
     <!-- =========================================
          FEATURED PRODUCTS
     ========================================== -->
-    <section class="home-section" id="featured-products">
-
-        <div class="section-header">
-
-            <div>
-                <span class="section-label">
-                    ແນະນຳ
-                </span>
-
-                <h2>
-                    ສິນຄ້າແນະນຳ
-                </h2>
-            </div>
-
-            <a
-                href="{% url 'product_list' %}"
-                class="section-link"
-            >
-                ເບິ່ງທັງໝົດ →
-            </a>
-
-        </div>
+    {% include "products/_section.html" with section_id="featured-products" label="ແນະນຳ" title="ສິນຄ້າແນະນຳ" products=featured_products empty_message="ຍັງບໍ່ມີສິນຄ້າແນະນຳ." %}
 
 
-        <div class="product-grid">
-
-            {% for product in featured_products %}
-                {% include "products/_card.html" %}
-            {% empty %}
-
-            <div class="empty-state">
-                <p>ຍັງບໍ່ມີສິນຄ້າແນະນຳ.</p>
-            </div>
-
-            {% endfor %}
-
-        </div>
-
-    </section>
+    <!-- =========================================
+         BEST SELLERS
+    ========================================== -->
+    {% include "products/_section.html" with label="ຂາຍດີ" title="ສິນຄ້າຂາຍດີ" products=bestseller_products empty_message="ຍັງບໍ່ມີສິນຄ້າຂາຍດີ." %}
 
 
     <!-- =========================================
          LATEST PRODUCTS
     ========================================== -->
-    <section class="home-section">
-
-        <div class="section-header">
-
-            <div>
-                <span class="section-label">
-                    ມາໃໝ່
-                </span>
-
-                <h2>
-                    ສິນຄ້າລ່າສຸດ
-                </h2>
-            </div>
-
-            <a
-                href="{% url 'product_list' %}"
-                class="section-link"
-            >
-                ເບິ່ງທັງໝົດ →
-            </a>
-
-        </div>
+    {% include "products/_section.html" with label="ມາໃໝ່" title="ສິນຄ້າລ່າສຸດ" products=latest_products empty_message="ຍັງບໍ່ມີສິນຄ້າ." %}
 
 
-        <div class="product-grid">
+    <!-- =========================================
+         ON SALE
+    ========================================== -->
+    {% include "products/_section.html" with label="ຫຼຸດລາຄາ" title="ສິນຄ້າລົດລາຄາ" products=on_sale_products empty_message="ຍັງບໍ່ມີສິນຄ້າຫຼຸດລາຄາ." %}
 
-            {% for product in latest_products %}
-                {% include "products/_card.html" %}
-            {% empty %}
 
-            <div class="empty-state">
-                <p>ຍັງບໍ່ມີສິນຄ້າ.</p>
-            </div>
-
-            {% endfor %}
-
-        </div>
-
-    </section>
+    <!-- =========================================
+         RECOMMENDED
+    ========================================== -->
+    {% include "products/_section.html" with label="ແນະນຳສະເພາະທ່ານ" title="ອາດຈະຖືກໃຈເຈົ້າ" products=recommended_products empty_message="ຍັງບໍ່ມີສິນຄ້າ." %}
 
 </div>
 
