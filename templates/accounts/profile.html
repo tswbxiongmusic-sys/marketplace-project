@@ -142,35 +142,58 @@
 
                 <div class="profile-details-list">
 
-                    <div class="profile-detail-row">
+                    <a href="#id_email" class="profile-detail-row">
                         <div class="profile-detail-icon"><i class="bi bi-envelope"></i></div>
                         <div><span>ອີເມວ</span><strong>{{ user.email|default:"—" }}</strong></div>
-                    </div>
+                        <i class="bi bi-chevron-right profile-detail-chevron"></i>
+                    </a>
 
-                    <div class="profile-detail-row">
+                    <a href="#id_phone" class="profile-detail-row">
                         <div class="profile-detail-icon"><i class="bi bi-telephone"></i></div>
                         <div><span>ເບີໂທ</span><strong>{{ user.phone|default:"—" }}</strong></div>
-                    </div>
+                        <i class="bi bi-chevron-right profile-detail-chevron"></i>
+                    </a>
 
-                    <div class="profile-detail-row">
+                    <div class="profile-detail-row profile-detail-row-static">
                         <div class="profile-detail-icon"><i class="bi bi-calendar3"></i></div>
                         <div><span>ເປັນສະມາຊິກຕັ້ງແຕ່</span><strong>{{ user.date_joined|date:"d/m/Y" }}</strong></div>
                     </div>
 
-                    <div class="profile-detail-row">
+                    {% if user.role == "CUSTOMER" %}
+                    <a href="{% url 'seller_application' %}" class="profile-detail-row">
+                        <div class="profile-detail-icon"><i class="bi bi-person-badge"></i></div>
+                        <div><span>ບົດບາດ</span><strong>{{ user.get_role_display }}</strong></div>
+                        <i class="bi bi-chevron-right profile-detail-chevron"></i>
+                    </a>
+                    {% elif user.role == "SELLER" %}
+                    <a href="{% url 'seller_dashboard' %}" class="profile-detail-row">
+                        <div class="profile-detail-icon"><i class="bi bi-person-badge"></i></div>
+                        <div><span>ບົດບາດ</span><strong>{{ user.get_role_display }}</strong></div>
+                        <i class="bi bi-chevron-right profile-detail-chevron"></i>
+                    </a>
+                    {% elif user.is_staff %}
+                    <a href="{% url 'admin:index' %}" class="profile-detail-row">
+                        <div class="profile-detail-icon"><i class="bi bi-person-badge"></i></div>
+                        <div><span>ບົດບາດ</span><strong>{{ user.get_role_display }}</strong></div>
+                        <i class="bi bi-chevron-right profile-detail-chevron"></i>
+                    </a>
+                    {% else %}
+                    <div class="profile-detail-row profile-detail-row-static">
                         <div class="profile-detail-icon"><i class="bi bi-person-badge"></i></div>
                         <div><span>ບົດບາດ</span><strong>{{ user.get_role_display }}</strong></div>
                     </div>
+                    {% endif %}
 
-                    <div class="profile-detail-row">
+                    <div class="profile-detail-row profile-detail-row-static">
                         <div class="profile-detail-icon"><i class="bi bi-toggle2-on"></i></div>
                         <div><span>ສະຖານະບັນຊີ</span><strong class="{% if user.is_active %}text-success{% else %}text-danger{% endif %}">{% if user.is_active %}ໃຊ້ງານໄດ້{% else %}ຖືກລະງັບ{% endif %}</strong></div>
                     </div>
 
-                    <div class="profile-detail-row">
+                    <a href="{% url 'account_email' %}" class="profile-detail-row">
                         <div class="profile-detail-icon"><i class="bi bi-patch-check"></i></div>
-                        <div><span>ອີເມວຢືນຢັນ</span><strong class="{% if email_verified %}text-success{% else %}text-warning{% endif %}">{% if email_verified %}ຢືນຢັນແລ້ວ{% else %}ຍັງບໍ່ຢືນຢັນ{% endif %}</strong></div>
-                    </div>
+                        <div><span>ອີເມວຢືນຢັນ</span><strong class="{% if email_verified %}text-success{% else %}text-warning{% endif %}">{% if email_verified %}ຢືນຢັນແລ້ວ{% else %}ຍັງບໍ່ຢືນຢັນ — ກົດເພື່ອຢືນຢັນ{% endif %}</strong></div>
+                        <i class="bi bi-chevron-right profile-detail-chevron"></i>
+                    </a>
 
                 </div>
 

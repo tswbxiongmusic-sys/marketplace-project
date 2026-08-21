@@ -5,9 +5,9 @@ from django.conf import settings
 
 class User(AbstractUser):
     class Role(models.TextChoices):
-        CUSTOMER = "CUSTOMER", "Customer"
-        SELLER = "SELLER", "Seller"
-        ADMIN = "ADMIN", "Admin"
+        CUSTOMER = "CUSTOMER", "ລູກຄ້າ"
+        SELLER = "SELLER", "ຜູ້ຂາຍ"
+        ADMIN = "ADMIN", "ຜູ້ດູແລລະບົບ"
 
     role = models.CharField(
         max_length=20,
