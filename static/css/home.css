@@ -280,55 +280,47 @@
 
 .category-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 18px;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 20px 12px;
 }
 
-.category-card {
+.category-pill {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 15px;
-    min-height: 100px;
-    padding: 20px;
-    border: 1px solid #e5e7eb;
-    border-radius: 18px;
-    background: #ffffff;
-    color: #111827;
+    gap: 10px;
     text-decoration: none;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-    transition: 0.25s ease;
+    color: #111827;
+    text-align: center;
+    transition: transform 0.2s ease;
 }
 
-.category-card:hover {
-    transform: translateY(-4px);
-    border-color: #bfdbfe;
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.10);
+.category-pill:hover {
+    transform: translateY(-5px);
 }
 
-.category-icon {
+.category-pill-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    flex: 0 0 52px;
-    width: 52px;
-    height: 52px;
-    border-radius: 15px;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
     background: #eff6ff;
-    font-size: 24px;
+    font-size: 30px;
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.12);
+    transition: 0.2s ease;
 }
 
-.category-card h3 {
-    margin: 0 0 5px;
-    font-size: 17px;
-    font-weight: 700;
-    line-height: 1.55;
+.category-pill:hover .category-pill-icon {
+    background: #dbeafe;
+    box-shadow: 0 12px 26px rgba(37, 99, 235, 0.22);
 }
 
-.category-card p {
-    margin: 0;
-    color: #6b7280;
-    font-size: 13px;
-    line-height: 1.6;
+.category-pill-label {
+    font-size: 13.5px;
+    font-weight: 600;
+    line-height: 1.4;
 }
 
 
@@ -524,7 +516,7 @@
 @media (max-width: 992px) {
 
     .category-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
     }
 
     .product-grid {
@@ -606,7 +598,18 @@
     }
 
     .category-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(auto-fill, minmax(78px, 1fr));
+        gap: 16px 8px;
+    }
+
+    .category-pill-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 24px;
+    }
+
+    .category-pill-label {
+        font-size: 12px;
     }
 
     .product-grid {

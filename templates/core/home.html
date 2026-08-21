@@ -2,7 +2,7 @@
 {% load static humanize %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/home.css' %}?v=20260821-hero">
+<link rel="stylesheet" href="{% static 'css/home.css' %}?v=20260821-categories">
 {% endblock %}
 
 {% block content %}
@@ -112,28 +112,13 @@
 
             {% for category in categories %}
 
-            <div class="category-card-wrap">
-                <a
-                    href="{% url 'product_list' %}?category={{ category.slug }}"
-                    class="category-card"
-                >
-                    <div class="category-icon" aria-hidden="true">{{ category.icon }}</div>
-                    <div>
-                        <h3>{{ category.name }}</h3>
-                        <p>ເບິ່ງສິນຄ້າ</p>
-                    </div>
-                </a>
-
-                {% if category.subcategories.all %}
-                <div class="subcategory-list">
-                    {% for subcategory in category.subcategories.all %}
-                    <a href="{% url 'product_list' %}?category={{ category.slug }}&subcategory={{ subcategory.slug }}">
-                        {{ subcategory.name }}
-                    </a>
-                    {% endfor %}
-                </div>
-                {% endif %}
-            </div>
+            <a
+                href="{% url 'product_list' %}?category={{ category.slug }}"
+                class="category-pill"
+            >
+                <span class="category-pill-icon" aria-hidden="true">{{ category.icon }}</span>
+                <span class="category-pill-label">{{ category.name }}</span>
+            </a>
 
             {% empty %}
 
