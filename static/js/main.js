@@ -147,4 +147,31 @@ document.addEventListener('DOMContentLoaded', function () {
       if (e.key === 'Escape') closeDrawer();
     });
   })();
+
+  // Quick contact floating button
+  (function () {
+    const wrapper = document.getElementById('quickContact');
+    const toggleBtn = document.getElementById('quickContactToggle');
+    const panel = document.getElementById('quickContactPanel');
+    if (!wrapper || !toggleBtn || !panel) return;
+
+    function closePanel() {
+      panel.classList.remove('is-open');
+      toggleBtn.setAttribute('aria-expanded', 'false');
+    }
+
+    toggleBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      const isOpen = panel.classList.toggle('is-open');
+      toggleBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!wrapper.contains(e.target)) closePanel();
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closePanel();
+    });
+  })();
 });

@@ -41,6 +41,7 @@
     <link rel="stylesheet" href="{% static 'css/buttons.css' %}">
     <link rel="stylesheet" href="{% static 'css/navbar.css' %}?v=20260821-icons">
     <link rel="stylesheet" href="{% static 'css/side_drawer.css' %}">
+    <link rel="stylesheet" href="{% static 'css/quick_contact.css' %}">
     <link rel="stylesheet" href="{% static 'css/cards.css' %}">
     <link rel="stylesheet" href="{% static 'css/footer.css' %}">
     <link rel="stylesheet" href="{% static 'css/auth.css' %}">
@@ -368,6 +369,48 @@
         </div>
     </div>
 </footer>
+
+
+<!-- Quick contact floating button -->
+{% if store.phone or store.facebook_url or store.email %}
+<div class="quick-contact" id="quickContact">
+
+    <div class="quick-contact-panel" id="quickContactPanel">
+        <div class="quick-contact-panel-header">ຕິດຕໍ່ພວກເຮົາ</div>
+
+        {% if store.phone %}
+        <a href="tel:{{ store.phone }}" class="quick-contact-link">
+            <span class="quick-contact-icon quick-contact-icon-phone"><i class="bi bi-telephone-fill"></i></span>
+            <span class="quick-contact-text">ໂທຫາຮ້ານ<small>{{ store.phone }}</small></span>
+        </a>
+        {% endif %}
+
+        {% if store.facebook_url %}
+        <a href="{{ store.facebook_url }}" target="_blank" rel="noopener" class="quick-contact-link">
+            <span class="quick-contact-icon quick-contact-icon-fb"><i class="bi bi-messenger"></i></span>
+            <span class="quick-contact-text">ຝາກຂໍ້ຄວາມທາງ Facebook</span>
+        </a>
+        {% endif %}
+
+        {% if store.email %}
+        <a href="mailto:{{ store.email }}" class="quick-contact-link">
+            <span class="quick-contact-icon quick-contact-icon-mail"><i class="bi bi-envelope-fill"></i></span>
+            <span class="quick-contact-text">ສົ່ງອີເມວ<small>{{ store.email }}</small></span>
+        </a>
+        {% endif %}
+
+        <a href="{% url 'store_info' %}" class="quick-contact-link">
+            <span class="quick-contact-icon quick-contact-icon-info"><i class="bi bi-info-circle-fill"></i></span>
+            <span class="quick-contact-text">ຂໍ້ມູນຕິດຕໍ່ຮ້ານທັງໝົດ</span>
+        </a>
+    </div>
+
+    <button type="button" class="quick-contact-fab" id="quickContactToggle" aria-label="ຕິດຕໍ່ພວກເຮົາ" aria-expanded="false" aria-controls="quickContactPanel">
+        <i class="bi bi-headset"></i>
+    </button>
+
+</div>
+{% endif %}
 
 
 <!-- Scripts -->
