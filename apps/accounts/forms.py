@@ -82,6 +82,37 @@ class ProfileForm(forms.ModelForm):
         }
 
 
+class SellerPaymentForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = (
+            "bank_name",
+            "bank_account_name",
+            "bank_account_number",
+            "payment_qr",
+        )
+        widgets = {
+            "bank_name": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "ເຊັ່ນ: BCEL, LDB, ..."}
+            ),
+            "bank_account_name": forms.TextInput(
+                attrs={"class": "form-control"}
+            ),
+            "bank_account_number": forms.TextInput(
+                attrs={"class": "form-control"}
+            ),
+            "payment_qr": forms.FileInput(
+                attrs={"class": "form-control"}
+            ),
+        }
+        labels = {
+            "bank_name": "ຊື່ທະນາຄານ",
+            "bank_account_name": "ຊື່ບັນຊີ",
+            "bank_account_number": "ເລກບັນຊີ",
+            "payment_qr": "ຮູບ QR ຮັບເງິນ",
+        }
+
+
 class SellerApplicationForm(forms.Form):
     confirm = forms.BooleanField(
         label="ຂ້ອຍຍອມຮັບວ່າຈະຂາຍສິນຄ້າຢ່າງຮັບຜິດຊອບ.",

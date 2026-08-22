@@ -189,28 +189,44 @@
                             {% endif %}
 
                             <section class="payment-instructions" data-payment-panel="bank_transfer" hidden>
-                                <h6 class="fw-bold mb-3">ຂໍ້ມູນບັນຊີສຳລັບໂອນເງິນ</h6>
-                                {% if store.bank_account_number %}
-                                    <dl class="transfer-details mb-0">
-                                        {% if store.bank_name %}<div><dt>ທະນາຄານ</dt><dd>{{ store.bank_name }}</dd></div>{% endif %}
-                                        {% if store.bank_account_name %}<div><dt>ຊື່ບັນຊີ</dt><dd>{{ store.bank_account_name }}</dd></div>{% endif %}
-                                        <div><dt>ເລກບັນຊີ</dt><dd><code>{{ store.bank_account_number }}</code></dd></div>
-                                    </dl>
-                                {% else %}
-                                    <div class="alert alert-warning py-2 mb-0 small">ຮ້ານຍັງບໍ່ໄດ້ລະບຸຂໍ້ມູນບັນຊີ. ກະລຸນາຕິດຕໍ່ຮ້ານກ່ອນໂອນ.</div>
-                                {% endif %}
-                                {% if store.transfer_instructions %}<p class="small text-muted mt-3 mb-0">{{ store.transfer_instructions|linebreaksbr }}</p>{% endif %}
+                                <h6 class="fw-bold mb-1">ຂໍ້ມູນບັນຊີສຳລັບໂອນເງິນ</h6>
+                                <p class="text-muted small mb-3">ກະຕ່າຂອງທ່ານມີສິນຄ້າຈາກ {{ seller_groups|length }} ຮ້ານ — ກະລຸນາໂອນຫາແຕ່ລະຮ້ານແຍກກັນຕາມຍອດຂອງຮ້ານນັ້ນ.</p>
+                                {% for group in seller_groups %}
+                                <div class="seller-payment-card">
+                                    <div class="seller-payment-header">
+                                        <span><i class="bi bi-shop me-1"></i>{{ group.seller.username }}</span>
+                                        <strong>₭{{ group.subtotal|floatformat:0|intcomma }}</strong>
+                                    </div>
+                                    {% if group.seller.bank_account_number %}
+                                        <dl class="transfer-details mb-0">
+                                            {% if group.seller.bank_name %}<div><dt>ທະນາຄານ</dt><dd>{{ group.seller.bank_name }}</dd></div>{% endif %}
+                                            {% if group.seller.bank_account_name %}<div><dt>ຊື່ບັນຊີ</dt><dd>{{ group.seller.bank_account_name }}</dd></div>{% endif %}
+                                            <div><dt>ເລກບັນຊີ</dt><dd><code>{{ group.seller.bank_account_number }}</code></dd></div>
+                                        </dl>
+                                    {% else %}
+                                        <div class="alert alert-warning py-2 mb-0 small">ຮ້ານນີ້ຍັງບໍ່ໄດ້ລະບຸຂໍ້ມູນບັນຊີ. ກະລຸນາຕິດຕໍ່ຮ້ານກ່ອນໂອນ ຫຼື ເລືອກຈ່າຍປາຍທາງແທນ.</div>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
                             </section>
 
                             <section class="payment-instructions" data-payment-panel="qr_payment" hidden>
-                                <h6 class="fw-bold mb-3">ສະແກນ QR ຂອງຮ້ານ</h6>
-                                {% if store.payment_qr %}
-                                    <img class="payment-qr-image" src="{{ store.payment_qr.url }}" alt="QR ສຳລັບໂອນເງິນໃຫ້ {{ store.name }}">
-                                {% else %}
-                                    <div class="alert alert-warning py-2 small">ຮ້ານຍັງບໍ່ໄດ້ອັບໂຫຼດ QR. ກະລຸນາເລືອກໂອນຜ່ານທະນາຄານ ຫຼື ຕິດຕໍ່ຮ້ານ.</div>
-                                {% endif %}
-                                {% if store.bank_account_number %}<p class="small text-muted mb-0">ຫຼືໂອນເຂົ້າເລກບັນຊີ: <strong>{{ store.bank_account_number }}</strong></p>{% endif %}
-                                {% if store.transfer_instructions %}<p class="small text-muted mt-3 mb-0">{{ store.transfer_instructions|linebreaksbr }}</p>{% endif %}
+                                <h6 class="fw-bold mb-1">ສະແກນ QR ຂອງແຕ່ລະຮ້ານ</h6>
+                                <p class="text-muted small mb-3">ກະຕ່າຂອງທ່ານມີສິນຄ້າຈາກ {{ seller_groups|length }} ຮ້ານ — ກະລຸນາສະແກນ QR ຂອງແຕ່ລະຮ້ານແຍກກັນຕາມຍອດຂອງຮ້ານນັ້ນ.</p>
+                                {% for group in seller_groups %}
+                                <div class="seller-payment-card">
+                                    <div class="seller-payment-header">
+                                        <span><i class="bi bi-shop me-1"></i>{{ group.seller.username }}</span>
+                                        <strong>₭{{ group.subtotal|floatformat:0|intcomma }}</strong>
+                                    </div>
+                                    {% if group.seller.payment_qr %}
+                                        <img class="payment-qr-image" src="{{ group.seller.payment_qr.url }}" alt="QR ສຳລັບໂອນເງິນໃຫ້ {{ group.seller.username }}">
+                                    {% else %}
+                                        <div class="alert alert-warning py-2 small mb-0">ຮ້ານນີ້ຍັງບໍ່ໄດ້ອັບໂຫຼດ QR. ກະລຸນາເລືອກໂອນຜ່ານທະນາຄານ ຫຼື ຈ່າຍປາຍທາງແທນ.</div>
+                                    {% endif %}
+                                    {% if group.seller.bank_account_number %}<p class="small text-muted mb-0 mt-2">ຫຼືໂອນເຂົ້າເລກບັນຊີ: <strong>{{ group.seller.bank_account_number }}</strong></p>{% endif %}
+                                </div>
+                                {% endfor %}
                             </section>
 
                             <div id="payment-receipt-field" class="payment-receipt-field mt-3" hidden>
@@ -514,7 +530,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/cart.css' %}?v=1">
-<link rel="stylesheet" href="{% static 'css/checkout.css' %}?v=20260822-steps">
+<link rel="stylesheet" href="{% static 'css/checkout.css' %}?v=20260822-sellerqr">
 {% endblock %}
 
 {% block extra_js %}

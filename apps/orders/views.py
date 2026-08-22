@@ -21,11 +21,27 @@ def notify_order(order, message):
         send_mail("ແຈ້ງເຕືອນຄຳສັ່ງຊື້", message, None, [order.user.email], fail_silently=True)
 
 
+def group_items_by_seller(items):
+    """Split cart items by seller, since each seller has an independent bank
+    account/QR and a buyer must pay each one separately."""
+    groups = {}
+    seller_order = []
+    for item in items:
+        seller = item.product.seller
+        if seller.id not in groups:
+            groups[seller.id] = {"seller": seller, "items": [], "subtotal": 0}
+            seller_order.append(seller.id)
+        groups[seller.id]["items"].append(item)
+        groups[seller.id]["subtotal"] += item.product.price * item.quantity
+    return [groups[seller_id] for seller_id in seller_order]
+
+
 def checkout_context(request, form):
     """Render checkout consistently after both GET and form validation errors."""
-    items = CartItem.objects.filter(user=request.user).select_related("product")
+    items = CartItem.objects.filter(user=request.user).select_related("product", "product__seller")
     total = sum((item.product.price * item.quantity for item in items), start=0)
     shipping_methods = list(ShippingMethod.objects.filter(is_active=True))
+    seller_groups = group_items_by_seller(items)
 
     applied_coupon = None
     discount_amount = 0
@@ -40,6 +56,7 @@ def checkout_context(request, form):
         "items": items,
         "total": total,
         "form": form,
+        "seller_groups": seller_groups,
         "shipping_methods": shipping_methods,
         "shipping_method_fees": {
             str(method.pk): str(method.fee) for method in shipping_methods

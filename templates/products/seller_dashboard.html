@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load humanize %}
+{% load static humanize %}
 
 {% block title %}
 ໜ້າຈັດການຮ້ານ | {{ store.name }}
@@ -133,6 +133,60 @@
                 </a>
             </div>
         {% endif %}
+    </div>
+</div>
+
+
+<!-- ========================= -->
+<!-- PAYMENT SETTINGS -->
+<!-- ========================= -->
+
+<div class="card border-0 shadow-sm rounded-4 mt-4">
+    <div class="card-body p-4">
+
+        <div class="d-flex align-items-center gap-2 mb-2">
+            <i class="bi bi-qr-code fs-4 text-primary"></i>
+            <h4 class="fw-bold mb-0">ຂໍ້ມູນຮັບເງິນ</h4>
+        </div>
+        <p class="text-muted small mb-4">
+            ລູກຄ້າຈະເຫັນ QR ແລະ ບັນຊີທະນາຄານນີ້ ເມື່ອຊື້ສິນຄ້າຈາກຮ້ານຂອງທ່ານ ແລະ ເລືອກຊຳລະຜ່ານທະນາຄານ/QR.
+            ແຕ່ລະຮ້ານໃນເວັບຈະໃຊ້ຂໍ້ມູນຮັບເງິນຂອງຕົນເອງ ບໍ່ໄດ້ໃຊ້ QR ຮ່ວມກັນ.
+        </p>
+
+        <form method="post" action="{% url 'seller_payment_settings' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    {{ payment_form.bank_name.label_tag }}
+                    {{ payment_form.bank_name }}
+                    {% if payment_form.bank_name.errors %}<div class="text-danger small mt-2">{{ payment_form.bank_name.errors }}</div>{% endif %}
+                </div>
+                <div class="col-md-6">
+                    {{ payment_form.bank_account_name.label_tag }}
+                    {{ payment_form.bank_account_name }}
+                    {% if payment_form.bank_account_name.errors %}<div class="text-danger small mt-2">{{ payment_form.bank_account_name.errors }}</div>{% endif %}
+                </div>
+                <div class="col-md-6">
+                    {{ payment_form.bank_account_number.label_tag }}
+                    {{ payment_form.bank_account_number }}
+                    {% if payment_form.bank_account_number.errors %}<div class="text-danger small mt-2">{{ payment_form.bank_account_number.errors }}</div>{% endif %}
+                </div>
+                <div class="col-md-6">
+                    {{ payment_form.payment_qr.label_tag }}
+                    {% if request.user.payment_qr %}
+                        <div class="mb-2">
+                            <img src="{{ request.user.payment_qr.url }}" alt="QR ປັດຈຸບັນ" style="width:90px;height:90px;object-fit:contain;border:1px solid #e5e7eb;border-radius:8px;">
+                        </div>
+                    {% endif %}
+                    {{ payment_form.payment_qr }}
+                    {% if payment_form.payment_qr.errors %}<div class="text-danger small mt-2">{{ payment_form.payment_qr.errors }}</div>{% endif %}
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-4">ບັນທຶກຂໍ້ມູນຮັບເງິນ</button>
+        </form>
+
     </div>
 </div>
 

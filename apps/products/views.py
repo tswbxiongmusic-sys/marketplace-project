@@ -7,6 +7,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
+from apps.accounts.forms import SellerPaymentForm
+
 from .forms import ProductForm, ReviewForm
 from .models import Category, Product, ProductImage, Review, Wishlist
 
@@ -123,7 +125,34 @@ def seller_dashboard(request):
     return render(
         request,
         "products/seller_dashboard.html",
-        {"products": products},
+        {"products": products, "payment_form": SellerPaymentForm(instance=request.user)},
+    )
+
+
+@login_required
+def seller_payment_settings(request):
+    if request.user.role != request.user.Role.SELLER:
+        messages.error(request, "ສ່ວນນີ້ສຳລັບຜູ້ຂາຍເທົ່ານັ້ນ.")
+        return redirect("home")
+
+    if request.method != "POST":
+        return redirect("seller_dashboard")
+
+    form = SellerPaymentForm(request.POST, request.FILES, instance=request.user)
+    if form.is_valid():
+        form.save()
+        messages.success(request, "ບັນທຶກຂໍ້ມູນຮັບເງິນແລ້ວ.")
+        return redirect("seller_dashboard")
+
+    products = (
+        Product.objects.filter(seller=request.user)
+        .select_related("category")
+        .order_by("-created_at")
+    )
+    return render(
+        request,
+        "products/seller_dashboard.html",
+        {"products": products, "payment_form": form},
     )
 
 

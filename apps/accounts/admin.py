@@ -56,6 +56,10 @@ class CustomUserAdmin(LaoAdminMixin, UserAdmin):
             {"fields": ("role", "seller_requested_at", "seller_approved_at")},
         ),
         (
+            "ຂໍ້ມູນຮັບເງິນ (ສຳລັບຜູ້ຂາຍ)",
+            {"fields": ("bank_name", "bank_account_name", "bank_account_number", "payment_qr")},
+        ),
+        (
             "ສິດທິໃນລະບົບ",
             {
                 "fields": (
@@ -106,6 +110,10 @@ class CustomUserAdmin(LaoAdminMixin, UserAdmin):
         "address": "ທີ່ຢູ່",
         "seller_requested_at": "ວັນທີສະໝັກເປັນຜູ້ຂາຍ",
         "seller_approved_at": "ວັນທີອະນຸມັດຜູ້ຂາຍ",
+        "bank_name": "ຊື່ທະນາຄານ",
+        "bank_account_name": "ຊື່ບັນຊີ",
+        "bank_account_number": "ເລກບັນຊີ",
+        "payment_qr": "ຮູບ QR ຮັບເງິນ",
         "is_active": "ເປີດໃຊ້ບັນຊີ",
         "is_staff": "ເຂົ້າໃຊ້ສ່ວນຈັດການໄດ້",
         "is_superuser": "ສິດສູງສຸດ",

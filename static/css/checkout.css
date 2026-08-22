@@ -176,6 +176,31 @@
     box-shadow: 0 .35rem 1rem rgba(0, 0, 0, .08);
 }
 
+.seller-payment-card {
+    padding: .85rem 1rem;
+    border-radius: .75rem;
+    background: #fff;
+    border: 1px solid rgba(37, 99, 235, .12);
+}
+
+.seller-payment-card + .seller-payment-card {
+    margin-top: .85rem;
+}
+
+.seller-payment-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+    margin-bottom: .65rem;
+    font-weight: 700;
+    color: #111827;
+}
+
+.seller-payment-header strong {
+    color: var(--primary);
+}
+
 #payment-receipt-field[hidden] {
     display: none !important;
 }

@@ -30,6 +30,14 @@ class User(AbstractUser):
     seller_requested_at = models.DateTimeField(blank=True, null=True)
     seller_approved_at = models.DateTimeField(blank=True, null=True)
 
+    # Each seller is an independent business with its own bank account, so
+    # buyers must pay each seller in a cart separately rather than through
+    # one shared store-wide QR code.
+    bank_name = models.CharField(max_length=120, blank=True)
+    bank_account_name = models.CharField(max_length=160, blank=True)
+    bank_account_number = models.CharField(max_length=80, blank=True)
+    payment_qr = models.ImageField(upload_to="sellers/payment_qr/", blank=True, null=True)
+
     def __str__(self):
         return self.username
 
