@@ -3,6 +3,102 @@
     height: 42px;
 }
 
+.checkout-section-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: #eff6ff;
+    color: var(--primary);
+    font-size: 14px;
+}
+
+.checkout-option-grid {
+    display: grid;
+    gap: 12px;
+}
+
+.checkout-option-grid-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.checkout-option-grid-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.checkout-option-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 18px 12px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: var(--radius-md, 14px);
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.checkout-option-card input {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    margin: 0;
+}
+
+.checkout-option-card:hover {
+    border-color: var(--primary);
+    background: rgba(37, 99, 235, .04);
+}
+
+.checkout-option-card:has(input:checked) {
+    border-color: var(--primary);
+    background: rgba(37, 99, 235, .08);
+    box-shadow: 0 0 0 .2rem rgba(37, 99, 235, .1);
+}
+
+.checkout-option-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #eff6ff;
+    color: var(--primary);
+    font-size: 18px;
+}
+
+.checkout-option-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #111827;
+}
+
+.checkout-option-text small {
+    font-weight: 400;
+    color: #6b7280;
+    font-size: 11.5px;
+}
+
+@media (max-width: 480px) {
+    .checkout-option-grid-3 {
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+
+    .checkout-option-card {
+        flex-direction: row;
+        text-align: left;
+        justify-content: flex-start;
+    }
+}
+
 .delivery-option {
     cursor: pointer;
     transition: border-color .18s ease, background-color .18s ease, box-shadow .18s ease;

@@ -150,11 +150,16 @@ def place_order(request):
 
         order = Order.objects.create(
             user=request.user,
+            recipient_name=form.cleaned_data["recipient_name"],
+            phone=form.cleaned_data["phone"],
+            shipping_address=form.cleaned_data["shipping_address"],
+            shipping_method=shipping_method,
+            payment_method=form.cleaned_data["payment_method"],
+            payment_receipt=form.cleaned_data.get("payment_receipt"),
             shipping_fee=shipping_method.fee,
             coupon=coupon,
             discount_amount=discount_amount,
             total_price=product_total + shipping_method.fee - discount_amount,
-            **form.cleaned_data,
         )
 
         if coupon is not None:

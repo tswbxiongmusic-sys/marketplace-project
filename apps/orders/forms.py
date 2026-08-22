@@ -1,5 +1,6 @@
 from django import forms
 
+from .lao_locations import LAO_PROVINCE_CHOICES
 from .models import Order, ShippingMethod
 
 
@@ -10,10 +11,15 @@ class ShippingMethodChoiceField(forms.ModelChoiceField):
 
 
 class CheckoutForm(forms.Form):
-    recipient_name = forms.CharField(max_length=150, label="ຊື່ຜູ້ຮັບ")
-    phone = forms.CharField(max_length=20, label="ເບີໂທ")
-    shipping_address = forms.CharField(
-        label="ທີ່ຢູ່ຈັດສົ່ງ", widget=forms.Textarea(attrs={"rows": 3})
+    recipient_name = forms.CharField(max_length=150, label="ຊື່-ນາມສະກຸນ")
+    phone = forms.CharField(max_length=20, label="ເບີໂທຕິດຕໍ່")
+    province = forms.ChoiceField(label="ແຂວງ / ນະຄອນຫຼວງ", choices=LAO_PROVINCE_CHOICES)
+    district = forms.CharField(max_length=100, label="ເມືອງ")
+    village_address = forms.CharField(max_length=200, label="ບ້ານ / ຖະໜົນ")
+    address_notes = forms.CharField(
+        label="ລາຍລະອຽດເພີ່ມເຕີມ (ຖ້າມີ)",
+        widget=forms.Textarea(attrs={"rows": 2}),
+        required=False,
     )
     shipping_method = ShippingMethodChoiceField(
         label="ວິທີຈັດສົ່ງ",
@@ -32,7 +38,10 @@ class CheckoutForm(forms.Form):
         shipping_methods = ShippingMethod.objects.filter(is_active=True)
         self.fields["shipping_method"].queryset = shipping_methods
 
-        for field_name in ("recipient_name", "phone", "shipping_address", "payment_receipt"):
+        for field_name in (
+            "recipient_name", "phone", "province", "district",
+            "village_address", "address_notes", "payment_receipt",
+        ):
             css_class = "form-control"
             self.fields[field_name].widget.attrs["class"] = css_class
 
@@ -48,4 +57,15 @@ class CheckoutForm(forms.Form):
         cleaned = super().clean()
         if cleaned.get("payment_method") in {"bank_transfer", "qr_payment"} and not cleaned.get("payment_receipt"):
             self.add_error("payment_receipt", "ກະລຸນາອັບໂຫຼດຫຼັກຖານການໂອນເງິນ.")
+
+        address_parts = [
+            cleaned.get("village_address", "").strip(),
+            cleaned.get("district", "").strip(),
+            cleaned.get("province", "").strip(),
+        ]
+        composed_address = ", ".join(part for part in address_parts if part)
+        if cleaned.get("address_notes"):
+            composed_address += f"\n{cleaned['address_notes'].strip()}"
+        cleaned["shipping_address"] = composed_address
+
         return cleaned

@@ -35,6 +35,12 @@
     color: #ffffff;
 }
 
+.cart-step.is-done .cart-step-circle {
+    background: var(--success, #16a34a);
+    color: #ffffff;
+    font-size: 15px;
+}
+
 .cart-step-label {
     font-size: 12.5px;
     font-weight: 600;
@@ -42,7 +48,8 @@
     white-space: nowrap;
 }
 
-.cart-step.is-active .cart-step-label {
+.cart-step.is-active .cart-step-label,
+.cart-step.is-done .cart-step-label {
     color: #111827;
 }
 
@@ -52,6 +59,10 @@
     margin: 0 10px;
     margin-bottom: 20px;
     background: #e5e7eb;
+}
+
+.cart-step-line.is-done {
+    background: var(--success, #16a34a);
 }
 
 

@@ -10,23 +10,33 @@
 <div class="container py-5">
 
     <!-- Page Header -->
-    <div class="mb-5">
+    <div class="mb-4">
 
         <a
             href="{% url 'cart' %}"
             class="text-decoration-none text-muted d-inline-block mb-3"
         >
-            ← ກັບໄປກະຕ່າ
+            ← ກັບໄປທີ່ກະຕ່າສິນຄ້າ
         </a>
 
-        <h1 class="fw-bold mb-2">
-            ຢືນຢັນການສັ່ງຊື້
-        </h1>
+    </div>
 
-        <p class="text-muted mb-0">
-            ກະລຸນາກອກຂໍ້ມູນຈັດສົ່ງເພື່ອດຳເນີນຄຳສັ່ງຊື້.
-        </p>
-
+    <!-- Step indicator -->
+    <div class="cart-steps mb-5">
+        <div class="cart-step is-done">
+            <span class="cart-step-circle"><i class="bi bi-check-lg"></i></span>
+            <span class="cart-step-label">ກະຕ່າສິນຄ້າ</span>
+        </div>
+        <div class="cart-step-line is-done"></div>
+        <div class="cart-step is-active">
+            <span class="cart-step-circle">2</span>
+            <span class="cart-step-label">ຂໍ້ມູນຈັດສົ່ງ</span>
+        </div>
+        <div class="cart-step-line"></div>
+        <div class="cart-step">
+            <span class="cart-step-circle">3</span>
+            <span class="cart-step-label">ຊຳລະເງິນ</span>
+        </div>
     </div>
 
 
@@ -88,62 +98,91 @@
 
 
                         <!-- Recipient information -->
-                        {% for field in form %}
-                            {% if field.name == 'recipient_name' or field.name == 'phone' or field.name == 'shipping_address' %}
-                                <div class="mb-4">
-                                    {{ field.label_tag }}
-                                    {{ field }}
-                                    {% if field.errors %}
-                                        <div class="text-danger small mt-2">{{ field.errors }}</div>
-                                    {% endif %}
-                                </div>
-                            {% endif %}
-                        {% endfor %}
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                {{ form.recipient_name.label_tag }}
+                                {{ form.recipient_name }}
+                                {% if form.recipient_name.errors %}<div class="text-danger small mt-2">{{ form.recipient_name.errors }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.phone.label_tag }}
+                                {{ form.phone }}
+                                {% if form.phone.errors %}<div class="text-danger small mt-2">{{ form.phone.errors }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.province.label_tag }}
+                                {{ form.province }}
+                                {% if form.province.errors %}<div class="text-danger small mt-2">{{ form.province.errors }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.district.label_tag }}
+                                {{ form.district }}
+                                {% if form.district.errors %}<div class="text-danger small mt-2">{{ form.district.errors }}</div>{% endif %}
+                            </div>
+                            <div class="col-12">
+                                {{ form.village_address.label_tag }}
+                                {{ form.village_address }}
+                                {% if form.village_address.errors %}<div class="text-danger small mt-2">{{ form.village_address.errors }}</div>{% endif %}
+                            </div>
+                            <div class="col-12">
+                                {{ form.address_notes.label_tag }}
+                                {{ form.address_notes }}
+                                {% if form.address_notes.errors %}<div class="text-danger small mt-2">{{ form.address_notes.errors }}</div>{% endif %}
+                            </div>
+                        </div>
 
                         <!-- Delivery method -->
                         <div class="border-top pt-4 mt-4">
-                            <h5 class="fw-bold mb-1">ວິທີຈັດສົ່ງ</h5>
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <span class="checkout-section-icon"><i class="bi bi-truck"></i></span>
+                                <h5 class="fw-bold mb-0">2. ວິທີຈັດສົ່ງ</h5>
+                            </div>
                             <p class="text-muted small mb-3">ຄ່າຂົນສົ່ງຈະຖືກລວມໃນຍອດສຸດທ້າຍ.</p>
 
                             {% if form.shipping_method.errors %}
                                 <div class="text-danger small mb-2">{{ form.shipping_method.errors }}</div>
                             {% endif %}
 
-                            {% for radio in form.shipping_method %}
-                                <label class="delivery-option d-flex gap-3 align-items-start border rounded-3 p-3 mb-2" for="{{ radio.id_for_label }}">
-                                    {{ radio.tag }}
-                                    <span class="form-check-label fw-semibold">{{ radio.choice_label }}</span>
-                                </label>
-                            {% empty %}
-                                <div class="alert alert-warning mb-0">ຍັງບໍ່ມີວິທີຈັດສົ່ງ. ກະລຸນາໃຫ້ admin ເພີ່ມການຕັ້ງຄ່າກ່ອນ.</div>
-                            {% endfor %}
+                            <div class="checkout-option-grid checkout-option-grid-2">
+                                {% for radio in form.shipping_method %}
+                                    <label class="checkout-option-card" for="{{ radio.id_for_label }}">
+                                        {{ radio.tag }}
+                                        <span class="checkout-option-icon"><i class="bi {% if forloop.first %}bi-truck{% else %}bi-lightning-charge-fill{% endif %}"></i></span>
+                                        <span class="checkout-option-text">{{ radio.choice_label }}</span>
+                                    </label>
+                                {% empty %}
+                                    <div class="alert alert-warning mb-0">ຍັງບໍ່ມີວິທີຈັດສົ່ງ. ກະລຸນາໃຫ້ admin ເພີ່ມການຕັ້ງຄ່າກ່ອນ.</div>
+                                {% endfor %}
+                            </div>
                         </div>
 
 
                         <div class="border-top pt-4 mt-4">
-                            <h5 class="fw-bold mb-1">ວິທີຊຳລະເງິນ</h5>
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <span class="checkout-section-icon"><i class="bi bi-credit-card"></i></span>
+                                <h5 class="fw-bold mb-0">3. ວິທີຊຳລະເງິນ</h5>
+                            </div>
                             <p class="text-muted small mb-3">ການໂອນເງິນຈະຖືກກວດສອບໂດຍຮ້ານກ່ອນຈັດສົ່ງ.</p>
 
-                            <label for="payment_cod" class="payment-option d-block border rounded-3 p-3 mb-2">
-                                <span class="form-check d-flex gap-2 align-items-start">
-                                    <input class="form-check-input mt-1" type="radio" name="payment_method" value="cash_on_delivery" id="payment_cod" {% if form.payment_method.value == "cash_on_delivery" or not form.payment_method.value %}checked{% endif %}>
-                                    <span class="form-check-label"><strong>ຈ່າຍເງິນປາຍທາງ</strong><span class="d-block text-muted small mt-1">ຊຳລະເມື່ອໄດ້ຮັບສິນຄ້າ.</span></span>
-                                </span>
-                            </label>
+                            <div class="checkout-option-grid checkout-option-grid-3">
+                                <label for="payment_cod" class="checkout-option-card">
+                                    <input type="radio" name="payment_method" value="cash_on_delivery" id="payment_cod" {% if form.payment_method.value == "cash_on_delivery" or not form.payment_method.value %}checked{% endif %}>
+                                    <span class="checkout-option-icon"><i class="bi bi-cash-coin"></i></span>
+                                    <span class="checkout-option-text"><strong>ຈ່າຍເງິນປາຍທາງ</strong><small>ຊຳລະເມື່ອໄດ້ຮັບສິນຄ້າ</small></span>
+                                </label>
 
-                            <label for="payment_bank" class="payment-option d-block border rounded-3 p-3 mb-2">
-                                <span class="form-check d-flex gap-2 align-items-start">
-                                    <input class="form-check-input mt-1" type="radio" name="payment_method" value="bank_transfer" id="payment_bank" {% if form.payment_method.value == "bank_transfer" %}checked{% endif %}>
-                                    <span class="form-check-label"><strong>ໂອນຜ່ານທະນາຄານ</strong><span class="d-block text-muted small mt-1">ໂອນເຂົ້າບັນຊີຮ້ານ ແລ້ວອັບໂຫຼດຫຼັກຖານ.</span></span>
-                                </span>
-                            </label>
+                                <label for="payment_bank" class="checkout-option-card">
+                                    <input type="radio" name="payment_method" value="bank_transfer" id="payment_bank" {% if form.payment_method.value == "bank_transfer" %}checked{% endif %}>
+                                    <span class="checkout-option-icon"><i class="bi bi-bank"></i></span>
+                                    <span class="checkout-option-text"><strong>ໂອນຜ່ານທະນາຄານ</strong><small>ອັບໂຫຼດຫຼັກຖານ</small></span>
+                                </label>
 
-                            <label for="payment_qr" class="payment-option d-block border rounded-3 p-3 mb-2">
-                                <span class="form-check d-flex gap-2 align-items-start">
-                                    <input class="form-check-input mt-1" type="radio" name="payment_method" value="qr_payment" id="payment_qr" {% if form.payment_method.value == "qr_payment" %}checked{% endif %}>
-                                    <span class="form-check-label"><strong>ສະແກນ QR ເພື່ອໂອນເງິນ</strong><span class="d-block text-muted small mt-1">ສະແກນ QR ຂອງຮ້ານ ແລະອັບໂຫຼດຫຼັກຖານ.</span></span>
-                                </span>
-                            </label>
+                                <label for="payment_qr" class="checkout-option-card">
+                                    <input type="radio" name="payment_method" value="qr_payment" id="payment_qr" {% if form.payment_method.value == "qr_payment" %}checked{% endif %}>
+                                    <span class="checkout-option-icon"><i class="bi bi-qr-code"></i></span>
+                                    <span class="checkout-option-text"><strong>ສະແກນ QR</strong><small>ໂອນຜ່ານ QR</small></span>
+                                </label>
+                            </div>
 
                             {% if form.payment_method.errors %}
                                 <div class="text-danger small mt-2">{{ form.payment_method.errors }}</div>
@@ -204,27 +243,15 @@
 
                     <div class="card-body p-4">
 
-                        <div class="d-flex align-items-center mb-4">
+                        <div class="mb-4">
 
-                            <div
-                                class="bg-primary text-white rounded-circle step-circle
-                                       d-flex align-items-center justify-content-center
-                                       me-3"
-                            >
-                                2
-                            </div>
+                            <h4 class="fw-bold mb-1">
+                                ສະຫຼຸບຄຳສັ່ງຊື້
+                            </h4>
 
-                            <div>
-
-                                <h4 class="fw-bold mb-1">
-                                    ສະຫຼຸບຄຳສັ່ງຊື້
-                                </h4>
-
-                                <p class="text-muted mb-0">
-                                    ກວດເບິ່ງສິນຄ້າຂອງທ່ານ.
-                                </p>
-
-                            </div>
+                            <p class="text-muted mb-0">
+                                ກວດເບິ່ງສິນຄ້າຂອງທ່ານ.
+                            </p>
 
                         </div>
 
@@ -369,6 +396,16 @@
 
                         </div>
 
+                        <div class="cart-coupon-box mb-1">
+                            {% if applied_coupon %}
+                            <p class="cart-coupon-applied mb-1"><i class="bi bi-check-circle-fill me-1"></i>ໃຊ້ຄູປອງ {{ applied_coupon.code }} ແລ້ວ</p>
+                            <a href="{% url 'cart' %}" class="small">ປ່ຽນ/ລຶບຄູປອງ ຢູ່ໜ້າກະຕ່າ</a>
+                            {% else %}
+                            <p class="small text-muted mb-1">ມີຄູປອງສ່ວນຫຼຸດບໍ່?</p>
+                            <a href="{% url 'cart' %}" class="small">ໃສ່ຄູປອງຢູ່ໜ້າກະຕ່າ →</a>
+                            {% endif %}
+                        </div>
+
 
                         <!-- Confirm Order -->
 
@@ -377,7 +414,7 @@
                             class="order-action-btn btn btn-lg w-100 mt-4"
                             aria-label="ຢືນຢັນຄຳສັ່ງຊື້"
                         >
-                            <span class="btn-label">ຢືນຢັນຄຳສັ່ງຊື້</span>
+                            <span class="btn-label">ໄປຕໍ່ການຊຳລະເງິນ →</span>
                             <span class="order-road" aria-hidden="true"></span>
                             <span class="order-car car-1" aria-hidden="true"><i class="bi bi-car-front-fill"></i></span>
                             <span class="order-car car-2" aria-hidden="true"><i class="bi bi-car-front-fill"></i></span>
@@ -390,10 +427,29 @@
                             class="btn btn-outline-secondary w-100 mt-2 rounded-3"
                         >
 
-                            ← ກັບໄປກະຕ່າ
+                            ← ກັບໄປທີ່ກະຕ່າສິນຄ້າ
 
                         </a>
 
+
+                        <div class="cart-trust-row">
+                            <div>
+                                <i class="bi bi-shield-lock-fill"></i>
+                                <span>ຊຳລະປອດໄພ 100%</span>
+                            </div>
+                            <div>
+                                <i class="bi bi-truck"></i>
+                                <span>ຈັດສົ່ງທົ່ວປະເທດ</span>
+                            </div>
+                            <div>
+                                <i class="bi bi-arrow-counterclockwise"></i>
+                                <span>ຄືນເງິນ 7 ວັນ</span>
+                            </div>
+                        </div>
+
+                        <p class="text-center text-muted small mt-3 mb-0">
+                            ທ່ານສາມາດກວດສອບຄຳສັ່ງຊື້ຢູ່ໜ້າ "ປະຫວັດຄຳສັ່ງຊື້".
+                        </p>
 
                         <div class="text-center text-muted small mt-3">
 
@@ -457,7 +513,8 @@
 {% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/checkout.css' %}?v=20260818-payment">
+<link rel="stylesheet" href="{% static 'css/cart.css' %}?v=1">
+<link rel="stylesheet" href="{% static 'css/checkout.css' %}?v=20260822-steps">
 {% endblock %}
 
 {% block extra_js %}
