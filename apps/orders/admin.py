@@ -1,7 +1,67 @@
 from django.contrib import admin
 from apps.core.admin_utils import LaoAdminMixin, LaoInlineMixin
 
-from .models import Order, OrderItem, OrderShipment, ShippingMethod
+from .models import Coupon, Order, OrderItem, OrderShipment, ShippingMethod
+
+
+@admin.register(Coupon)
+class CouponAdmin(LaoAdminMixin, admin.ModelAdmin):
+    list_display = (
+        "code",
+        "discount_display",
+        "min_order_display",
+        "usage_display",
+        "valid_range_display",
+        "is_active",
+    )
+    list_filter = ("discount_type", "is_active")
+    search_fields = ("code",)
+    readonly_fields = ("times_used", "created_at")
+    fieldsets = (
+        ("ຄູປອງ", {
+            "fields": ("code", "is_active"),
+        }),
+        ("ສ່ວນຫຼຸດ", {
+            "fields": ("discount_type", "discount_value", "min_order_amount"),
+        }),
+        ("ເງື່ອນໄຂການໃຊ້ງານ", {
+            "fields": ("max_uses", "times_used", "valid_from", "valid_until"),
+        }),
+        ("ບັນທຶກ", {"fields": ("created_at",)}),
+    )
+    field_labels = {
+        "code": "ລະຫັດຄູປອງ",
+        "discount_type": "ປະເພດສ່ວນຫຼຸດ",
+        "discount_value": "ມູນຄ່າສ່ວນຫຼຸດ",
+        "min_order_amount": "ຍອດຊື້ຂັ້ນຕ່ຳ",
+        "max_uses": "ຈຳນວນຄັ້ງທີ່ໃຊ້ໄດ້ສູງສຸດ",
+        "times_used": "ໃຊ້ໄປແລ້ວ",
+        "valid_from": "ໃຊ້ໄດ້ຕັ້ງແຕ່",
+        "valid_until": "ໃຊ້ໄດ້ຫາ",
+        "is_active": "ເປີດໃຊ້ງານ",
+        "created_at": "ສ້າງເມື່ອ",
+    }
+
+    @admin.display(description="ສ່ວນຫຼຸດ")
+    def discount_display(self, obj):
+        return str(obj)
+
+    @admin.display(description="ຍອດຊື້ຂັ້ນຕ່ຳ", ordering="min_order_amount")
+    def min_order_display(self, obj):
+        return f"₭{obj.min_order_amount:,.0f}" if obj.min_order_amount else "—"
+
+    @admin.display(description="ໃຊ້ໄປແລ້ວ")
+    def usage_display(self, obj):
+        limit = obj.max_uses if obj.max_uses is not None else "∞"
+        return f"{obj.times_used} / {limit}"
+
+    @admin.display(description="ໄລຍະເວລາ")
+    def valid_range_display(self, obj):
+        if not obj.valid_from and not obj.valid_until:
+            return "ບໍ່ຈຳກັດ"
+        start = obj.valid_from.strftime("%d/%m/%Y") if obj.valid_from else "—"
+        end = obj.valid_until.strftime("%d/%m/%Y") if obj.valid_until else "—"
+        return f"{start} - {end}"
 
 
 class OrderItemInline(LaoInlineMixin, admin.TabularInline):
@@ -120,6 +180,8 @@ class OrderAdmin(LaoAdminMixin, admin.ModelAdmin):
                 "payment_receipt",
                 "shipping_method",
                 "shipping_fee",
+                "coupon",
+                "discount_amount",
                 "total_price_display",
                 "created_at_display",
             )
@@ -140,6 +202,8 @@ class OrderAdmin(LaoAdminMixin, admin.ModelAdmin):
         "payment_receipt": "ຫຼັກຖານການໂອນ",
         "shipping_method": "ວິທີຈັດສົ່ງ",
         "shipping_fee": "ຄ່າຂົນສົ່ງ",
+        "coupon": "ຄູປອງທີ່ໃຊ້",
+        "discount_amount": "ຈຳນວນສ່ວນຫຼຸດ",
         "recipient_name": "ຊື່ຜູ້ຮັບ",
         "phone": "ເບີໂທ",
         "shipping_address": "ທີ່ຢູ່ຈັດສົ່ງ",

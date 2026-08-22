@@ -11,7 +11,7 @@ from apps.cart.models import CartItem
 from apps.products.models import Product
 
 from .forms import CheckoutForm
-from .models import Order, OrderItem, OrderShipment, ShippingMethod
+from .models import Coupon, Order, OrderItem, OrderShipment, ShippingMethod
 
 
 def notify_order(order, message):
@@ -26,6 +26,16 @@ def checkout_context(request, form):
     items = CartItem.objects.filter(user=request.user).select_related("product")
     total = sum((item.product.price * item.quantity for item in items), start=0)
     shipping_methods = list(ShippingMethod.objects.filter(is_active=True))
+
+    applied_coupon = None
+    discount_amount = 0
+    coupon_code = request.session.get("applied_coupon_code")
+    if coupon_code:
+        coupon = Coupon.objects.filter(code__iexact=coupon_code).first()
+        if coupon and not coupon.error_for(total):
+            applied_coupon = coupon
+            discount_amount = coupon.compute_discount(total)
+
     return {
         "items": items,
         "total": total,
@@ -34,6 +44,9 @@ def checkout_context(request, form):
         "shipping_method_fees": {
             str(method.pk): str(method.fee) for method in shipping_methods
         },
+        "applied_coupon": applied_coupon,
+        "discount_amount": discount_amount,
+        "subtotal_after_discount": total - discount_amount,
     }
 
 
@@ -123,12 +136,30 @@ def place_order(request):
             (item.product.price * item.quantity for item in items), start=0
         )
         shipping_method = form.cleaned_data["shipping_method"]
+
+        coupon = None
+        discount_amount = 0
+        coupon_code = request.session.get("applied_coupon_code")
+        if coupon_code:
+            coupon = Coupon.objects.filter(code__iexact=coupon_code).first()
+            if coupon is None or coupon.error_for(product_total):
+                messages.warning(request, "ຄູປອງທີ່ນຳໃຊ້ບໍ່ສາມາດໃຊ້ໄດ້ອີກຕໍ່ໄປ, ຄຳສັ່ງຊື້ຈະດຳເນີນຕໍ່ໂດຍບໍ່ມີສ່ວນຫຼຸດ.")
+                coupon = None
+            else:
+                discount_amount = coupon.compute_discount(product_total)
+
         order = Order.objects.create(
             user=request.user,
             shipping_fee=shipping_method.fee,
-            total_price=product_total + shipping_method.fee,
+            coupon=coupon,
+            discount_amount=discount_amount,
+            total_price=product_total + shipping_method.fee - discount_amount,
             **form.cleaned_data,
         )
+
+        if coupon is not None:
+            Coupon.objects.filter(pk=coupon.pk).update(times_used=F("times_used") + 1)
+            request.session.pop("applied_coupon_code", None)
 
         for item in items:
             product = products[item.product_id]

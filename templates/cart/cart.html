@@ -125,7 +125,7 @@
 
         <div class="col-lg-4">
 
-            <div class="cart-summary-card sticky-lg-top sticky-summary-offset" data-subtotal="{{ total }}">
+            <div class="cart-summary-card sticky-lg-top sticky-summary-offset" data-subtotal="{{ subtotal_after_discount }}">
 
                 <h4 class="fw-bold mb-4">ສະຫຼຸບຄຳສັ່ງຊື້</h4>
 
@@ -139,6 +139,13 @@
                     <span class="fw-semibold">₭{{ total|floatformat:0|intcomma }}</span>
                 </div>
 
+                {% if applied_coupon %}
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="text-success"><i class="bi bi-tag-fill me-1"></i>ສ່ວນຫຼຸດ ({{ applied_coupon.code }})</span>
+                    <span class="fw-semibold text-success">−₭{{ discount_amount|floatformat:0|intcomma }}</span>
+                </div>
+                {% endif %}
+
                 <div class="d-flex justify-content-between mb-3">
                     <span class="text-muted">ຄ່າຈັດສົ່ງ</span>
                     <span class="fw-semibold" id="cart-shipping-fee">
@@ -151,8 +158,25 @@
                 <div class="d-flex justify-content-between mb-4">
                     <span class="fw-bold fs-5">ລວມທັງໝົດ</span>
                     <span class="fw-bold fs-4 text-primary" id="cart-grand-total">
-                        ₭{{ total|floatformat:0|intcomma }}
+                        ₭{{ grand_total|floatformat:0|intcomma }}
                     </span>
+                </div>
+
+                <div class="cart-coupon-box mb-4">
+                    <p class="fw-semibold small mb-2">ມີຄູປອງສ່ວນຫຼຸດບໍ່?</p>
+                    {% if applied_coupon %}
+                    <form method="post" action="{% url 'remove_coupon' %}" class="d-flex align-items-center justify-content-between gap-2">
+                        {% csrf_token %}
+                        <span class="cart-coupon-applied"><i class="bi bi-check-circle-fill me-1"></i>{{ applied_coupon.code }}</span>
+                        <button type="submit" class="btn btn-outline-danger btn-sm">ນຳອອກ</button>
+                    </form>
+                    {% else %}
+                    <form method="post" action="{% url 'apply_coupon' %}" class="d-flex gap-2">
+                        {% csrf_token %}
+                        <input type="text" name="code" class="form-control" placeholder="ໃສ່ລະຫັດຄູປອງ">
+                        <button type="submit" class="btn btn-primary">ໃຊ້ງານ</button>
+                    </form>
+                    {% endif %}
                 </div>
 
                 {% if shipping_methods %}

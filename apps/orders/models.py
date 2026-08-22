@@ -1,14 +1,74 @@
 import uuid
 from decimal import Decimal
 
+from django.core.validators import MinValueValidator
 from django.db import models, transaction
 from django.db.models import F, Sum
 from django.conf import settings
+from django.utils import timezone
 from apps.products.models import Product
 
 
 def generate_order_number():
     return f"ORD-{uuid.uuid4().hex[:10].upper()}"
+
+
+class Coupon(models.Model):
+    """A discount code the store owner can create and hand out to customers."""
+
+    PERCENT = "percent"
+    FIXED = "fixed"
+    DISCOUNT_TYPE_CHOICES = [
+        (PERCENT, "ເປີເຊັນ (%)"),
+        (FIXED, "ຈຳນວນເງິນຄົງທີ່ (₭)"),
+    ]
+
+    code = models.CharField(max_length=40, unique=True)
+    discount_type = models.CharField(max_length=10, choices=DISCOUNT_TYPE_CHOICES, default=PERCENT)
+    discount_value = models.DecimalField(
+        max_digits=10, decimal_places=2, validators=[MinValueValidator(Decimal("0.01"))]
+    )
+    min_order_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0, blank=True)
+    max_uses = models.PositiveIntegerField(
+        null=True, blank=True, help_text="ປ່ອຍວ່າງໄວ້ = ບໍ່ຈຳກັດຈຳນວນຄັ້ງ"
+    )
+    times_used = models.PositiveIntegerField(default=0, editable=False)
+    valid_from = models.DateTimeField(null=True, blank=True)
+    valid_until = models.DateTimeField(null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "ຄູປອງສ່ວນຫຼຸດ"
+        verbose_name_plural = "ຄູປອງສ່ວນຫຼຸດ"
+
+    def __str__(self):
+        if self.discount_type == self.PERCENT:
+            return f"{self.code} (-{self.discount_value}%)"
+        return f"{self.code} (-₭{self.discount_value:,.0f})"
+
+    def error_for(self, subtotal):
+        """Return a Lao-language error string if this coupon cannot be used, else None."""
+        now = timezone.now()
+        if not self.is_active:
+            return "ຄູປອງນີ້ຖືກປິດໃຊ້ງານແລ້ວ."
+        if self.valid_from and now < self.valid_from:
+            return "ຄູປອງນີ້ຍັງບໍ່ທັນເຖິງເວລາໃຊ້ງານ."
+        if self.valid_until and now > self.valid_until:
+            return "ຄູປອງນີ້ໝົດອາຍຸແລ້ວ."
+        if self.max_uses is not None and self.times_used >= self.max_uses:
+            return "ຄູປອງນີ້ຖືກໃຊ້ຄົບຈຳນວນແລ້ວ."
+        if subtotal < self.min_order_amount:
+            return f"ຄູປອງນີ້ໃຊ້ໄດ້ເມື່ອຊື້ຄົບ ₭{self.min_order_amount:,.0f}."
+        return None
+
+    def compute_discount(self, subtotal):
+        subtotal = Decimal(subtotal)
+        if self.discount_type == self.PERCENT:
+            discount = (subtotal * self.discount_value / Decimal("100"))
+        else:
+            discount = self.discount_value
+        return min(discount, subtotal).quantize(Decimal("1"))
 
 
 class ShippingMethod(models.Model):
@@ -81,6 +141,15 @@ class Order(models.Model):
         blank=True,
     )
     shipping_fee = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+
+    coupon = models.ForeignKey(
+        Coupon,
+        on_delete=models.SET_NULL,
+        related_name="orders",
+        null=True,
+        blank=True,
+    )
+    discount_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
 
     payment_method = models.CharField(
     max_length=30,

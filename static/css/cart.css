@@ -287,6 +287,24 @@
     box-shadow: var(--shadow-sm);
 }
 
+.cart-coupon-box {
+    padding-top: 4px;
+    padding-bottom: 12px;
+    border-bottom: 1px dashed #e5e7eb;
+}
+
+.cart-coupon-box input {
+    min-width: 0;
+}
+
+.cart-coupon-applied {
+    display: flex;
+    align-items: center;
+    color: var(--success, #16a34a);
+    font-weight: 700;
+    font-size: 14px;
+}
+
 .cart-shipping-options {
     padding-top: 6px;
     border-top: 1px dashed #e5e7eb;

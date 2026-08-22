@@ -3,7 +3,7 @@ from django.http import HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 
-from apps.orders.models import ShippingMethod
+from apps.orders.models import Coupon, ShippingMethod
 from apps.products.models import Product, Wishlist
 from .models import CartItem
 
@@ -55,6 +55,21 @@ def cart_view(request):
         Wishlist.objects.filter(user=request.user).values_list("product_id", flat=True)
     )
 
+    applied_coupon = None
+    discount_amount = 0
+    coupon_code = request.session.get("applied_coupon_code")
+    if coupon_code:
+        applied_coupon = Coupon.objects.filter(code__iexact=coupon_code).first()
+        error = applied_coupon.error_for(total) if applied_coupon else "ບໍ່ພົບລະຫັດຄູປອງນີ້."
+        if error:
+            messages.warning(request, f"ຄູປອງ {coupon_code}: {error}")
+            request.session.pop("applied_coupon_code", None)
+            applied_coupon = None
+        else:
+            discount_amount = applied_coupon.compute_discount(total)
+
+    default_shipping_fee = shipping_methods[0].fee if shipping_methods else 0
+
     return render(
         request,
         "cart/cart.html",
@@ -64,8 +79,49 @@ def cart_view(request):
             "shipping_methods": shipping_methods,
             "recommended_products": recommended_products,
             "wishlisted_ids": wishlisted_ids,
+            "applied_coupon": applied_coupon,
+            "discount_amount": discount_amount,
+            "subtotal_after_discount": total - discount_amount,
+            "grand_total": total - discount_amount + default_shipping_fee,
         }
     )
+
+
+@login_required
+def apply_coupon(request):
+    if request.method != "POST":
+        return HttpResponseNotAllowed(["POST"])
+
+    code = request.POST.get("code", "").strip()
+    if not code:
+        messages.error(request, "ກະລຸນາໃສ່ລະຫັດຄູປອງ.")
+        return redirect("cart")
+
+    items = CartItem.objects.filter(user=request.user).select_related("product")
+    subtotal = sum(item.product.price * item.quantity for item in items)
+
+    coupon = Coupon.objects.filter(code__iexact=code).first()
+    if coupon is None:
+        messages.error(request, "ບໍ່ພົບລະຫັດຄູປອງນີ້.")
+        return redirect("cart")
+
+    error = coupon.error_for(subtotal)
+    if error:
+        messages.error(request, error)
+        return redirect("cart")
+
+    request.session["applied_coupon_code"] = coupon.code
+    messages.success(request, f"ນຳໃຊ້ຄູປອງ {coupon.code} ສຳເລັດແລ້ວ.")
+    return redirect("cart")
+
+
+@login_required
+def remove_coupon(request):
+    if request.method != "POST":
+        return HttpResponseNotAllowed(["POST"])
+    request.session.pop("applied_coupon_code", None)
+    messages.info(request, "ນຳຄູປອງອອກແລ້ວ.")
+    return redirect("cart")
 
 @login_required
 def update_cart_item(request, pk):
