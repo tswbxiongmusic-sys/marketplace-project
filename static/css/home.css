@@ -591,7 +591,7 @@
 .product-image {
     display: block;
     position: relative;
-    height: 270px;
+    height: 190px;
     overflow: hidden;
     background: #f3f4f6;
     text-decoration: none;
@@ -1044,7 +1044,7 @@
     }
 
     .product-image {
-        height: 190px;
+        height: 160px;
     }
 
     .product-info {
@@ -1090,7 +1090,7 @@
     }
 
     .product-image {
-        height: 140px;
+        height: 120px;
     }
 
     .discount-badge,
