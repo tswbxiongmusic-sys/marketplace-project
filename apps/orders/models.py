@@ -199,6 +199,16 @@ class Order(models.Model):
             "cancelled": "bg-danger",
         }.get(self.status, "bg-secondary")
 
+    @property
+    def status_step(self):
+        """Which stage (1-3) of the fulfillment tracker this order has reached."""
+        return {
+            "pending": 1,
+            "paid": 1,
+            "shipping": 2,
+            "completed": 3,
+        }.get(self.status, 1)
+
     def cancel(self):
         """Cancel once and return reserved stock to inventory."""
         if self.status not in {"pending", "paid"}:
