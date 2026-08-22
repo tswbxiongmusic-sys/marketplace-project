@@ -115,4 +115,36 @@ document.addEventListener('DOMContentLoaded', function () {
       startAutoplay();
     }
   }
+
+  // Side drawer menu
+  (function () {
+    const toggleBtn = document.getElementById('sideMenuToggle');
+    const drawer = document.getElementById('sideDrawer');
+    const backdrop = document.getElementById('sideDrawerBackdrop');
+    const closeBtn = document.getElementById('sideDrawerClose');
+    if (!toggleBtn || !drawer || !backdrop) return;
+
+    function openDrawer() {
+      drawer.classList.add('is-open');
+      backdrop.classList.add('is-open');
+      drawer.setAttribute('aria-hidden', 'false');
+      toggleBtn.setAttribute('aria-expanded', 'true');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeDrawer() {
+      drawer.classList.remove('is-open');
+      backdrop.classList.remove('is-open');
+      drawer.setAttribute('aria-hidden', 'true');
+      toggleBtn.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    }
+
+    toggleBtn.addEventListener('click', openDrawer);
+    if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+    backdrop.addEventListener('click', closeDrawer);
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeDrawer();
+    });
+  })();
 });

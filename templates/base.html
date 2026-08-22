@@ -40,6 +40,7 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20260819-polish">
     <link rel="stylesheet" href="{% static 'css/buttons.css' %}">
     <link rel="stylesheet" href="{% static 'css/navbar.css' %}?v=20260821-icons">
+    <link rel="stylesheet" href="{% static 'css/side_drawer.css' %}">
     <link rel="stylesheet" href="{% static 'css/cards.css' %}">
     <link rel="stylesheet" href="{% static 'css/footer.css' %}">
     <link rel="stylesheet" href="{% static 'css/auth.css' %}">
@@ -63,6 +64,10 @@
 <header>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm" role="navigation" aria-label="ເມນຫຼັກ">
         <div class="container">
+            <button type="button" class="nav-icon-btn side-menu-toggle" id="sideMenuToggle" aria-label="ເປີດເມນູ" aria-expanded="false" aria-controls="sideDrawer">
+                <i class="bi bi-list"></i>
+            </button>
+
             <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="{% url 'home' %}">{% if store.logo %}<img src="{{ store.logo.url }}" alt="{{ store.name }}" style="height:32px;width:32px;object-fit:contain">{% endif %}{{ store.name }}</a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="#navbarNav" aria-expanded="false" aria-label="ເປີດເມນູ">
@@ -138,6 +143,106 @@
         </div>
     </nav>
 </header>
+
+
+<!-- Side drawer menu -->
+<div class="side-drawer-backdrop" id="sideDrawerBackdrop"></div>
+
+<aside class="side-drawer" id="sideDrawer" aria-hidden="true" aria-label="ເມນູຂ້າງ">
+
+    <div class="side-drawer-header">
+        <a href="{% url 'home' %}" class="side-drawer-brand">
+            {% if store.logo %}<img src="{{ store.logo.url }}" alt="{{ store.name }}">{% endif %}
+            <span>{{ store.name }}</span>
+        </a>
+        <button type="button" class="side-drawer-close" id="sideDrawerClose" aria-label="ປິດເມນູ">
+            <i class="bi bi-x-lg"></i>
+        </button>
+    </div>
+
+    {% if user.is_authenticated %}
+    <a href="{% url 'profile' %}" class="side-drawer-user">
+        {% if user.avatar %}
+            <img src="{{ user.avatar.url }}" alt="{{ user.username }}">
+        {% else %}
+            <i class="bi bi-person-circle"></i>
+        {% endif %}
+        <div>
+            <strong>{{ user.get_full_name|default:user.username }}</strong>
+            <span>ເບິ່ງບັນຊີຂອງຂ້ອຍ →</span>
+        </div>
+    </a>
+    {% endif %}
+
+    <nav class="side-drawer-nav">
+
+        <div class="side-drawer-group">
+            <a href="{% url 'home' %}" class="side-drawer-link"><i class="bi bi-house"></i>ໜ້າຫຼັກ</a>
+            <a href="{% url 'product_list' %}" class="side-drawer-link"><i class="bi bi-bag"></i>ສິນຄ້າທັງໝົດ</a>
+            <a href="{% url 'seller_list' %}" class="side-drawer-link"><i class="bi bi-shop"></i>ຮ້ານຄ້າ</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'cart' %}" class="side-drawer-link">
+                    <i class="bi bi-cart3"></i>ກະຕ່າ
+                    {% if cart_count %}<span class="side-drawer-badge">{{ cart_count }}</span>{% endif %}
+                </a>
+                <a href="{% url 'wishlist' %}" class="side-drawer-link"><i class="bi bi-heart"></i>ລາຍການທີ່ມັກ</a>
+            {% endif %}
+        </div>
+
+        {% if categories %}
+        <div class="side-drawer-divider"></div>
+        <div class="side-drawer-group">
+            <span class="side-drawer-group-label">ໝວດໝູ່</span>
+            {% for category in categories %}
+                <a href="{% url 'product_list' %}?category={{ category.slug }}" class="side-drawer-link">
+                    <span class="side-drawer-emoji" aria-hidden="true">{{ category.icon }}</span>{{ category.name }}
+                </a>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if user.is_authenticated %}
+        <div class="side-drawer-divider"></div>
+        <div class="side-drawer-group">
+            <span class="side-drawer-group-label">ບັນຊີຂອງຂ້ອຍ</span>
+            <a href="{% url 'my_orders' %}" class="side-drawer-link"><i class="bi bi-bag-check"></i>ຄຳສັ່ງຊື້ຂອງຂ້ອຍ</a>
+            <a href="{% url 'notifications' %}" class="side-drawer-link">
+                <i class="bi bi-bell"></i>ແຈ້ງເຕືອນ
+                {% if unread_notifications %}<span class="side-drawer-badge">{{ unread_notifications }}</span>{% endif %}
+            </a>
+            {% if user.role == "SELLER" %}
+                <a href="{% url 'seller_dashboard' %}" class="side-drawer-link"><i class="bi bi-shop-window"></i>ໜ້າຈັດການຮ້ານ</a>
+            {% else %}
+                <a href="{% url 'seller_application' %}" class="side-drawer-link"><i class="bi bi-briefcase"></i>ສະໝັກເປັນຜູ້ຂາຍ</a>
+            {% endif %}
+            {% if user.is_staff %}
+                <a href="{% url 'admin:index' %}" class="side-drawer-link"><i class="bi bi-gear"></i>ຈັດການລະບົບ</a>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <div class="side-drawer-divider"></div>
+        <div class="side-drawer-group">
+            <span class="side-drawer-group-label">ຂໍ້ມູນຮ້ານ</span>
+            <a href="{% url 'store_info' %}" class="side-drawer-link"><i class="bi bi-info-circle"></i>ກ່ຽວກັບຮ້ານ</a>
+            <a href="{% url 'store_policies' %}" class="side-drawer-link"><i class="bi bi-shield-check"></i>ນະໂຍບາຍຮ້ານ</a>
+        </div>
+
+    </nav>
+
+    <div class="side-drawer-footer">
+        {% if user.is_authenticated %}
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="side-drawer-link side-drawer-logout"><i class="bi bi-box-arrow-right"></i>ອອກຈາກລະບົບ</button>
+            </form>
+        {% else %}
+            <a href="{% url 'login' %}" class="btn btn-outline-primary w-100 mb-2">ເຂົ້າລະບົບ</a>
+            <a href="{% url 'register' %}" class="btn btn-primary w-100">ສະໝັກສະມາຊິກ</a>
+        {% endif %}
+    </div>
+
+</aside>
 
 
 <!-- Main content -->

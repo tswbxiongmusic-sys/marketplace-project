@@ -1,0 +1,252 @@
+/* =========================================================
+   SIDE MENU TOGGLE BUTTON
+========================================================= */
+
+.side-menu-toggle {
+    margin-right: .5rem;
+    font-size: 1.4rem;
+}
+
+
+/* =========================================================
+   BACKDROP
+========================================================= */
+
+.side-drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1040;
+    background: rgba(15, 23, 42, 0.55);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+}
+
+.side-drawer-backdrop.is-open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+
+/* =========================================================
+   DRAWER PANEL
+========================================================= */
+
+.side-drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 1050;
+    display: flex;
+    flex-direction: column;
+    width: min(320px, 85vw);
+    background: #ffffff;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    overflow-y: auto;
+}
+
+.side-drawer.is-open {
+    transform: translateX(0);
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.side-drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 18px 18px;
+    border-bottom: 1px solid #f1f5f9;
+    flex: 0 0 auto;
+}
+
+.side-drawer-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #111827;
+    font-weight: 800;
+    font-size: 16px;
+    text-decoration: none;
+}
+
+.side-drawer-brand img {
+    height: 30px;
+    width: 30px;
+    object-fit: contain;
+}
+
+.side-drawer-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 50%;
+    background: #f3f4f6;
+    color: #374151;
+    font-size: 14px;
+    cursor: pointer;
+    transition: var(--transition, 0.2s ease);
+}
+
+.side-drawer-close:hover {
+    background: #e5e7eb;
+}
+
+
+/* =========================================================
+   USER CARD
+========================================================= */
+
+.side-drawer-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 18px;
+    border-bottom: 1px solid #f1f5f9;
+    color: inherit;
+    text-decoration: none;
+    flex: 0 0 auto;
+}
+
+.side-drawer-user img {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.side-drawer-user > i {
+    font-size: 44px;
+    line-height: 1;
+    color: #9ca3af;
+}
+
+.side-drawer-user strong {
+    display: block;
+    color: #111827;
+    font-size: 14.5px;
+}
+
+.side-drawer-user span {
+    display: block;
+    color: var(--primary, #2563eb);
+    font-size: 12.5px;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   NAV GROUPS / LINKS
+========================================================= */
+
+.side-drawer-nav {
+    flex: 1 1 auto;
+    padding: 8px 0;
+}
+
+.side-drawer-group {
+    display: flex;
+    flex-direction: column;
+    padding: 6px 10px;
+}
+
+.side-drawer-group-label {
+    padding: 10px 12px 4px;
+    color: #9ca3af;
+    font-size: 11.5px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.side-drawer-link {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 12px;
+    border: none;
+    border-radius: var(--radius-sm, 8px);
+    background: none;
+    color: #374151;
+    font-size: 14.5px;
+    font-weight: 600;
+    text-align: left;
+    text-decoration: none;
+    width: 100%;
+    cursor: pointer;
+    transition: var(--transition, 0.2s ease);
+}
+
+.side-drawer-link:hover {
+    background: #f3f4f6;
+    color: var(--primary, #2563eb);
+}
+
+.side-drawer-link i {
+    flex: 0 0 auto;
+    width: 22px;
+    font-size: 19px;
+    text-align: center;
+    color: #6b7280;
+}
+
+.side-drawer-link:hover i {
+    color: var(--primary, #2563eb);
+}
+
+.side-drawer-emoji {
+    flex: 0 0 auto;
+    width: 22px;
+    font-size: 17px;
+    text-align: center;
+}
+
+.side-drawer-badge {
+    margin-left: auto;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 10px;
+    background: var(--danger, #dc2626);
+    color: #fff;
+    font-size: 11.5px;
+    font-weight: 700;
+    line-height: 20px;
+    text-align: center;
+}
+
+.side-drawer-divider {
+    height: 1px;
+    margin: 6px 18px;
+    background: #f1f5f9;
+    flex: 0 0 auto;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.side-drawer-footer {
+    flex: 0 0 auto;
+    padding: 16px 18px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.side-drawer-logout {
+    color: #dc2626;
+}
+
+.side-drawer-logout i {
+    color: #dc2626;
+}
