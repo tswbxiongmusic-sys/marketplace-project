@@ -3,7 +3,8 @@ from django.http import HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 
-from apps.products.models import Product
+from apps.orders.models import ShippingMethod
+from apps.products.models import Product, Wishlist
 from .models import CartItem
 
 
@@ -32,11 +33,26 @@ def cart_view(request):
 
     items = CartItem.objects.filter(
         user=request.user
-    ).select_related("product")
+    ).select_related("product").prefetch_related("product__images")
 
     total = sum(
         item.product.price * item.quantity
         for item in items
+    )
+
+    shipping_methods = ShippingMethod.objects.filter(is_active=True)
+
+    cart_product_ids = [item.product_id for item in items]
+    recommended_products = (
+        Product.objects.filter(is_active=True)
+        .exclude(id__in=cart_product_ids)
+        .select_related("category")
+        .prefetch_related("images")
+        .order_by("?")[:4]
+    )
+
+    wishlisted_ids = set(
+        Wishlist.objects.filter(user=request.user).values_list("product_id", flat=True)
     )
 
     return render(
@@ -45,6 +61,9 @@ def cart_view(request):
         {
             "items": items,
             "total": total,
+            "shipping_methods": shipping_methods,
+            "recommended_products": recommended_products,
+            "wishlisted_ids": wishlisted_ids,
         }
     )
 

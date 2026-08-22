@@ -1,256 +1,204 @@
 {% extends "base.html" %}
-{% load humanize %}
+{% load static humanize %}
 
 {% block title %}
 ກະຕ່າສິນຄ້າ | {{ store.name }}
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}?v=1">
+<link rel="stylesheet" href="{% static 'css/cart.css' %}?v=1">
 {% endblock %}
 
 {% block content %}
 
 <div class="container py-4 py-lg-5">
 
-    <!-- Page Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="fw-bold mb-1">ກະຕ່າສິນຄ້າ</h1>
-            <p class="text-muted mb-0">
-                ກວດເບິ່ງສິນຄ້າກ່ອນດຳເນີນການສັ່ງຊື້.
-            </p>
+    <!-- Step indicator -->
+    <div class="cart-steps mb-4">
+        <div class="cart-step is-active">
+            <span class="cart-step-circle">1</span>
+            <span class="cart-step-label">ກະຕ່າສິນຄ້າ</span>
         </div>
-
-        <a href="{% url 'product_list' %}"
-           class="btn btn-outline-secondary">
-            ← ເລືອກຊື້ຕໍ່
-        </a>
+        <div class="cart-step-line"></div>
+        <div class="cart-step">
+            <span class="cart-step-circle">2</span>
+            <span class="cart-step-label">ຂໍ້ມູນຈັດສົ່ງ</span>
+        </div>
+        <div class="cart-step-line"></div>
+        <div class="cart-step">
+            <span class="cart-step-circle">3</span>
+            <span class="cart-step-label">ຊຳລະເງິນ</span>
+        </div>
     </div>
-
 
     {% if items %}
 
     <div class="row g-4">
 
-        <!-- =========================
-             CART ITEMS
-        ========================== -->
+        <!-- ============================= -->
+        <!-- CART ITEMS -->
+        <!-- ============================= -->
 
         <div class="col-lg-8">
 
-            <div class="card border-0 shadow-sm rounded-4">
+            <h1 class="fw-bold mb-1">
+                ກະຕ່າສິນຄ້າ <span class="cart-count-badge">{{ items|length }}</span>
+            </h1>
+            <p class="text-muted mb-4">ທ່ານມີສິນຄ້າໃນກະຕ່າ.</p>
 
-                <div class="card-body p-0">
+            <div class="cart-item-list">
 
-                    {% for item in items %}
+                {% for item in items %}
+                <div class="cart-item-card">
 
-                    <div class="p-3 p-md-4 border-bottom">
+                    <form method="post" action="{% url 'remove_cart_item' item.pk %}"
+                          class="cart-item-remove"
+                          onsubmit="return confirm('ຢືນຢັນລຶບ {{ item.product.name|escapejs }} ອອກຈາກກະຕ່າ?');">
+                        {% csrf_token %}
+                        <button type="submit" aria-label="ລຶບອອກຈາກກະຕ່າ"><i class="bi bi-x-lg"></i></button>
+                    </form>
 
-                        <div class="row align-items-center g-3">
+                    <a href="{% url 'product_detail' item.product.pk %}" class="cart-item-image">
+                        {% if item.product.image %}
+                        <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                        {% else %}
+                        <div class="product-no-image">{{ item.product.fallback_icon }}</div>
+                        {% endif %}
+                    </a>
 
-                            <!-- Product -->
-                            <div class="col-12 col-md-5">
+                    <div class="cart-item-info">
+                        <a href="{% url 'product_detail' item.product.pk %}" class="cart-item-name">{{ item.product.name }}</a>
+                        <span class="cart-item-category">{{ item.product.category.name }}</span>
 
-                                <div class="d-flex align-items-center gap-3">
-
-                                    {% if item.product.image %}
-
-                                    <img
-                                        src="{{ item.product.image.url }}"
-                                        alt="{{ item.product.name }}"
-                                        class="rounded-3"
-                                        style="
-                                            width: 90px;
-                                            height: 90px;
-                                            object-fit: cover;
-                                        "
-                                    >
-
-                                    {% else %}
-
-                                    <div
-                                        class="bg-light rounded-3 d-flex
-                                               align-items-center
-                                               justify-content-center"
-                                        style="
-                                            width: 90px;
-                                            height: 90px;
-                                        "
-                                    >
-                                        <span class="text-muted small">
-                                            ບໍ່ມີຮູບ
-                                        </span>
-                                    </div>
-
-                                    {% endif %}
-
-
-                                    <div>
-
-                                        <h5 class="fw-bold mb-1">
-                                            {{ item.product.name }}
-                                        </h5>
-
-                                        <p class="text-muted small mb-0">
-                                            ₭{{ item.product.price|floatformat:0|intcomma }} / ຊິ້ນ
-                                        </p>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-
-                            <!-- Quantity -->
-                            <div class="col-12 col-md-3">
-
-                                <form
-                                    method="post"
-                                    action="{% url 'update_cart_item' item.pk %}"
-                                    class="d-flex gap-2"
-                                >
-
-                                    {% csrf_token %}
-
-                                    <input
-                                        type="number"
-                                        name="quantity"
-                                        value="{{ item.quantity }}"
-                                        min="1"
-                                        max="{{ item.product.stock }}"
-                                        class="form-control"
-                                    >
-
-                                    <button
-                                        type="submit"
-                                        class="btn btn-outline-primary"
-                                    >
-                                        ອັບເດດ
-                                    </button>
-
-                                </form>
-
-                            </div>
-
-
-                            <!-- Total -->
-                            <div class="col-6 col-md-2">
-
-                                <span class="fw-bold text-primary">
-                                    ₭{{ item.total_price|floatformat:0|intcomma }}
-                                </span>
-
-                            </div>
-
-
-                            <!-- Remove -->
-                            <div class="col-6 col-md-2 text-md-end">
-
-                                <form
-                                    method="post"
-                                    action="{% url 'remove_cart_item' item.pk %}"
-                                    onsubmit="return confirm('ຢືນຢັນລຶບ {{ item.product.name|escapejs }} ອອກຈາກກະຕ່າ?');"
-                                >
-
-                                    {% csrf_token %}
-
-                                    <button
-                                        type="submit"
-                                        class="btn btn-outline-danger"
-                                    >
-                                        ລຶບ
-                                    </button>
-
-                                </form>
-
-                            </div>
-
+                        {% if item.product.average_rating %}
+                        <div class="product-rating">
+                            <span class="rating-stars">{% for i in "12345" %}<i class="bi {% if forloop.counter <= item.product.average_rating %}bi-star-fill{% else %}bi-star{% endif %}"></i>{% endfor %}</span>
+                            <span>{{ item.product.average_rating|floatformat:1 }} ({{ item.product.reviews.count }} ຣີວິວ)</span>
                         </div>
+                        {% endif %}
 
+                        {% if item.product.stock > 0 %}
+                        <span class="cart-stock-ok"><i class="bi bi-check-circle-fill"></i> ມີສິນຄ້າ</span>
+                        {% else %}
+                        <span class="cart-stock-out"><i class="bi bi-x-circle-fill"></i> ໝົດແລ້ວ</span>
+                        {% endif %}
                     </div>
 
-                    {% endfor %}
+                    <div class="cart-item-price">₭{{ item.product.price|floatformat:0|intcomma }}</div>
+
+                    <form method="post" action="{% url 'update_cart_item' item.pk %}" class="cart-qty-stepper">
+                        {% csrf_token %}
+                        <button type="submit" name="quantity" value="{{ item.quantity|add:'-1' }}" {% if item.quantity <= 1 %}disabled{% endif %} aria-label="ຫຼຸດຈຳນວນ">−</button>
+                        <span>{{ item.quantity }}</span>
+                        <button type="submit" name="quantity" value="{{ item.quantity|add:'1' }}" {% if item.quantity >= item.product.stock %}disabled{% endif %} aria-label="ເພີ່ມຈຳນວນ">+</button>
+                    </form>
+
+                    <div class="cart-item-total">₭{{ item.total_price|floatformat:0|intcomma }}</div>
 
                 </div>
+                {% endfor %}
 
             </div>
+
+            <a href="{% url 'product_list' %}" class="cart-continue-link">
+                <i class="bi bi-arrow-left"></i> ເລືອກຊື້ສິນຄ້າຕໍ່
+            </a>
+
+            {% if recommended_products %}
+            <div class="mt-5">
+                <h2 class="h5 fw-bold mb-3">ສິນຄ້າທີ່ອາດສົນໃຈ</h2>
+                <div class="product-grid cart-recommend-grid">
+                    {% for product in recommended_products %}
+                        {% include "products/_card.html" %}
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
 
         </div>
 
 
-        <!-- =========================
-             ORDER SUMMARY
-        ========================== -->
+        <!-- ============================= -->
+        <!-- ORDER SUMMARY -->
+        <!-- ============================= -->
 
         <div class="col-lg-4">
 
-            <div
-                class="card border-0 shadow-sm rounded-4 sticky-lg-top sticky-summary-offset"
-            >
+            <div class="cart-summary-card sticky-lg-top sticky-summary-offset" data-subtotal="{{ total }}">
 
-                <div class="card-body p-4">
+                <h4 class="fw-bold mb-4">ສະຫຼຸບຄຳສັ່ງຊື້</h4>
 
-                    <h4 class="fw-bold mb-4">
-                        ສະຫຼຸບຄຳສັ່ງຊື້
-                    </h4>
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="text-muted">ລາຍການສິນຄ້າ</span>
+                    <span class="fw-semibold">{{ items|length }} ລາຍການ</span>
+                </div>
 
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="text-muted">ລວມຍ່ອຍ</span>
+                    <span class="fw-semibold">₭{{ total|floatformat:0|intcomma }}</span>
+                </div>
 
-                    <div class="d-flex justify-content-between mb-3">
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="text-muted">ຄ່າຈັດສົ່ງ</span>
+                    <span class="fw-semibold" id="cart-shipping-fee">
+                        {% if shipping_methods.0 %}{% if shipping_methods.0.fee == 0 %}ຟຣີ{% else %}₭{{ shipping_methods.0.fee|floatformat:0|intcomma }}{% endif %}{% else %}—{% endif %}
+                    </span>
+                </div>
 
-                        <span class="text-muted">
-                            ລວມຍ່ອຍ
+                <hr>
+
+                <div class="d-flex justify-content-between mb-4">
+                    <span class="fw-bold fs-5">ລວມທັງໝົດ</span>
+                    <span class="fw-bold fs-4 text-primary" id="cart-grand-total">
+                        ₭{{ total|floatformat:0|intcomma }}
+                    </span>
+                </div>
+
+                {% if shipping_methods %}
+                <div class="cart-shipping-options mb-4">
+                    <p class="fw-semibold small mb-2">ວິທີຈັດສົ່ງ (ຄາດຄະເນ)</p>
+                    {% for method in shipping_methods %}
+                    <label class="cart-shipping-option">
+                        <input
+                            type="radio"
+                            name="shipping_preview"
+                            value="{{ method.fee }}"
+                            data-label="{% if method.fee == 0 %}ຟຣີ{% else %}₭{{ method.fee|floatformat:0|intcomma }}{% endif %}"
+                            {% if forloop.first %}checked{% endif %}
+                        >
+                        <span class="cart-shipping-option-text">
+                            <strong>{{ method.name }}</strong>
+                            {% if method.estimated_delivery %}<small>({{ method.estimated_delivery }})</small>{% endif %}
                         </span>
+                        <span class="cart-shipping-option-fee">{% if method.fee == 0 %}ຟຣີ{% else %}₭{{ method.fee|floatformat:0|intcomma }}{% endif %}</span>
+                    </label>
+                    {% endfor %}
+                    <p class="text-muted small mt-2 mb-0">ເລືອກວິທີຈັດສົ່ງແທ້ໆອີກຄັ້ງຢູ່ໜ້າຊຳລະເງິນ.</p>
+                </div>
+                {% endif %}
 
-                        <span class="fw-semibold">
-                            ₭{{ total|floatformat:0|intcomma }}
-                        </span>
+                <a href="{% url 'checkout' %}" class="btn btn-primary btn-lg w-100 rounded-3 py-3">
+                    <i class="bi bi-lock-fill me-2"></i>ດຳເນີນການຊຳລະ →
+                </a>
 
+                <div class="text-center mt-3">
+                    <small class="text-muted"><i class="bi bi-shield-check me-1"></i>ການຊຳລະແມ່ນປອດໄພ 100%</small>
+                </div>
+
+                <div class="cart-trust-row">
+                    <div>
+                        <i class="bi bi-shield-lock-fill"></i>
+                        <span>ຊຳລະປອດໄພ</span>
                     </div>
-
-
-                    <div class="d-flex justify-content-between mb-3">
-
-                        <span class="text-muted">
-                            ຄ່າຈັດສົ່ງ
-                        </span>
-
-                        <span class="text-success">
-                            ຟຣີ
-                        </span>
-
+                    <div>
+                        <i class="bi bi-truck"></i>
+                        <span>ຈັດສົ່ງທົ່ວປະເທດ</span>
                     </div>
-
-
-                    <hr>
-
-
-                    <div class="d-flex justify-content-between mb-4">
-
-                        <span class="fw-bold fs-5">
-                            ລວມທັງໝົດ
-                        </span>
-
-                        <span class="fw-bold fs-4 text-primary">
-                            ₭{{ total|floatformat:0|intcomma }}
-                        </span>
-
+                    <div>
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                        <span>ຄືນເງິນ 7 ວັນ</span>
                     </div>
-
-
-                    <a
-                        href="{% url 'checkout' %}"
-                        class="btn btn-primary btn-lg w-100 rounded-3 py-3"
-                    >
-                        ໄປໜ້າສັ່ງຊື້ →
-                    </a>
-
-
-                    <div class="text-center mt-3">
-
-                        <small class="text-muted">
-                            ຂໍ້ມູນສັ່ງຊື້ປອດໄພ
-                        </small>
-
-                    </div>
-
                 </div>
 
             </div>
@@ -261,39 +209,44 @@
 
     {% else %}
 
-    <!-- =========================
-         EMPTY CART
-    ========================== -->
+    <!-- ============================= -->
+    <!-- EMPTY CART -->
+    <!-- ============================= -->
 
     <div class="card border-0 shadow-sm rounded-4">
-
         <div class="card-body text-center py-5">
-
-            <div class="display-1 mb-3 text-primary">
-                <i class="bi bi-cart3"></i>
-            </div>
-
-            <h2 class="fw-bold">
-                ກະຕ່າຂອງທ່ານວ່າງ
-            </h2>
-
-            <p class="text-muted mb-4">
-                ທ່ານຍັງບໍ່ໄດ້ເພີ່ມສິນຄ້າໃສ່ກະຕ່າ.
-            </p>
-
-            <a
-                href="{% url 'product_list' %}"
-                class="btn btn-primary btn-lg px-4"
-            >
-                ເລີ່ມເລືອກຊື້
-            </a>
-
+            <div class="display-1 mb-3 text-primary"><i class="bi bi-cart3"></i></div>
+            <h2 class="fw-bold">ກະຕ່າຂອງທ່ານວ່າງ</h2>
+            <p class="text-muted mb-4">ທ່ານຍັງບໍ່ໄດ້ເພີ່ມສິນຄ້າໃສ່ກະຕ່າ.</p>
+            <a href="{% url 'product_list' %}" class="btn btn-primary btn-lg px-4">ເລີ່ມເລືອກຊື້</a>
         </div>
-
     </div>
 
     {% endif %}
 
 </div>
 
+{% endblock %}
+
+{% block extra_js %}
+{% if shipping_methods %}
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const summary = document.querySelector(".cart-summary-card");
+        if (!summary) return;
+        const subtotal = Number(summary.dataset.subtotal || 0);
+        const feeOutput = document.getElementById("cart-shipping-fee");
+        const totalOutput = document.getElementById("cart-grand-total");
+        const formatMoney = (amount) => `₭${new Intl.NumberFormat("lo-LA", {maximumFractionDigits: 0}).format(amount)}`;
+
+        document.querySelectorAll('input[name="shipping_preview"]').forEach((radio) => {
+            radio.addEventListener("change", () => {
+                const fee = Number(radio.value || 0);
+                feeOutput.textContent = radio.dataset.label;
+                totalOutput.textContent = formatMoney(subtotal + fee);
+            });
+        });
+    });
+</script>
+{% endif %}
 {% endblock %}
