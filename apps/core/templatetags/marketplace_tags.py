@@ -25,6 +25,16 @@ def category_icon(name):
 
 
 @register.simple_tag
+def star_icons(rating):
+    """Return 5 booleans (filled or not) for rendering a star rating."""
+    try:
+        filled = round(float(rating))
+    except (TypeError, ValueError):
+        filled = 0
+    return [i <= filled for i in range(1, 6)]
+
+
+@register.simple_tag
 def product_icon(name, category_name=""):
     label = f"{name or ''} {category_name or ''}".lower()
     icons = {

@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{% load static humanize %}
+{% load static humanize marketplace_tags %}
 
 {% block title %}
 {{ product.name }} | {{ store.name }}
 {% endblock %}
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/detail.css' %}">
+<link rel="stylesheet" href="{% static 'css/detail.css' %}?v=20260824-reviews">
 {% endblock %}
 
 {% block content %}
@@ -68,7 +68,7 @@
                             class="img-fluid w-100"
                             style="
                                 height: 520px;
-                                object-fit: cover;
+                                object-fit: contain;
                             "
                         >
 
@@ -97,7 +97,7 @@
             {% if product.images.all %}
             <div class="d-flex flex-wrap gap-2 mt-3">
                 {% for gallery_image in product.images.all %}
-                <a href="{{ gallery_image.image.url }}" target="_blank"><img src="{{ gallery_image.image.url }}" alt="{{ gallery_image.alt_text|default:product.name }}" class="rounded border" style="width:84px;height:84px;object-fit:cover;"></a>
+                <a href="{{ gallery_image.image.url }}" target="_blank"><img src="{{ gallery_image.image.url }}" alt="{{ gallery_image.alt_text|default:product.name }}" class="rounded border bg-light" style="width:84px;height:84px;object-fit:contain;"></a>
                 {% endfor %}
             </div>
             {% endif %}
@@ -138,6 +138,19 @@
 
                     </div>
 
+                {% endif %}
+
+
+                <!-- Seller -->
+
+                {% if product.seller %}
+                    <a
+                        href="{% url 'product_list' %}?seller={{ product.seller_id }}"
+                        class="d-inline-flex align-items-center gap-2 text-decoration-none mb-3 seller-inline-link"
+                    >
+                        <i class="bi bi-shop"></i>
+                        <span>ຂາຍໂດຍ <strong>{{ product.seller.username }}</strong></span>
+                    </a>
                 {% endif %}
 
 
@@ -378,7 +391,63 @@
 
     </div>
 
-    <div class="card border-0 shadow-sm rounded-4 mt-5"><div class="card-body p-4"><h3>ຣີວິວ ({{ reviews|length }}) · {{ product.average_rating|floatformat:1 }}/5</h3>{% for review in reviews %}<div class="border-top py-3"><strong>{{ review.user.username }}</strong> — {{ review.rating }}/5<p class="mb-0 text-muted">{{ review.comment }}</p></div>{% empty %}<p class="text-muted">ຍັງບໍ່ມີຣີວິວ.</p>{% endfor %}{% if user.is_authenticated and user != product.seller %}<form method="post" action="{% url 'review_product' product.pk %}" class="border-top pt-3">{% csrf_token %}{{ review_form.as_p }}<button class="btn btn-primary">ບັນທຶກຣີວິວ</button></form>{% endif %}</div></div>
+    <!-- ============================= -->
+    <!-- REVIEWS -->
+    <!-- ============================= -->
+
+    <div class="card border-0 shadow-sm rounded-4 mt-5">
+        <div class="card-body p-4">
+
+            <div class="review-summary mb-4">
+                <span class="review-summary-score">{{ product.average_rating|floatformat:1 }}</span>
+                <div>
+                    <div class="review-summary-stars">
+                        {% star_icons product.average_rating as product_stars %}
+                        {% for filled in product_stars %}<i class="bi {% if filled %}bi-star-fill{% else %}bi-star{% endif %}"></i>{% endfor %}
+                    </div>
+                    <small class="text-muted">{{ reviews|length }} ຣີວິວ</small>
+                </div>
+            </div>
+
+            {% for review in reviews %}
+            <div class="review-card">
+                <div class="review-avatar">{{ review.user.username|slice:":1"|upper }}</div>
+                <div class="review-body">
+                    <strong>{{ review.user.username }}</strong>
+                    <span class="review-stars">
+                        {% star_icons review.rating as review_stars %}
+                        {% for filled in review_stars %}<i class="bi {% if filled %}bi-star-fill{% else %}bi-star{% endif %}"></i>{% endfor %}
+                    </span>
+                    <span class="review-date">{{ review.created_at|date:"d/m/Y" }}</span>
+                    {% if review.comment %}<p class="review-comment">{{ review.comment }}</p>{% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-muted">ຍັງບໍ່ມີຣີວິວ.</p>
+            {% endfor %}
+
+            {% if user.is_authenticated and user != product.seller %}
+            <div class="review-form-card">
+                <h6 class="fw-bold mb-3">ໃຫ້ຣີວິວສິນຄ້ານີ້</h6>
+                <form method="post" action="{% url 'review_product' product.pk %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        {{ review_form.rating.label_tag }}
+                        {{ review_form.rating }}
+                        {% if review_form.rating.errors %}<div class="text-danger small mt-2">{{ review_form.rating.errors }}</div>{% endif %}
+                    </div>
+                    <div class="mb-3">
+                        {{ review_form.comment.label_tag }}
+                        {{ review_form.comment }}
+                        {% if review_form.comment.errors %}<div class="text-danger small mt-2">{{ review_form.comment.errors }}</div>{% endif %}
+                    </div>
+                    <button class="btn btn-primary">ບັນທຶກຣີວິວ</button>
+                </form>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
 </div>
 
 {% endblock %}
