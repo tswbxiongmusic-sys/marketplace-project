@@ -23,7 +23,10 @@ class LaoAdminMixin:
     choice_labels = {}
 
     def get_form(self, request, obj=None, change=False, **kwargs):
-        form = super().get_form(request, obj, change, **kwargs)
+        # Passed as a keyword, not positionally: some ModelAdmin subclasses
+        # (e.g. django.contrib.auth.admin.UserAdmin) override get_form with a
+        # narrower signature that has no positional slot for `change`.
+        form = super().get_form(request, obj, change=change, **kwargs)
         apply_lao_labels(form.base_fields, self.field_labels, self.choice_labels)
         return form
 
