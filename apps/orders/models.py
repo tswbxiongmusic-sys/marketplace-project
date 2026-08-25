@@ -28,7 +28,7 @@ class Coupon(models.Model):
     discount_value = models.DecimalField(
         max_digits=10, decimal_places=2, validators=[MinValueValidator(Decimal("0.01"))]
     )
-    min_order_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0, blank=True)
+    min_order_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     max_uses = models.PositiveIntegerField(
         null=True, blank=True, help_text="ປ່ອຍວ່າງໄວ້ = ບໍ່ຈຳກັດຈຳນວນຄັ້ງ"
     )
