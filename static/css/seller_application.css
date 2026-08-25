@@ -1,0 +1,140 @@
+/* =========================================================
+   HERO
+========================================================= */
+
+.seller-hero {
+    padding: 64px 0 48px;
+    background: linear-gradient(135deg, var(--primary, #2563eb), #1e40af);
+    color: #ffffff;
+}
+
+.seller-hero h1 {
+    font-size: 2.2rem;
+}
+
+.seller-hero-subtitle {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 16px;
+    margin-bottom: 24px;
+}
+
+.seller-hero-cta {
+    color: var(--primary, #2563eb) !important;
+}
+
+.seller-launch-banner {
+    display: inline-block;
+    margin-top: 24px;
+    padding: 10px 20px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    font-size: 14.5px;
+}
+
+
+/* =========================================================
+   FORM SECTIONS
+========================================================= */
+
+.seller-section-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary, #2563eb);
+    font-size: 18px;
+}
+
+.seller-note {
+    padding: 10px 14px;
+    border-radius: var(--radius-sm, 8px);
+    background: #f8fafc;
+    color: #6b7280;
+    font-size: 13px;
+    margin-bottom: 16px;
+}
+
+
+/* =========================================================
+   APPLICATION STATUS
+========================================================= */
+
+.seller-status-steps {
+    display: flex;
+    align-items: flex-start;
+    max-width: 480px;
+    margin: 32px auto 0;
+}
+
+.seller-status-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    flex: 0 0 auto;
+    width: 130px;
+}
+
+.seller-status-step i {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #e5e7eb;
+    color: #9ca3af;
+    font-size: 18px;
+}
+
+.seller-status-step span {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #6b7280;
+    text-align: center;
+}
+
+.seller-status-step.is-active i {
+    background: var(--primary, #2563eb);
+    color: #ffffff;
+}
+
+.seller-status-step.is-active span {
+    color: #111827;
+}
+
+.seller-status-step.is-done i {
+    background: var(--success, #16a34a);
+    color: #ffffff;
+}
+
+.seller-status-line {
+    flex: 1 1 auto;
+    height: 2px;
+    margin-top: 22px;
+    background: #e5e7eb;
+}
+
+.seller-status-line.is-done {
+    background: var(--success, #16a34a);
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 576px) {
+    .seller-hero {
+        padding: 48px 0 36px;
+    }
+
+    .seller-hero h1 {
+        font-size: 1.6rem;
+    }
+}

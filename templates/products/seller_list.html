@@ -32,13 +32,15 @@
             <div class="seller-card-top">
                 <span class="seller-status-badge">ເປີດຂາຍ</span>
 
-                {% if seller.avatar %}
-                <img src="{{ seller.avatar.url }}" alt="{{ seller.username }}" class="seller-avatar">
+                {% if seller.store_logo %}
+                <img src="{{ seller.store_logo.url }}" alt="{{ seller.display_name }}" class="seller-avatar">
+                {% elif seller.avatar %}
+                <img src="{{ seller.avatar.url }}" alt="{{ seller.display_name }}" class="seller-avatar">
                 {% else %}
-                <div class="seller-avatar seller-avatar-placeholder">{{ seller.username|slice:":1"|upper }}</div>
+                <div class="seller-avatar seller-avatar-placeholder">{{ seller.display_name|slice:":1"|upper }}</div>
                 {% endif %}
 
-                <h3 class="seller-name">{{ seller.username }}</h3>
+                <h3 class="seller-name">{{ seller.display_name }}</h3>
                 <span class="seller-role-label">ຜູ້ຂາຍ</span>
             </div>
 

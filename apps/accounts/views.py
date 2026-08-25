@@ -3,11 +3,22 @@ from django.contrib.auth import login, logout, update_session_auth_hash
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
+from django.db import transaction
+from django.forms.models import construct_instance
 from django.shortcuts import redirect, render
+from django.utils import timezone
 
 from allauth.account.models import EmailAddress
 
-from .forms import ProfileForm, SellerApplicationForm, SignUpForm
+from .forms import (
+    ProfileForm,
+    SellerAccountForm,
+    SellerApplicationForm,
+    SellerPaymentForm,
+    SellerStoreProfileForm,
+    SignUpForm,
+)
+from .models import SellerApplication
 
 
 def _stylize(form, labels=None):
@@ -97,18 +108,81 @@ def profile(request):
     )
 
 
-@login_required
 def seller_application(request):
-    if request.user.role == request.user.Role.SELLER:
+    """Public seller sign-up page: works for a visitor who is not logged in
+    yet (creates their account) as well as an existing customer."""
+
+    if request.user.is_authenticated and request.user.role == request.user.Role.SELLER:
         return redirect("seller_dashboard")
-    form = SellerApplicationForm(request.POST or None)
-    if request.method == "POST" and form.is_valid():
-        from django.utils import timezone
-        request.user.seller_requested_at = timezone.now()
-        request.user.save(update_fields=["seller_requested_at"])
-        messages.success(request, "Your seller application was sent to the administrator.")
-        return redirect("profile")
-    return render(request, "accounts/seller_application.html", {"form": form})
+
+    existing_application = None
+    if request.user.is_authenticated:
+        existing_application = request.user.seller_applications.order_by("-created_at").first()
+
+    if existing_application and existing_application.status != SellerApplication.REJECTED:
+        return render(
+            request,
+            "accounts/seller_application.html",
+            {"existing_application": existing_application},
+        )
+
+    account_form = None if request.user.is_authenticated else SellerAccountForm(request.POST or None)
+    profile_form = SellerStoreProfileForm(
+        request.POST or None,
+        request.FILES or None,
+        instance=request.user if request.user.is_authenticated else None,
+    )
+    payment_form = SellerPaymentForm(
+        request.POST or None,
+        request.FILES or None,
+        instance=request.user if request.user.is_authenticated else None,
+    )
+    application_form = SellerApplicationForm(request.POST or None, request.FILES or None)
+
+    if request.method == "POST":
+        account_valid = account_form is None or account_form.is_valid()
+        profile_valid = profile_form.is_valid()
+        payment_valid = payment_form.is_valid()
+        application_valid = application_form.is_valid()
+
+        if account_valid and profile_valid and payment_valid and application_valid:
+            with transaction.atomic():
+                if account_form is not None:
+                    user = account_form.save()
+                    login(request, user, backend="django.contrib.auth.backends.ModelBackend")
+                else:
+                    user = request.user
+
+                # profile_form/payment_form were validated against a blank
+                # instance when the applicant had no account yet (the real
+                # `user` didn't exist at bind time), so re-apply their
+                # cleaned data onto the now-real user instead of just
+                # swapping `.instance` (which would silently drop the data).
+                construct_instance(profile_form, user)
+                construct_instance(payment_form, user)
+                user.save()
+
+                application = application_form.save(commit=False)
+                application.user = user
+                application.save()
+
+                user.seller_requested_at = timezone.now()
+                user.save(update_fields=["seller_requested_at"])
+
+            messages.success(request, "ສົ່ງໃບສະໝັກແລ້ວ! ພວກເຮົາຈະກວດສອບ ແລະ ແຈ້ງຜົນຜ່ານແຈ້ງເຕືອນ/ອີເມວ.")
+            return redirect("seller_application")
+
+    return render(
+        request,
+        "accounts/seller_application.html",
+        {
+            "account_form": account_form,
+            "profile_form": profile_form,
+            "payment_form": payment_form,
+            "application_form": application_form,
+            "rejected_application": existing_application,
+        },
+    )
 
 
 @login_required

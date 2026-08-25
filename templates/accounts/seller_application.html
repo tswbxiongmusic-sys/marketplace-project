@@ -1,58 +1,313 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}
-ສະໝັກເປັນຜູ້ຂາຍ | {{ store.name }}
+{% block title %}ສະໝັກເປັນຜູ້ຂາຍ | {{ store.name }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/seller_application.css' %}">
 {% endblock %}
 
 {% block content %}
 
-<div class="container py-4 py-lg-5">
+<!-- ============================= -->
+<!-- HERO -->
+<!-- ============================= -->
+
+<section class="seller-hero">
+    <div class="container text-center">
+        <h1 class="fw-bold">ເປີດຮ້ານກັບ {{ store.name }}</h1>
+        <p class="seller-hero-subtitle">ເພີ່ມອີກໜຶ່ງຊ່ອງທາງໃນການຂາຍສິນຄ້າຂອງທ່ານອອນລາຍ</p>
+
+        {% if not existing_application %}
+        <a href="#application-form" class="btn btn-light btn-lg rounded-pill px-4 fw-semibold seller-hero-cta">
+            ສະໝັກເປັນຜູ້ຂາຍ
+        </a>
+        {% endif %}
+
+        <div class="seller-launch-banner">
+            🎉 <strong>Launch Program</strong> — ຮ້ານຄ້າກຸ່ມທຳອິດເປີດຮ້ານຟຣີ
+        </div>
+    </div>
+</section>
+
+
+<div class="container py-5">
+
+{% if existing_application %}
+
+    <!-- ============================= -->
+    <!-- APPLICATION STATUS -->
+    <!-- ============================= -->
 
     <div class="row justify-content-center">
-        <div class="col-lg-6">
-
-            <h1 class="fw-bold mb-2">ສະໝັກເປັນຜູ້ຂາຍ</h1>
-            <p class="text-muted mb-4">
-                ຜູ້ດູແລລະບົບຈະກວດສອບຄຳຮ້ອງຂອງເຈົ້າ.
-            </p>
-
+        <div class="col-lg-8">
             <div class="card border-0 shadow-sm rounded-4">
-                <div class="card-body p-4 p-md-5">
+                <div class="card-body p-4 p-md-5 text-center">
 
-                    <form method="post">
-                        {% csrf_token %}
+                    {% if existing_application.status == "pending" %}
+                        <i class="bi bi-hourglass-split display-4 text-primary"></i>
+                        <h3 class="fw-bold mt-3">ໃບສະໝັກຂອງທ່ານລໍຖ້າກວດສອບ</h3>
+                        <p class="text-muted">ພວກເຮົາໄດ້ຮັບໃບສະໝັກຂອງທ່ານແລ້ວ ແລະ ຈະກວດສອບໄວໆນີ້.</p>
+                    {% elif existing_application.status == "reviewing" %}
+                        <i class="bi bi-search display-4 text-primary"></i>
+                        <h3 class="fw-bold mt-3">ກຳລັງກວດສອບໃບສະໝັກຂອງທ່ານ</h3>
+                        <p class="text-muted">ພວກເຮົາກຳລັງກວດຂໍ້ມູນຂອງທ່ານ, ອາດຕິດຕໍ່ຫາທ່ານເພື່ອຂໍຂໍ້ມູນເພີ່ມເຕີມ.</p>
+                    {% endif %}
 
-                        {% if form.non_field_errors %}
-                            <div class="alert alert-danger">
-                                {{ form.non_field_errors }}
-                            </div>
-                        {% endif %}
+                    <div class="seller-status-steps">
+                        <div class="seller-status-step is-done"><i class="bi bi-check-lg"></i><span>ສົ່ງໃບສະໝັກ</span></div>
+                        <div class="seller-status-line {% if existing_application.status == 'reviewing' %}is-done{% endif %}"></div>
+                        <div class="seller-status-step is-active"><i class="bi bi-search"></i><span>ກຳລັງກວດສອບ</span></div>
+                        <div class="seller-status-line"></div>
+                        <div class="seller-status-step"><i class="bi bi-shop"></i><span>ອະນຸມັດ ແລະ ເປີດຮ້ານ</span></div>
+                    </div>
 
-                        {% for field in form %}
-                            <div class="form-check mb-4">
-                                {{ field }}
-                                <label for="{{ field.id_for_label }}" class="form-check-label">
-                                    {{ field.label }}
-                                </label>
-
-                                {% if field.errors %}
-                                    <div class="text-danger small mt-2">
-                                        {{ field.errors }}
-                                    </div>
-                                {% endif %}
-                            </div>
-                        {% endfor %}
-
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-send-fill"></i> ສົ່ງຄຳຮ້ອງ
-                        </button>
-                    </form>
+                    <a href="{% url 'profile' %}" class="btn btn-outline-primary mt-4">← ກັບໄປໜ້າບັນຊີ</a>
 
                 </div>
             </div>
-
         </div>
     </div>
+
+{% else %}
+
+    <!-- ============================= -->
+    <!-- APPLICATION FORM -->
+    <!-- ============================= -->
+
+    <form method="post" enctype="multipart/form-data" id="application-form">
+        {% csrf_token %}
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+
+                {% if rejected_application %}
+                <div class="alert alert-warning rounded-4">
+                    <strong>ໃບສະໝັກກ່ອນໜ້ານີ້ຍັງບໍ່ໄດ້ຮັບອະນຸມັດ.</strong>
+                    {% if rejected_application.rejection_reason %}
+                        <p class="mb-0 mt-1">ເຫດຜົນ: {{ rejected_application.rejection_reason }}</p>
+                    {% endif %}
+                    <p class="mb-0 mt-1">ທ່ານສາມາດແກ້ໄຂຂໍ້ມູນ ແລະ ສົ່ງໃບສະໝັກໃໝ່ໄດ້ຂ້າງລຸ່ມ.</p>
+                </div>
+                {% endif %}
+
+                {% if account_form %}
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-4 p-md-5">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <span class="seller-section-icon"><i class="bi bi-person-badge"></i></span>
+                            <h4 class="fw-bold mb-0">ສ້າງບັນຊີເຂົ້າລະບົບ</h4>
+                        </div>
+                        <p class="text-muted small mb-4">ໃຊ້ບັນຊີນີ້ເພື່ອເຂົ້າສູ່ລະບົບ ແລະ ຈັດການຮ້ານຂອງທ່ານພາຍຫຼັງ.</p>
+
+                        {% if account_form.non_field_errors %}<div class="alert alert-danger">{{ account_form.non_field_errors }}</div>{% endif %}
+
+                        <div class="row g-3">
+                            <div class="col-12">
+                                {{ account_form.username.label_tag }}
+                                {{ account_form.username }}
+                                {% if account_form.username.errors %}<div class="text-danger small mt-2">{{ account_form.username.errors }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                {{ account_form.password1.label_tag }}
+                                {{ account_form.password1 }}
+                                {% if account_form.password1.errors %}<div class="text-danger small mt-2">{{ account_form.password1.errors }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                {{ account_form.password2.label_tag }}
+                                {{ account_form.password2 }}
+                                {% if account_form.password2.errors %}<div class="text-danger small mt-2">{{ account_form.password2.errors }}</div>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+
+                <!-- ຂໍ້ມູນເຈົ້າຂອງ -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-4 p-md-5">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <span class="seller-section-icon"><i class="bi bi-person-fill"></i></span>
+                            <h4 class="fw-bold mb-0">ຂໍ້ມູນເຈົ້າຂອງ</h4>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                {{ profile_form.first_name.label_tag }}
+                                {{ profile_form.first_name }}
+                                {% if profile_form.first_name.errors %}<div class="text-danger small mt-2">{{ profile_form.first_name.errors }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                {{ profile_form.last_name.label_tag }}
+                                {{ profile_form.last_name }}
+                                {% if profile_form.last_name.errors %}<div class="text-danger small mt-2">{{ profile_form.last_name.errors }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                {{ profile_form.phone.label_tag }}
+                                {{ profile_form.phone }}
+                                {% if profile_form.phone.errors %}<div class="text-danger small mt-2">{{ profile_form.phone.errors }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                {{ profile_form.email.label_tag }}
+                                {{ profile_form.email }}
+                                {% if profile_form.email.errors %}<div class="text-danger small mt-2">{{ profile_form.email.errors }}</div>{% endif %}
+                            </div>
+                            <div class="col-12">
+                                {{ profile_form.address.label_tag }}
+                                {{ profile_form.address }}
+                                {% if profile_form.address.errors %}<div class="text-danger small mt-2">{{ profile_form.address.errors }}</div>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- ຂໍ້ມູນຮ້ານ -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-4 p-md-5">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <span class="seller-section-icon"><i class="bi bi-shop"></i></span>
+                            <h4 class="fw-bold mb-0">ຂໍ້ມູນຮ້ານ</h4>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                {{ profile_form.store_name.label_tag }}
+                                {{ profile_form.store_name }}
+                                {% if profile_form.store_name.errors %}<div class="text-danger small mt-2">{{ profile_form.store_name.errors }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                {{ profile_form.store_category.label_tag }}
+                                {{ profile_form.store_category }}
+                                {% if profile_form.store_category.errors %}<div class="text-danger small mt-2">{{ profile_form.store_category.errors }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                {{ profile_form.store_logo.label_tag }}
+                                {{ profile_form.store_logo }}
+                                {% if profile_form.store_logo.errors %}<div class="text-danger small mt-2">{{ profile_form.store_logo.errors }}</div>{% endif %}
+                            </div>
+                            <div class="col-12">
+                                {{ profile_form.store_description.label_tag }}
+                                {{ profile_form.store_description }}
+                                {% if profile_form.store_description.errors %}<div class="text-danger small mt-2">{{ profile_form.store_description.errors }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                {{ profile_form.facebook_url.label_tag }}
+                                {{ profile_form.facebook_url }}
+                                {% if profile_form.facebook_url.errors %}<div class="text-danger small mt-2">{{ profile_form.facebook_url.errors }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                {{ profile_form.tiktok_url.label_tag }}
+                                {{ profile_form.tiktok_url }}
+                                {% if profile_form.tiktok_url.errors %}<div class="text-danger small mt-2">{{ profile_form.tiktok_url.errors }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                {{ profile_form.website_url.label_tag }}
+                                {{ profile_form.website_url }}
+                                {% if profile_form.website_url.errors %}<div class="text-danger small mt-2">{{ profile_form.website_url.errors }}</div>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- ຂໍ້ມູນທຸລະກິດ -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-4 p-md-5">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <span class="seller-section-icon"><i class="bi bi-briefcase-fill"></i></span>
+                            <h4 class="fw-bold mb-0">ຂໍ້ມູນທຸລະກິດ</h4>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                {{ application_form.business_type.label_tag }}
+                                {{ application_form.business_type }}
+                                {% if application_form.business_type.errors %}<div class="text-danger small mt-2">{{ application_form.business_type.errors }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                {{ application_form.business_registration_number.label_tag }}
+                                {{ application_form.business_registration_number }}
+                                {% if application_form.business_registration_number.errors %}<div class="text-danger small mt-2">{{ application_form.business_registration_number.errors }}</div>{% endif %}
+                            </div>
+                            <div class="col-12">
+                                {{ application_form.verification_document.label_tag }}
+                                {{ application_form.verification_document }}
+                                <div class="form-text">ເຊັ່ນ: ບັດປະຈຳຕົວ ຫຼື ໃບທະບຽນທຸລະກິດ (ຖ້າມີ). ໃຊ້ເພື່ອຢືນຢັນຕົວຕົນຜູ້ຂາຍເທົ່ານັ້ນ.</div>
+                                {% if application_form.verification_document.errors %}<div class="text-danger small mt-2">{{ application_form.verification_document.errors }}</div>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- ຂໍ້ມູນການຮັບເງິນ -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-4 p-md-5">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <span class="seller-section-icon"><i class="bi bi-qr-code"></i></span>
+                            <h4 class="fw-bold mb-0">ຂໍ້ມູນການຮັບເງິນ</h4>
+                        </div>
+                        <p class="seller-note">
+                            <i class="bi bi-shield-lock-fill me-1"></i>
+                            ໃຊ້ຂໍ້ມູນນີ້ເພື່ອໃຫ້ລູກຄ້າໂອນເງິນເຂົ້າຮ້ານທ່ານໂດຍກົງເທົ່ານັ້ນ — ບໍ່ຂໍລະຫັດຜ່ານທະນາຄານ ຫຼື ຂໍ້ມູນບັດໃດໆ.
+                        </p>
+
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                {{ payment_form.bank_name.label_tag }}
+                                {{ payment_form.bank_name }}
+                                {% if payment_form.bank_name.errors %}<div class="text-danger small mt-2">{{ payment_form.bank_name.errors }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                {{ payment_form.bank_account_name.label_tag }}
+                                {{ payment_form.bank_account_name }}
+                                {% if payment_form.bank_account_name.errors %}<div class="text-danger small mt-2">{{ payment_form.bank_account_name.errors }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                {{ payment_form.bank_account_number.label_tag }}
+                                {{ payment_form.bank_account_number }}
+                                {% if payment_form.bank_account_number.errors %}<div class="text-danger small mt-2">{{ payment_form.bank_account_number.errors }}</div>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- ການຍອມຮັບ -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-4 p-md-5">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <span class="seller-section-icon"><i class="bi bi-shield-check"></i></span>
+                            <h4 class="fw-bold mb-0">ການຍອມຮັບ</h4>
+                        </div>
+
+                        {% for field in application_form %}
+                            {% if field.field.widget.input_type == "checkbox" %}
+                            <div class="form-check mb-3">
+                                {{ field }}
+                                <label for="{{ field.id_for_label }}" class="form-check-label">
+                                    {{ field.label }}
+                                    {% if field.name == "agreed_seller_agreement" %}<a href="{% url 'store_policies' %}" target="_blank">(ອ່ານທີ່ນີ້)</a>{% endif %}
+                                    {% if field.name == "agreed_privacy_policy" %}<a href="{% url 'store_policies' %}" target="_blank">(ອ່ານທີ່ນີ້)</a>{% endif %}
+                                </label>
+                                {% if field.errors %}<div class="text-danger small mt-1">{{ field.errors }}</div>{% endif %}
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg w-100 rounded-3 py-3 fw-semibold">
+                    <i class="bi bi-send-fill me-1"></i> ສົ່ງໃບສະໝັກ
+                </button>
+
+            </div>
+        </div>
+    </form>
+
+{% endif %}
 
 </div>
 

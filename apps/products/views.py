@@ -94,7 +94,7 @@ def seller_list(request):
     )
 
     if query:
-        sellers = sellers.filter(username__icontains=query)
+        sellers = sellers.filter(Q(username__icontains=query) | Q(store_name__icontains=query))
 
     paginator = Paginator(sellers, 12)
     page_obj = paginator.get_page(request.GET.get("page"))
