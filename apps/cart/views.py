@@ -13,7 +13,7 @@ def add_to_cart(request, pk):
     if request.method != "POST":
         return HttpResponseNotAllowed(["POST"])
 
-    product = get_object_or_404(Product, pk=pk, is_active=True)
+    product = get_object_or_404(Product.objects.published(), pk=pk)
     item, created = CartItem.objects.get_or_create(user=request.user, product=product)
     requested_quantity = item.quantity if created else item.quantity + 1
     if requested_quantity > product.stock:
@@ -44,7 +44,7 @@ def cart_view(request):
 
     cart_product_ids = [item.product_id for item in items]
     recommended_products = (
-        Product.objects.filter(is_active=True)
+        Product.objects.published()
         .exclude(id__in=cart_product_ids)
         .select_related("category")
         .prefetch_related("images")

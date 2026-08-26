@@ -7,6 +7,15 @@
 
 {% block content %}
 
+{% if request.user.is_suspended %}
+<div class="alert alert-danger rounded-4 mb-4">
+    <strong><i class="bi bi-exclamation-triangle-fill me-1"></i>ບັນຊີຮ້ານຂອງທ່ານຖືກລະງັບ</strong>
+    <p class="mb-0 mt-1">ສິນຄ້າຂອງທ່ານຈະບໍ່ສະແດງໃນຮ້ານ ແລະ ບໍ່ສາມາດເພີ່ມ/ແກ້ໄຂສິນຄ້າໄດ້ ຈົນກວ່າຈະຖືກຍົກເລີກການລະງັບ.
+    {% if request.user.suspension_reason %}<br>ເຫດຜົນ: {{ request.user.suspension_reason }}{% endif %}
+    ກະລຸນາຕິດຕໍ່ຮ້ານຫຼັກເພື່ອສອບຖາມ.</p>
+</div>
+{% endif %}
+
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
     <div>
         <h1 class="fw-bold mb-1">ໜ້າຈັດການຮ້ານ — {{ request.user.display_name }}</h1>
@@ -24,9 +33,11 @@
         ຄຳສັ່ງຊື້
     </a>
 
+    {% if not request.user.is_suspended %}
     <a href="{% url 'add_product' %}" class="btn btn-primary">
         + ເພີ່ມສິນຄ້າ
     </a>
+    {% endif %}
 </div>
 </div>
 
@@ -112,7 +123,14 @@
                                     {% endif %}
                                 </td>
                                 <td>
-                                    {% if product.is_active %}
+                                    {% if product.approval_status == "pending" %}
+                                        <span class="badge text-bg-warning text-dark">ລໍຖ້າ admin ກວດສອບ</span>
+                                    {% elif product.approval_status == "rejected" %}
+                                        <span class="badge text-bg-danger">ຖືກປະຕິເສດ</span>
+                                        {% if product.rejection_reason %}
+                                            <div class="small text-danger mt-1">{{ product.rejection_reason }}</div>
+                                        {% endif %}
+                                    {% elif product.is_active %}
                                         <span class="badge text-bg-success">ກຳລັງຂາຍ</span>
                                     {% else %}
                                         <span class="badge text-bg-secondary">ເຊື່ອງໄວ້</span>
@@ -120,12 +138,14 @@
                                 </td>
                                 <td class="text-end">
                                     <div class="d-inline-flex gap-2">
+                                        {% if not request.user.is_suspended %}
                                         <a
                                             href="{% url 'edit_product' product.pk %}"
                                             class="btn btn-sm btn-outline-primary"
                                         >
                                             ແກ້ໄຂ
                                         </a>
+                                        {% endif %}
 
                                         {% if product.is_active %}
                                             <form

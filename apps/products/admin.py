@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils import timezone
 from django.utils.html import format_html
 from apps.core.admin_utils import LaoAdminMixin
 
@@ -70,12 +71,14 @@ class ProductAdmin(LaoAdminMixin, admin.ModelAdmin):
         "seller_display",
         "price_display",
         "stock_display",
+        "approval_status_display",
         "active_display",
         "image_preview",
     )
     list_display_links = ("id", "name_display")
     list_select_related = ("category", "subcategory", "seller")
     list_filter = (
+        "approval_status",
         "category",
         "subcategory",
         "is_active",
@@ -88,10 +91,10 @@ class ProductAdmin(LaoAdminMixin, admin.ModelAdmin):
         "seller__username",
     )
     prepopulated_fields = {"slug": ("name",)}
-    readonly_fields = ("image_preview", "created_at", "updated_at")
+    readonly_fields = ("image_preview", "created_at", "updated_at", "reviewed_at", "reviewed_by")
     ordering = ("-created_at",)
     date_hierarchy = "created_at"
-    actions = ("mark_as_active", "mark_as_inactive",)
+    actions = ("approve_products", "reject_products", "mark_as_active", "mark_as_inactive")
     fieldsets = (
         ("ລາຍລະອຽດສິນຄ້າ", {
             "fields": (
@@ -108,6 +111,9 @@ class ProductAdmin(LaoAdminMixin, admin.ModelAdmin):
                 "image_preview",
                 "video",
             )
+        }),
+        ("ການກວດສອບຂອງ Admin", {
+            "fields": ("approval_status", "rejection_reason", "reviewed_at", "reviewed_by"),
         }),
         ("Flash Sale (ບໍ່ບັງຄັບ)", {
             "fields": ("sale_price", "sale_ends_at"),
@@ -131,6 +137,13 @@ class ProductAdmin(LaoAdminMixin, admin.ModelAdmin):
         "video": "ວິດີໂອອະທິບາຍສິນຄ້າ",
         "sale_price": "ລາຄາຫຼຸດ (Flash Sale)",
         "sale_ends_at": "ວັນ-ເວລາສິ້ນສຸດ Sale",
+        "approval_status": "ສະຖານະການກວດສອບ",
+        "rejection_reason": "ເຫດຜົນທີ່ປະຕິເສດ",
+        "reviewed_at": "ວັນທີກວດສອບ",
+        "reviewed_by": "ກວດສອບໂດຍ",
+    }
+    choice_labels = {
+        "approval_status": dict(Product.APPROVAL_STATUS_CHOICES),
     }
 
     @admin.display(description="ຊື່ສິນຄ້າ", ordering="name")
@@ -161,11 +174,45 @@ class ProductAdmin(LaoAdminMixin, admin.ModelAdmin):
     def active_display(self, obj):
         return obj.is_active
 
+    @admin.display(description="ສະຖານະການກວດສອບ", ordering="approval_status")
+    def approval_status_display(self, obj):
+        return obj.get_approval_status_display()
+
     def image_preview(self, obj):
         if obj.image:
             return format_html('<img src="{}" style="max-height: 100px; max-width: 150px;" />', obj.image.url)
         return "ບໍ່ມີຮູບ"
     image_preview.short_description = "ຕົວຢ່າງຮູບ"
+
+    def approve_products(self, request, queryset):
+        count = 0
+        for product in queryset.exclude(approval_status=Product.APPROVED).select_related("seller"):
+            product.approval_status = Product.APPROVED
+            product.reviewed_at = timezone.now()
+            product.reviewed_by = request.user
+            product.save(update_fields=["approval_status", "reviewed_at", "reviewed_by"])
+            product.seller.notifications.create(
+                message=f"ສິນຄ້າ '{product.name}' ຖືກອະນຸມັດແລ້ວ, ຂຶ້ນຂາຍໃນຮ້ານແລ້ວ.",
+                link=f"/products/{product.pk}/",
+            )
+            count += 1
+        self.message_user(request, f"ອະນຸມັດ {count} ສິນຄ້າແລ້ວ.")
+    approve_products.short_description = "ອະນຸມັດສິນຄ້າທີ່ເລືອກ"
+
+    def reject_products(self, request, queryset):
+        count = 0
+        for product in queryset.exclude(approval_status=Product.REJECTED).select_related("seller"):
+            product.approval_status = Product.REJECTED
+            product.reviewed_at = timezone.now()
+            product.reviewed_by = request.user
+            product.save(update_fields=["approval_status", "reviewed_at", "reviewed_by"])
+            product.seller.notifications.create(
+                message=f"ສິນຄ້າ '{product.name}' ບໍ່ໄດ້ຮັບອະນຸມັດ. ກະລຸນາແກ້ໄຂ ແລະ ຕິດຕໍ່ຮ້ານ ຖ້າມີຄຳຖາມ.",
+                link=f"/products/seller/products/{product.pk}/edit/",
+            )
+            count += 1
+        self.message_user(request, f"ປະຕິເສດ {count} ສິນຄ້າແລ້ວ.")
+    reject_products.short_description = "ປະຕິເສດສິນຄ້າທີ່ເລືອກ"
 
     def mark_as_active(self, request, queryset):
         updated = queryset.update(is_active=True)

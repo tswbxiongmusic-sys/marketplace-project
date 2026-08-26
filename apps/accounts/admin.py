@@ -19,6 +19,7 @@ class CustomUserAdmin(LaoAdminMixin, UserAdmin):
         "phone_display",
         "staff_display",
         "active_display",
+        "suspended_display",
     )
 
     list_display_links = (
@@ -30,6 +31,7 @@ class CustomUserAdmin(LaoAdminMixin, UserAdmin):
         "role",
         "is_staff",
         "is_active",
+        "is_suspended",
     )
 
     search_fields = (
@@ -71,6 +73,13 @@ class CustomUserAdmin(LaoAdminMixin, UserAdmin):
             {"fields": ("bank_name", "bank_account_name", "bank_account_number", "payment_qr")},
         ),
         (
+            "ການລະງັບບັນຊີຮ້ານ",
+            {
+                "fields": ("is_suspended", "suspended_at", "suspension_reason"),
+                "description": "ລະງັບຮ້ານ ຈະເຊື່ອງສິນຄ້າທັງໝົດຂອງຮ້ານນີ້ອອກຈາກເວັບ ແລະ ບໍ່ໃຫ້ເພີ່ມ/ແກ້ໄຂສິນຄ້າໄດ້, ແຕ່ຍັງເຂົ້າສູ່ລະບົບໄດ້ປົກກະຕິ.",
+            },
+        ),
+        (
             "ສິດທິໃນລະບົບ",
             {
                 "fields": (
@@ -106,7 +115,7 @@ class CustomUserAdmin(LaoAdminMixin, UserAdmin):
         ),
     )
 
-    actions = ("approve_sellers",)
+    actions = ("approve_sellers", "suspend_sellers", "unsuspend_sellers")
     field_labels = {
         "username": "ຊື່ຜູ້ໃຊ້",
         "password": "ລະຫັດຜ່ານ",
@@ -121,6 +130,9 @@ class CustomUserAdmin(LaoAdminMixin, UserAdmin):
         "address": "ທີ່ຢູ່",
         "seller_requested_at": "ວັນທີສະໝັກເປັນຜູ້ຂາຍ",
         "seller_approved_at": "ວັນທີອະນຸມັດຜູ້ຂາຍ",
+        "is_suspended": "ລະງັບບັນຊີຮ້ານ",
+        "suspended_at": "ວັນທີລະງັບ",
+        "suspension_reason": "ເຫດຜົນທີ່ລະງັບ",
         "bank_name": "ຊື່ທະນາຄານ",
         "bank_account_name": "ຊື່ບັນຊີ",
         "bank_account_number": "ເລກບັນຊີ",
@@ -172,9 +184,41 @@ class CustomUserAdmin(LaoAdminMixin, UserAdmin):
     def active_display(self, obj):
         return obj.is_active
 
+    @admin.display(boolean=True, description="ຖືກລະງັບ", ordering="is_suspended")
+    def suspended_display(self, obj):
+        return obj.is_suspended
+
     @admin.action(description="ອະນຸມັດຄຳຮ້ອງເປັນຜູ້ຂາຍທີ່ເລືອກ")
     def approve_sellers(self, request, queryset):
         queryset.filter(seller_requested_at__isnull=False).update(role=User.Role.SELLER, seller_approved_at=timezone.now())
+
+    @admin.action(description="ລະງັບບັນຊີຮ້ານທີ່ເລືອກ (ເຊື່ອງສິນຄ້າທັງໝົດ)")
+    def suspend_sellers(self, request, queryset):
+        count = 0
+        for user in queryset.filter(role=User.Role.SELLER, is_suspended=False):
+            user.is_suspended = True
+            user.suspended_at = timezone.now()
+            user.save(update_fields=["is_suspended", "suspended_at"])
+            user.notifications.create(
+                message="ບັນຊີຮ້ານຂອງທ່ານຖືກລະງັບຊົ່ວຄາວ, ສິນຄ້າຂອງທ່ານຈະບໍ່ສະແດງໃນຮ້ານ. ກະລຸນາຕິດຕໍ່ຮ້ານ.",
+                link="/products/seller/",
+            )
+            count += 1
+        self.message_user(request, f"ລະງັບບັນຊີຮ້ານ {count} ຄົນແລ້ວ.")
+
+    @admin.action(description="ຍົກເລີກການລະງັບບັນຊີຮ້ານທີ່ເລືອກ")
+    def unsuspend_sellers(self, request, queryset):
+        count = 0
+        for user in queryset.filter(role=User.Role.SELLER, is_suspended=True):
+            user.is_suspended = False
+            user.suspension_reason = ""
+            user.save(update_fields=["is_suspended", "suspension_reason"])
+            user.notifications.create(
+                message="ບັນຊີຮ້ານຂອງທ່ານຖືກຍົກເລີກການລະງັບແລ້ວ, ສາມາດຂາຍສິນຄ້າໄດ້ປົກກະຕິ.",
+                link="/products/seller/",
+            )
+            count += 1
+        self.message_user(request, f"ຍົກເລີກການລະງັບ {count} ຄົນແລ້ວ.")
 
 
 @admin.register(SellerApplication)

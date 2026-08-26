@@ -1,6 +1,6 @@
 from django.db import connection
 from django.db.models import Avg, F, Sum
-from django.http import HttpResponse, JsonResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 from django.views.decorators.http import require_GET
@@ -25,7 +25,7 @@ def home(request):
     # -----------------------------------------
     products = (
         Product.objects
-        .filter(is_active=True)
+        .published()
         .select_related("category", "subcategory").prefetch_related("images")
     )
 
@@ -114,8 +114,12 @@ def product_detail(request, pk):
     product = get_object_or_404(
         Product.objects.select_related("category", "subcategory").prefetch_related("images", "reviews__user"),
         pk=pk,
-        is_active=True,
     )
+
+    is_owner = request.user.is_authenticated and request.user.pk == product.seller_id
+    if not is_owner and not request.user.is_staff:
+        if not Product.objects.published().filter(pk=product.pk).exists():
+            raise Http404("ບໍ່ພົບສິນຄ້ານີ້.")
 
     return render(
         request,

@@ -53,7 +53,30 @@ class SubCategory(models.Model):
         ordering = ["name"]
 
 
+class ProductQuerySet(models.QuerySet):
+    def published(self):
+        """Everything a customer is allowed to browse: active, approved by
+        an admin, and belonging to a seller who is active and not suspended."""
+        return self.filter(
+            is_active=True,
+            approval_status=Product.APPROVED,
+            seller__is_active=True,
+            seller__is_suspended=False,
+        )
+
+
 class Product(models.Model):
+    PENDING = "pending"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+    APPROVAL_STATUS_CHOICES = [
+        (PENDING, "ລໍຖ້າກວດສອບ"),
+        (APPROVED, "ອະນຸມັດແລ້ວ"),
+        (REJECTED, "ຖືກປະຕິເສດ"),
+    ]
+
+    objects = ProductQuerySet.as_manager()
+
     seller = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -113,6 +136,20 @@ class Product(models.Model):
     )
 
     is_active = models.BooleanField(default=True)
+
+    # Defaults to APPROVED so existing products stay visible once this field
+    # is added; only the seller-facing "add product" view sets new listings
+    # to PENDING for admin review.
+    approval_status = models.CharField(max_length=20, choices=APPROVAL_STATUS_CHOICES, default=APPROVED)
+    rejection_reason = models.TextField(blank=True)
+    reviewed_at = models.DateTimeField(blank=True, null=True)
+    reviewed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="reviewed_products",
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

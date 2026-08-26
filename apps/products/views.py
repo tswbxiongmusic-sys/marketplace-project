@@ -17,7 +17,7 @@ User = get_user_model()
 
 def product_list(request):
     products = (
-        Product.objects.filter(is_active=True)
+        Product.objects.published()
         .select_related("category", "subcategory").prefetch_related("images")
         .order_by("-created_at")
     )
@@ -88,8 +88,11 @@ def seller_list(request):
     query = request.GET.get("q", "").strip()
 
     sellers = (
-        User.objects.filter(role=User.Role.SELLER, is_active=True)
-        .annotate(product_count=Count("products", filter=Q(products__is_active=True)))
+        User.objects.filter(role=User.Role.SELLER, is_active=True, is_suspended=False)
+        .annotate(product_count=Count(
+            "products",
+            filter=Q(products__is_active=True, products__approval_status=Product.APPROVED),
+        ))
         .order_by("-seller_approved_at", "username")
     )
 
@@ -182,6 +185,9 @@ def add_product(request):
     if request.user.role != request.user.Role.SELLER:
         messages.error(request, "ສ່ວນນີ້ສຳລັບຜູ້ຂາຍເທົ່ານັ້ນ.")
         return redirect("home")
+    if request.user.is_suspended:
+        messages.error(request, "ບັນຊີຮ້ານຂອງທ່ານຖືກລະງັບ, ບໍ່ສາມາດເພີ່ມສິນຄ້າໄດ້.")
+        return redirect("seller_dashboard")
 
     form = ProductForm(
         request.POST or None,
@@ -191,11 +197,12 @@ def add_product(request):
     if request.method == "POST" and form.is_valid():
         product = form.save(commit=False)
         product.seller = request.user
+        product.approval_status = Product.PENDING
         product.save()
         for image in request.FILES.getlist("gallery_images"):
             ProductImage.objects.create(product=product, image=image)
 
-        messages.success(request, "ເພີ່ມສິນຄ້າສຳເລັດແລ້ວ.")
+        messages.success(request, "ເພີ່ມສິນຄ້າສຳເລັດແລ້ວ, ລໍຖ້າ admin ກວດສອບກ່ອນຂຶ້ນຂາຍ.")
         return redirect("seller_dashboard")
 
     return render(
@@ -210,6 +217,9 @@ def edit_product(request, pk):
     if request.user.role != request.user.Role.SELLER:
         messages.error(request, "ສ່ວນນີ້ສຳລັບຜູ້ຂາຍເທົ່ານັ້ນ.")
         return redirect("home")
+    if request.user.is_suspended:
+        messages.error(request, "ບັນຊີຮ້ານຂອງທ່ານຖືກລະງັບ, ບໍ່ສາມາດແກ້ໄຂສິນຄ້າໄດ້.")
+        return redirect("seller_dashboard")
 
     product = get_object_or_404(
         Product,
@@ -290,7 +300,7 @@ def restore_product(request, pk):
 @login_required
 @require_POST
 def toggle_wishlist(request, pk):
-    product = get_object_or_404(Product, pk=pk, is_active=True)
+    product = get_object_or_404(Product.objects.published(), pk=pk)
     item, created = Wishlist.objects.get_or_create(user=request.user, product=product)
     if created:
         messages.success(request, "ເພີ່ມເຂົ້າລາຍການທີ່ມັກແລ້ວ.")
@@ -313,7 +323,7 @@ def wishlist(request):
 @login_required
 @require_POST
 def review_product(request, pk):
-    product = get_object_or_404(Product, pk=pk, is_active=True)
+    product = get_object_or_404(Product.objects.published(), pk=pk)
     if product.seller_id == request.user.id:
         messages.error(request, "ທ່ານບໍ່ສາມາດຣີວິວສິນຄ້າຂອງຕົນເອງໄດ້.")
         return redirect("product_detail", pk=pk)

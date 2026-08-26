@@ -30,6 +30,14 @@ class User(AbstractUser):
     seller_requested_at = models.DateTimeField(blank=True, null=True)
     seller_approved_at = models.DateTimeField(blank=True, null=True)
 
+    # A suspension keeps the seller's account, login, and data intact but
+    # blocks selling (unlike is_active, which would also block login
+    # entirely) — used when a seller violates policy but shouldn't lose
+    # their history/order records.
+    is_suspended = models.BooleanField(default=False)
+    suspended_at = models.DateTimeField(blank=True, null=True)
+    suspension_reason = models.TextField(blank=True)
+
     # Each seller is an independent business with its own bank account, so
     # buyers must pay each seller in a cart separately rather than through
     # one shared store-wide QR code.
