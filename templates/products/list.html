@@ -7,6 +7,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/home.css' %}?v=20260822-imagecontain">
+<link rel="stylesheet" href="{% static 'css/sellers.css' %}?v=1">
 {% endblock %}
 
 {% block content %}
@@ -16,11 +17,44 @@
     <!-- Header -->
     <div class="mb-4">
         {% if seller_store %}
-            <a href="{% url 'seller_list' %}" class="d-inline-flex align-items-center gap-1 text-decoration-none small mb-2">
+            <a href="{% url 'seller_list' %}" class="d-inline-flex align-items-center gap-1 text-decoration-none small mb-3">
                 <i class="bi bi-arrow-left"></i>ຮ້ານຄ້າທັງໝົດ
             </a>
-            <h1 class="fw-bold">ຮ້ານ: {{ seller_store.display_name }}</h1>
-            <p class="text-muted">ສິນຄ້າທັງໝົດຈາກຮ້ານນີ້.</p>
+
+            <div class="seller-store-banner">
+
+                {% if seller_store.store_logo %}
+                    <img src="{{ seller_store.store_logo.url }}" alt="{{ seller_store.display_name }}" class="seller-store-logo">
+                {% else %}
+                    <div class="seller-store-logo seller-store-logo-placeholder">{{ seller_store.display_name|slice:":1"|upper }}</div>
+                {% endif %}
+
+                <div class="seller-store-info">
+                    <h1 class="fw-bold mb-1">{{ seller_store.display_name }}</h1>
+
+                    {% if seller_store.store_description %}
+                        <p class="seller-store-description">{{ seller_store.store_description }}</p>
+                    {% else %}
+                        <p class="text-muted mb-2">ສິນຄ້າທັງໝົດຈາກຮ້ານນີ້.</p>
+                    {% endif %}
+
+                    <div class="seller-store-meta">
+                        <span><i class="bi bi-bag-fill"></i>{{ page_obj.paginator.count }} ສິນຄ້າ</span>
+                        {% if seller_store.seller_approved_at %}
+                            <span><i class="bi bi-patch-check-fill"></i>ຜູ້ຂາຍຕັ້ງແຕ່ {{ seller_store.seller_approved_at|date:"d/m/Y" }}</span>
+                        {% endif %}
+                    </div>
+
+                    {% if seller_store.facebook_url or seller_store.tiktok_url or seller_store.website_url %}
+                        <div class="seller-store-links">
+                            {% if seller_store.facebook_url %}<a href="{{ seller_store.facebook_url }}" target="_blank" rel="noopener"><i class="bi bi-facebook"></i>Facebook</a>{% endif %}
+                            {% if seller_store.tiktok_url %}<a href="{{ seller_store.tiktok_url }}" target="_blank" rel="noopener"><i class="bi bi-tiktok"></i>TikTok</a>{% endif %}
+                            {% if seller_store.website_url %}<a href="{{ seller_store.website_url }}" target="_blank" rel="noopener"><i class="bi bi-globe2"></i>Website</a>{% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+
+            </div>
         {% else %}
             <h1 class="fw-bold">ສິນຄ້າ</h1>
 
