@@ -80,7 +80,8 @@
 .side-drawer-brand img {
     height: 30px;
     width: 30px;
-    object-fit: contain;
+    object-fit: cover;
+    border-radius: 50%;
 }
 
 .side-drawer-close {

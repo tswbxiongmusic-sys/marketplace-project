@@ -26,8 +26,8 @@ footer{
 .footer-brand img {
     height: 34px;
     width: 34px;
-    object-fit: contain;
-    border-radius: 8px;
+    object-fit: cover;
+    border-radius: 50%;
 }
 
 .footer-tagline {
