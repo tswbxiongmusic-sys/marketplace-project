@@ -1,4 +1,5 @@
 import logging
+from decimal import Decimal
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -6,6 +7,7 @@ from django.db import transaction
 from django.db.models import F, Prefetch
 from django.http import HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils import timezone
 from django.core.mail import send_mail
 
@@ -28,10 +30,50 @@ def notify_order(order, message):
 
 
 def _send_order_email(order, message):
+    _send_email("ແຈ້ງເຕືອນຄຳສັ່ງຊື້", message, order.user.email, order)
+
+
+def notify_sellers(request, order, headline):
+    """Tell every seller in the order about it, in-site and by email, with only
+    their own items (each seller sees just their parcel)."""
+    from apps.accounts.models import Notification
+
+    seller_items = {}
+    for item in order.items.select_related("product__seller"):
+        seller_items.setdefault(item.product.seller, []).append(item)
+
+    for seller, items in seller_items.items():
+        shipment = order.shipments.filter(seller=seller).first()
+        link = reverse("seller_orders") + (f"#shipment-{shipment.pk}" if shipment else "")
+        subtotal = sum((item.total_price for item in items), Decimal("0"))
+        Notification.objects.create(
+            user=seller,
+            message=f"{headline} {order.order_number}: {len(items)} ລາຍການ, ₭{subtotal:,.0f} ({order.get_payment_method_display()})"[:255],
+            link=link,
+        )
+        if seller.email:
+            lines = [
+                f"{headline} {order.order_number}",
+                "",
+                *[f"- {item.product_name} × {item.quantity} = ₭{item.total_price:,.0f}" for item in items],
+                f"ລວມ: ₭{subtotal:,.0f}",
+                f"ວິທີຊຳລະ: {order.get_payment_method_display()}",
+                f"ຜູ້ຮັບ: {order.recipient_name} ({order.phone})",
+                "",
+                f"ເບິ່ງລາຍລະອຽດ: {request.build_absolute_uri(link)}",
+            ]
+            transaction.on_commit(
+                lambda email=seller.email, body="\n".join(lines): _send_email(
+                    f"{headline} {order.order_number}", body, email, order
+                )
+            )
+
+
+def _send_email(subject, body, email, order):
     try:
-        send_mail("ແຈ້ງເຕືອນຄຳສັ່ງຊື້", message, None, [order.user.email])
+        send_mail(subject, body, None, [email])
     except Exception:
-        logger.exception("Failed to send order email for %s to %s", order.order_number, order.user.email)
+        logger.exception("Failed to send order email for %s to %s", order.order_number, email)
 
 
 def group_items_by_seller(items):
@@ -227,6 +269,7 @@ def place_order(request):
 
         messages.success(request, "ສັ່ງຊື້ສຳເລັດແລ້ວ.")
         notify_order(order, f"ຄຳສັ່ງຊື້ {order.order_number} ຂອງທ່ານຖືກສ້າງແລ້ວ.")
+        notify_sellers(request, order, "🛒 ມີຄຳສັ່ງຊື້ໃໝ່")
 
     return redirect("order_detail", order_id=order.id)
 
@@ -295,6 +338,7 @@ def cancel_order(request, order_id):
     order = get_object_or_404(Order, pk=order_id, user=request.user)
     if order.cancel():
         notify_order(order, f"ຄຳສັ່ງຊື້ {order.order_number} ຂອງທ່ານຖືກຍົກເລີກແລ້ວ.")
+        notify_sellers(request, order, "❌ ລູກຄ້າຍົກເລີກຄຳສັ່ງຊື້")
         messages.success(request, "ຍົກເລີກຄຳສັ່ງຊື້ແລ້ວ.")
     else:
         messages.error(request, "ຄຳສັ່ງຊື້ນີ້ບໍ່ສາມາດຍົກເລີກໄດ້ແລ້ວ.")

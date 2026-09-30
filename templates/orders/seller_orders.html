@@ -24,7 +24,7 @@
     <div class="row g-4">
         {% for shipment in shipments %}
             <div class="col-12">
-                <article class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <article id="shipment-{{ shipment.pk }}" class="card border-0 shadow-sm rounded-4 overflow-hidden">
                     <div class="card-header bg-white border-0 p-4 pb-0">
                         <div class="d-flex flex-column flex-md-row justify-content-between gap-3">
                             <div>

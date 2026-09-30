@@ -391,3 +391,54 @@ class CheckoutModerationTests(TestCase):
             )
         self.assertEqual(response.status_code, 302)
         self.assertTrue(Order.objects.exists())
+
+
+class SellerNotificationTests(TestCase):
+    setUp = CheckoutTests.setUp
+
+    def place_order(self):
+        CartItem.objects.create(user=self.user, product=self.product, quantity=2)
+        with self.captureOnCommitCallbacks(execute=True):
+            self.client.post(reverse("place_order"), {
+                "recipient_name": "Buyer", "phone": "020000000", "province": "ນະຄອນຫຼວງວຽງຈັນ",
+                "district": "ຈັນທະບູລີ", "village_address": "Laos",
+                "shipping_method": self.shipping_method.pk, "payment_method": "cash_on_delivery",
+            })
+        return Order.objects.get()
+
+    def test_new_order_notifies_seller_in_site_and_by_email(self):
+        from django.core import mail
+
+        self.seller.email = "seller@example.com"
+        self.seller.save()
+        order = self.place_order()
+
+        note = Notification.objects.get(user=self.seller)
+        self.assertIn(order.order_number, note.message)
+        self.assertIn("ມີຄຳສັ່ງຊື້ໃໝ່", note.message)
+        shipment = order.shipments.get(seller=self.seller)
+        self.assertEqual(note.link, f"{reverse('seller_orders')}#shipment-{shipment.pk}")
+        self.assertFalse(Notification.objects.filter(user=self.other_seller).exists())
+
+        seller_mail = [m for m in mail.outbox if m.to == ["seller@example.com"]]
+        self.assertEqual(len(seller_mail), 1)
+        self.assertIn("Phone × 2", seller_mail[0].body)
+        self.assertIn("http://testserver/orders/seller-orders/#shipment-", seller_mail[0].body)
+
+    def test_each_seller_only_sees_their_own_items(self):
+        other_product = Product.objects.create(
+            seller=self.other_seller, category=self.product.category, name="Case", slug="case",
+            description="c", price=Decimal("50.00"), stock=5,
+        )
+        CartItem.objects.create(user=self.user, product=other_product, quantity=1)
+        self.place_order()
+        self.assertIn("1 ລາຍການ", Notification.objects.get(user=self.other_seller).message)
+        self.assertIn("₭50", Notification.objects.get(user=self.other_seller).message)
+        self.assertIn("₭400", Notification.objects.get(user=self.seller).message)
+
+    def test_buyer_cancel_notifies_seller(self):
+        order = self.place_order()
+        self.client.post(reverse("cancel_order", args=[order.pk]))
+        self.assertTrue(
+            Notification.objects.filter(user=self.seller, message__contains="ຍົກເລີກ").exists()
+        )
