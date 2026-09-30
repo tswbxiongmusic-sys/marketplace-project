@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm, UserCreationForm
 
 from apps.products.models import Category
 
@@ -211,3 +211,26 @@ class SellerApplicationForm(forms.ModelForm):
         self.fields["verification_document"].required = False
         for agreement in ("agreed_seller_agreement", "agreed_privacy_policy", "agreed_seller_rules"):
             self.fields[agreement].required = True
+
+
+class StyledPasswordResetForm(PasswordResetForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["email"].label = "ອີເມວທີ່ໃຊ້ສະໝັກ"
+        self.fields["email"].widget.attrs.update({"class": "form-control", "placeholder": "you@example.com"})
+
+    def save(self, *args, request=None, domain_override=None, **kwargs):
+        # SITE_ID points at a placeholder Site (example.com), so build the reset
+        # link from the host the customer actually used.
+        if domain_override is None and request is not None:
+            domain_override = request.get_host()
+        return super().save(*args, request=request, domain_override=domain_override, **kwargs)
+
+
+class StyledSetPasswordForm(SetPasswordForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["new_password1"].label = "ລະຫັດຜ່ານໃໝ່"
+        self.fields["new_password2"].label = "ຢືນຢັນລະຫັດຜ່ານໃໝ່"
+        for field in self.fields.values():
+            field.widget.attrs["class"] = "form-control"

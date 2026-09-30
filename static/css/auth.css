@@ -220,6 +220,25 @@ body.auth-forest-page {
     text-underline-offset: .18em;
 }
 
+.forest-forgot-link {
+    margin: -.35rem 0 0;
+    font-size: .88rem;
+    text-align: right;
+}
+
+.forest-forgot-link a,
+.forest-login-card .forest-back-link a {
+    color: #fff;
+    font-weight: 700;
+    text-underline-offset: .18em;
+}
+
+.forest-login-card .forest-back-link {
+    margin: 1.5rem 0 0;
+    font-size: .92rem;
+    text-align: center;
+}
+
 /* The Google/Facebook final account-creation page uses the same visual system. */
 .auth-forest-page .oauth-completion-shell {
     display: grid;

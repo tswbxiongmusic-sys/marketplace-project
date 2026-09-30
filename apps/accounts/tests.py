@@ -154,3 +154,49 @@ class AccountTests(TestCase):
 
         self.assertNotContains(response, "ສືບຕໍ່ດ້ວຍ Google")
         self.assertNotContains(response, "ສືບຕໍ່ດ້ວຍ Facebook")
+
+
+class PasswordResetTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user("resetme", "resetme@example.com", "Old-password-123")
+
+    def test_login_page_links_to_password_reset(self):
+        response = self.client.get(reverse("login"))
+        self.assertContains(response, reverse("password_reset"))
+
+    def test_reset_flow_emails_link_on_request_host_and_sets_new_password(self):
+        from django.core import mail
+
+        response = self.client.post(
+            reverse("password_reset"), {"email": "resetme@example.com"}, HTTP_HOST="127.0.0.1:8000"
+        )
+        self.assertRedirects(response, reverse("password_reset_done"))
+        self.assertEqual(len(mail.outbox), 1)
+        body = mail.outbox[0].body
+        self.assertIn("http://127.0.0.1:8000/accounts/password-reset/", body)
+        self.assertNotIn("example.com/accounts", body)
+
+        link = next(line for line in body.splitlines() if "/password-reset/" in line).strip()
+        path = link.split("127.0.0.1:8000", 1)[1]
+        response = self.client.get(path, follow=True)
+        self.assertContains(response, "ຕັ້ງລະຫັດຜ່ານໃໝ່")
+        response = self.client.post(
+            response.redirect_chain[-1][0],
+            {"new_password1": "Brand-new-pass-456", "new_password2": "Brand-new-pass-456"},
+        )
+        self.assertRedirects(response, reverse("password_reset_complete"))
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.check_password("Brand-new-pass-456"))
+
+    def test_unknown_email_shows_same_done_page_without_sending(self):
+        from django.core import mail
+
+        response = self.client.post(reverse("password_reset"), {"email": "nobody@example.com"})
+        self.assertRedirects(response, reverse("password_reset_done"))
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_invalid_token_shows_expired_message(self):
+        response = self.client.get(
+            reverse("password_reset_confirm", kwargs={"uidb64": "xx", "token": "bad-token"})
+        )
+        self.assertContains(response, "ລິ້ງໃຊ້ບໍ່ໄດ້")
