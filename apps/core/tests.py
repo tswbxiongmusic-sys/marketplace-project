@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from apps.products.models import Category, Product
@@ -83,3 +83,18 @@ class StorefrontLocalizationTests(TestCase):
             with self.subTest(url_name=url_name):
                 response = self.client.get(reverse(url_name))
                 self.assertEqual(response.status_code, 200)
+
+
+class ErrorPageTests(TestCase):
+    @override_settings(DEBUG=False)
+    def test_unknown_url_renders_branded_404(self):
+        response = self.client.get("/this-page-does-not-exist/")
+        self.assertEqual(response.status_code, 404)
+        self.assertContains(response, "ບໍ່ພົບໜ້າທີ່ທ່ານຊອກຫາ", status_code=404)
+        self.assertContains(response, reverse("product_list"), status_code=404)
+
+    def test_500_template_renders_without_request_context(self):
+        from django.template.loader import get_template
+
+        html = get_template("500.html").render()
+        self.assertIn("ລະບົບມີບັນຫາຊົ່ວຄາວ", html)

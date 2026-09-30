@@ -1,0 +1,9 @@
+<section class="error-page" aria-labelledby="error-heading">
+  <p class="error-page-code" aria-hidden="true">{{ code }}</p>
+  <h1 id="error-heading" class="error-page-title">{{ title }}</h1>
+  <p class="error-page-text">{{ text }}</p>
+  <div class="error-page-actions">
+    <a class="btn btn-primary" href="{% url 'home' %}"><i class="bi bi-house-door me-1"></i>ກັບໜ້າຫຼັກ</a>
+    <a class="btn btn-outline-primary" href="{% url 'product_list' %}"><i class="bi bi-bag me-1"></i>ເບິ່ງສິນຄ້າ</a>
+  </div>
+</section>

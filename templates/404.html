@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+
+{% block title %}ບໍ່ພົບໜ້ານີ້ | {{ store.name }}{% endblock %}
+
+{% block content %}
+{% include "_error_page.html" with code="404" title="ບໍ່ພົບໜ້າທີ່ທ່ານຊອກຫາ" text="ໜ້ານີ້ອາດຖືກລຶບ, ຍ້າຍບ່ອນ ຫຼື ລິ້ງພິມຜິດ. ລອງຄົ້ນຫາສິນຄ້າ ຫຼື ກັບໄປໜ້າຫຼັກ." %}
+{% endblock %}
