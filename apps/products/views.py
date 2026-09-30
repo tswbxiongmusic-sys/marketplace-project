@@ -212,6 +212,9 @@ def add_product(request):
     )
 
 
+REVIEWED_PRODUCT_FIELDS = {"name", "category", "subcategory", "description", "image"}
+
+
 @login_required
 def edit_product(request, pk):
     if request.user.role != request.user.Role.SELLER:
@@ -234,11 +237,27 @@ def edit_product(request, pk):
     )
 
     if request.method == "POST" and form.is_valid():
-        form.save()
-        for image in request.FILES.getlist("gallery_images"):
+        gallery_images = request.FILES.getlist("gallery_images")
+        # Price and stock are the seller's business and go live immediately.
+        # Anything that changes what the product *is* (or resubmitting a
+        # rejected listing) must be re-reviewed by an admin before it sells.
+        needs_review = (
+            product.approval_status == Product.REJECTED
+            or bool(set(form.changed_data) & REVIEWED_PRODUCT_FIELDS)
+            or bool(gallery_images)
+        )
+        product = form.save(commit=False)
+        if needs_review:
+            product.approval_status = Product.PENDING
+            product.rejection_reason = ""
+        product.save()
+        for image in gallery_images:
             ProductImage.objects.create(product=product, image=image)
 
-        messages.success(request, "ອັບເດດສິນຄ້າສຳເລັດແລ້ວ.")
+        if needs_review:
+            messages.success(request, "ບັນທຶກແລ້ວ. ສິນຄ້ານີ້ຈະລໍຖ້າ admin ກວດສອບກ່ອນຂຶ້ນຂາຍອີກຄັ້ງ.")
+        else:
+            messages.success(request, "ອັບເດດສິນຄ້າສຳເລັດແລ້ວ.")
         return redirect("seller_dashboard")
 
     return render(

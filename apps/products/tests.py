@@ -196,3 +196,58 @@ class ModerationAndSuspensionTests(TestCase):
         self.assertEqual(pending.reviewed_by, self.admin)
         self.assertEqual(other.approval_status, Product.REJECTED)
         self.assertEqual(self.seller.notifications.count(), 2)
+
+
+class SellerEditReviewTests(TestCase):
+    def setUp(self):
+        User = get_user_model()
+        self.seller = User.objects.create_user(
+            username="edit-seller", password="StrongPass123!", role=User.Role.SELLER
+        )
+        self.category = Category.objects.create(name="Shoes", slug="shoes")
+        self.product = Product.objects.create(
+            seller=self.seller, category=self.category, name="Runner", slug="runner",
+            description="Light shoe", price="100.00", stock=5, approval_status=Product.APPROVED,
+        )
+        self.client.force_login(self.seller)
+
+    def edit(self, **changes):
+        data = {
+            "name": "Runner", "category": self.category.pk, "subcategory": "",
+            "description": "Light shoe", "price": "100.00", "stock": 5, **changes,
+        }
+        response = self.client.post(reverse("edit_product", args=[self.product.pk]), data)
+        self.product.refresh_from_db()
+        return response
+
+    def test_price_and_stock_changes_stay_live(self):
+        self.edit(price="79.50", stock=20)
+        self.assertEqual(str(self.product.price), "79.50")
+        self.assertEqual(self.product.stock, 20)
+        self.assertEqual(self.product.approval_status, Product.APPROVED)
+
+    def test_changing_name_or_description_sends_product_back_to_review(self):
+        self.edit(name="Totally different item")
+        self.assertEqual(self.product.approval_status, Product.PENDING)
+        self.assertNotIn(self.product, Product.objects.published())
+
+        self.product.approval_status = Product.APPROVED
+        self.product.save()
+        self.edit(name="Totally different item", description="New text")
+        self.assertEqual(self.product.approval_status, Product.PENDING)
+
+    def test_editing_a_rejected_product_resubmits_it(self):
+        self.product.approval_status = Product.REJECTED
+        self.product.rejection_reason = "Bad photo"
+        self.product.save()
+        self.edit(price="90.00")
+        self.assertEqual(self.product.approval_status, Product.PENDING)
+        self.assertEqual(self.product.rejection_reason, "")
+
+    def test_seller_cannot_edit_another_sellers_product(self):
+        User = get_user_model()
+        other = User.objects.create_user(username="other-s", password="StrongPass123!", role=User.Role.SELLER)
+        self.client.force_login(other)
+        response = self.edit(price="1.00")
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(str(self.product.price), "100.00")
