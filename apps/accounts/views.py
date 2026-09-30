@@ -5,11 +5,13 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.db import transaction
 from django.forms.models import construct_instance
+from django.views.decorators.http import require_POST
 from django.shortcuts import redirect, render
 from django.utils import timezone
 
 from allauth.account.models import EmailAddress
 
+from . import telegram
 from .forms import (
     ProfileForm,
     SellerAccountForm,
@@ -189,3 +191,55 @@ def seller_application(request):
 def notifications(request):
     request.user.notifications.filter(is_read=False).update(is_read=True)
     return render(request, "accounts/notifications.html", {"notifications": request.user.notifications.all()[:30]})
+
+
+def _seller_only(request):
+    if request.user.role != request.user.Role.SELLER:
+        messages.error(request, "ສ່ວນນີ້ສຳລັບຜູ້ຂາຍເທົ່ານັ້ນ.")
+        return redirect("home")
+    if not telegram.is_configured():
+        messages.error(request, "ລະບົບແຈ້ງເຕືອນ Telegram ຍັງບໍ່ໄດ້ເປີດໃຊ້ງານ.")
+        return redirect("seller_dashboard")
+    return None
+
+
+@login_required
+@require_POST
+def telegram_connect(request):
+    """Give the seller a one-time code and send them to the bot with it."""
+    if (blocked := _seller_only(request)) is not None:
+        return blocked
+    import secrets
+
+    request.user.telegram_link_token = secrets.token_urlsafe(16)
+    request.user.save(update_fields=["telegram_link_token"])
+    return redirect(telegram.link_url(request.user.telegram_link_token))
+
+
+@login_required
+@require_POST
+def telegram_verify(request):
+    if (blocked := _seller_only(request)) is not None:
+        return blocked
+    try:
+        telegram.sync_links()
+    except Exception:
+        telegram.logger.exception("Telegram link sync failed")
+        messages.error(request, "ຕິດຕໍ່ Telegram ບໍ່ໄດ້ຊົ່ວຄາວ, ກະລຸນາລອງໃໝ່.")
+        return redirect("seller_dashboard")
+    request.user.refresh_from_db(fields=["telegram_chat_id"])
+    if request.user.telegram_chat_id:
+        messages.success(request, "ເຊື່ອມຕໍ່ Telegram ສຳເລັດ! ທ່ານຈະໄດ້ຮັບແຈ້ງເຕືອນຄຳສັ່ງຊື້ໃໝ່ຜ່ານ Telegram.")
+    else:
+        messages.error(request, "ຍັງບໍ່ພົບການເຊື່ອມຕໍ່. ກົດ 'ເຊື່ອມຕໍ່ Telegram', ກົດ Start ໃນ Telegram, ແລ້ວກັບມາກົດຢືນຢັນອີກຄັ້ງ.")
+    return redirect("seller_dashboard")
+
+
+@login_required
+@require_POST
+def telegram_disconnect(request):
+    request.user.telegram_chat_id = ""
+    request.user.telegram_link_token = ""
+    request.user.save(update_fields=["telegram_chat_id", "telegram_link_token"])
+    messages.info(request, "ຍົກເລີກການແຈ້ງເຕືອນຜ່ານ Telegram ແລ້ວ.")
+    return redirect("seller_dashboard")

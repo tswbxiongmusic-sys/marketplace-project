@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
+from apps.accounts import telegram
 from apps.accounts.forms import SellerPaymentForm
 
 from .forms import ProductForm, ReviewForm
@@ -149,6 +150,7 @@ def seller_dashboard(request):
             "products": products,
             "payment_form": SellerPaymentForm(instance=request.user),
             "sales_stats": seller_sales_stats(request.user),
+            "telegram_enabled": telegram.is_configured(),
         },
     )
 

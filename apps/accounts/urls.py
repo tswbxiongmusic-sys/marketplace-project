@@ -11,6 +11,9 @@ urlpatterns = [
     path("profile/", views.profile, name="profile"),
     path("seller-application/", views.seller_application, name="seller_application"),
     path("notifications/", views.notifications, name="notifications"),
+    path("telegram/connect/", views.telegram_connect, name="telegram_connect"),
+    path("telegram/verify/", views.telegram_verify, name="telegram_verify"),
+    path("telegram/disconnect/", views.telegram_disconnect, name="telegram_disconnect"),
     path(
         "password-reset/",
         auth_views.PasswordResetView.as_view(

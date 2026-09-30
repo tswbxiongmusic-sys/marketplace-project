@@ -251,4 +251,43 @@
     </div>
 </div>
 
+<!-- ========================= -->
+<!-- ORDER ALERTS (TELEGRAM) -->
+<!-- ========================= -->
+
+{% if telegram_enabled %}
+<div id="telegram-alerts" class="card border-0 shadow-sm rounded-4 mt-4">
+    <div class="card-body p-4">
+        <div class="d-flex align-items-center gap-2 mb-2">
+            <i class="bi bi-telegram fs-4 text-primary"></i>
+            <h4 class="fw-bold mb-0">ແຈ້ງເຕືອນຄຳສັ່ງຊື້ຜ່ານ Telegram</h4>
+            {% if request.user.telegram_chat_id %}<span class="badge bg-success rounded-pill ms-auto">ເຊື່ອມຕໍ່ແລ້ວ</span>{% endif %}
+        </div>
+        {% if request.user.telegram_chat_id %}
+            <p class="text-muted small mb-3">ເມື່ອມີຄຳສັ່ງຊື້ໃໝ່ ຫຼື ລູກຄ້າຍົກເລີກ, ທ່ານຈະໄດ້ຮັບຂໍ້ຄວາມໃນ Telegram ທັນທີ.</p>
+            <form method="post" action="{% url 'telegram_disconnect' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-danger btn-sm">ຍົກເລີກການເຊື່ອມຕໍ່</button>
+            </form>
+        {% else %}
+            <p class="text-muted small mb-3">ຮັບແຈ້ງເຕືອນເດັ້ງຂຶ້ນໃນມືຖືທັນທີເມື່ອມີຄົນສັ່ງຊື້. ເຮັດ 2 ຂັ້ນຕອນ:</p>
+            <ol class="small mb-3 ps-3">
+                <li>ກົດ <strong>ເຊື່ອມຕໍ່ Telegram</strong> ແລ້ວກົດ <strong>Start</strong> ໃນ Telegram</li>
+                <li>ກັບມາໜ້ານີ້ ແລ້ວກົດ <strong>ຢືນຢັນການເຊື່ອມຕໍ່</strong></li>
+            </ol>
+            <div class="d-flex flex-wrap gap-2">
+                <form method="post" action="{% url 'telegram_connect' %}" target="_blank">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-telegram me-1"></i>ເຊື່ອມຕໍ່ Telegram</button>
+                </form>
+                <form method="post" action="{% url 'telegram_verify' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-primary">ຢືນຢັນການເຊື່ອມຕໍ່</button>
+                </form>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
 {% endblock %}

@@ -11,6 +11,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.core.mail import send_mail
 
+from apps.accounts import telegram
 from apps.cart.models import CartItem
 from apps.products.models import Product
 
@@ -51,6 +52,17 @@ def notify_sellers(request, order, headline):
             message=f"{headline} {order.order_number}: {len(items)} ລາຍການ, ₭{subtotal:,.0f} ({order.get_payment_method_display()})"[:255],
             link=link,
         )
+        if seller.telegram_chat_id:
+            tg_lines = [
+                f"{headline} {order.order_number}",
+                *[f"• {item.product_name} × {item.quantity} = ₭{item.total_price:,.0f}" for item in items],
+                f"ລວມ: ₭{subtotal:,.0f} ({order.get_payment_method_display()})",
+                f"ຜູ້ຮັບ: {order.recipient_name} {order.phone}",
+                request.build_absolute_uri(link),
+            ]
+            transaction.on_commit(
+                lambda chat_id=seller.telegram_chat_id, text="\n".join(tg_lines): telegram.send_message(chat_id, text)
+            )
         if seller.email:
             lines = [
                 f"{headline} {order.order_number}",

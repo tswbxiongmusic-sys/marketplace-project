@@ -442,3 +442,43 @@ class SellerNotificationTests(TestCase):
         self.assertTrue(
             Notification.objects.filter(user=self.seller, message__contains="ຍົກເລີກ").exists()
         )
+
+
+@override_settings(TELEGRAM_BOT_TOKEN="123:abc", TELEGRAM_BOT_USERNAME="HmongShopBot")
+class SellerTelegramAlertTests(TestCase):
+    setUp = CheckoutTests.setUp
+
+    def test_new_order_sends_telegram_to_linked_seller(self):
+        from unittest import mock
+
+        self.seller.telegram_chat_id = "555"
+        self.seller.save()
+        CartItem.objects.create(user=self.user, product=self.product, quantity=1)
+        with mock.patch("apps.accounts.telegram._call") as call, self.captureOnCommitCallbacks(execute=True):
+            self.client.post(reverse("place_order"), {
+                "recipient_name": "Buyer", "phone": "020000000", "province": "ນະຄອນຫຼວງວຽງຈັນ",
+                "district": "ຈັນທະບູລີ", "village_address": "Laos",
+                "shipping_method": self.shipping_method.pk, "payment_method": "cash_on_delivery",
+            })
+        method, kwargs = call.call_args.args[0], call.call_args.kwargs
+        self.assertEqual(method, "sendMessage")
+        self.assertEqual(kwargs["chat_id"], "555")
+        self.assertIn(Order.objects.get().order_number, kwargs["text"])
+        self.assertIn("Phone × 1", kwargs["text"])
+
+    def test_telegram_failure_does_not_break_checkout(self):
+        from unittest import mock
+
+        self.seller.telegram_chat_id = "555"
+        self.seller.save()
+        CartItem.objects.create(user=self.user, product=self.product, quantity=1)
+        with mock.patch("apps.accounts.telegram._call", side_effect=OSError("down")), \
+                self.assertLogs("apps.accounts.telegram", level="ERROR"), \
+                self.captureOnCommitCallbacks(execute=True):
+            response = self.client.post(reverse("place_order"), {
+                "recipient_name": "Buyer", "phone": "020000000", "province": "ນະຄອນຫຼວງວຽງຈັນ",
+                "district": "ຈັນທະບູລີ", "village_address": "Laos",
+                "shipping_method": self.shipping_method.pk, "payment_method": "cash_on_delivery",
+            })
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(Order.objects.exists())

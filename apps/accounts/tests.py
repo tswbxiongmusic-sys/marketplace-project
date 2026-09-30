@@ -200,3 +200,57 @@ class PasswordResetTests(TestCase):
             reverse("password_reset_confirm", kwargs={"uidb64": "xx", "token": "bad-token"})
         )
         self.assertContains(response, "ລິ້ງໃຊ້ບໍ່ໄດ້")
+
+
+@override_settings(TELEGRAM_BOT_TOKEN="123:abc", TELEGRAM_BOT_USERNAME="HmongShopBot")
+class TelegramLinkTests(TestCase):
+    def setUp(self):
+        self.seller = User.objects.create_user("tg-seller", password="x-Strong-pass-1", role=User.Role.SELLER)
+        self.client.force_login(self.seller)
+
+    def test_connect_issues_token_and_redirects_to_bot(self):
+        response = self.client.post(reverse("telegram_connect"))
+        self.seller.refresh_from_db()
+        self.assertTrue(self.seller.telegram_link_token)
+        self.assertEqual(response.url, f"https://t.me/HmongShopBot?start={self.seller.telegram_link_token}")
+
+    def test_verify_links_chat_from_start_message_and_acknowledges_updates(self):
+        from unittest import mock
+
+        self.seller.telegram_link_token = "tok123"
+        self.seller.save()
+        updates = [
+            {"update_id": 7, "message": {"text": "/start unknown", "chat": {"id": 1}}},
+            {"update_id": 8, "message": {"text": "/start tok123", "chat": {"id": 555}}},
+        ]
+        calls = []
+
+        def fake_call(method, **params):
+            calls.append((method, params))
+            return updates if method == "getUpdates" and "offset" not in params else True
+
+        with mock.patch("apps.accounts.telegram._call", side_effect=fake_call):
+            self.client.post(reverse("telegram_verify"))
+        self.seller.refresh_from_db()
+        self.assertEqual(self.seller.telegram_chat_id, "555")
+        self.assertEqual(self.seller.telegram_link_token, "")
+        self.assertIn(("getUpdates", {"offset": 9, "timeout": 0}), calls)
+
+    def test_disconnect_clears_chat(self):
+        self.seller.telegram_chat_id = "555"
+        self.seller.save()
+        self.client.post(reverse("telegram_disconnect"))
+        self.seller.refresh_from_db()
+        self.assertEqual(self.seller.telegram_chat_id, "")
+
+    def test_dashboard_shows_card_only_when_bot_configured(self):
+        self.assertContains(self.client.get(reverse("seller_dashboard")), "telegram-alerts")
+        with self.settings(TELEGRAM_BOT_TOKEN=""):
+            self.assertNotContains(self.client.get(reverse("seller_dashboard")), "telegram-alerts")
+
+    def test_customers_cannot_connect(self):
+        customer = User.objects.create_user("tg-buyer", password="x-Strong-pass-1")
+        self.client.force_login(customer)
+        self.client.post(reverse("telegram_connect"))
+        customer.refresh_from_db()
+        self.assertEqual(customer.telegram_link_token, "")

@@ -63,6 +63,12 @@ class User(AbstractUser):
     tiktok_url = models.URLField(blank=True)
     website_url = models.URLField(blank=True)
 
+    # Where new-order alerts go on Telegram.  The link token is a one-time
+    # code the seller sends to the bot via its /start deep link so we can
+    # learn their chat id without asking them to find it themselves.
+    telegram_chat_id = models.CharField(max_length=32, blank=True)
+    telegram_link_token = models.CharField(max_length=32, blank=True)
+
     @property
     def display_name(self):
         return self.store_name or self.username
