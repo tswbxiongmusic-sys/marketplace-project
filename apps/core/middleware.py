@@ -12,7 +12,11 @@ class ProductionSecurityHeadersMiddleware:
             "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
             "img-src 'self' data: https:; "
             "font-src 'self' data: https://cdn.jsdelivr.net https://fonts.gstatic.com; "
-            "connect-src 'self' https://cdn.jsdelivr.net; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://t.me"
+            "connect-src 'self' https://cdn.jsdelivr.net; frame-ancestors 'none'; base-uri 'self'; "
+            # Social-login and Telegram buttons are POST forms that redirect
+            # off-site; browsers apply form-action to that redirect too.
+            "form-action 'self' https://accounts.google.com https://www.facebook.com "
+            "https://m.facebook.com https://t.me"
         )
         response["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
         return response

@@ -98,3 +98,16 @@ class ErrorPageTests(TestCase):
 
         html = get_template("500.html").render()
         self.assertIn("ລະບົບມີບັນຫາຊົ່ວຄາວ", html)
+
+
+class SecurityHeaderTests(TestCase):
+    def test_csp_lets_social_login_forms_redirect_to_providers(self):
+        from .middleware import ProductionSecurityHeadersMiddleware
+        from django.http import HttpResponse
+
+        response = ProductionSecurityHeadersMiddleware(lambda request: HttpResponse())(None)
+        form_action = next(
+            part for part in response["Content-Security-Policy"].split(";") if "form-action" in part
+        )
+        for origin in ("'self'", "https://accounts.google.com", "https://www.facebook.com", "https://t.me"):
+            self.assertIn(origin, form_action)
