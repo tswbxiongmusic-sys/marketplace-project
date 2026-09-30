@@ -350,3 +350,44 @@ class CheckoutTests(TestCase):
         self.client.post(reverse("cancel_order", args=[order.pk]))
         order.refresh_from_db()
         self.assertEqual(order.status, "completed")
+
+
+class CheckoutModerationTests(TestCase):
+    setUp = CheckoutTests.setUp
+
+    CHECKOUT_DATA = {
+        "recipient_name": "Buyer", "phone": "020000000", "province": "ນະຄອນຫຼວງວຽງຈັນ",
+        "district": "ຈັນທະບູລີ", "village_address": "Laos", "payment_method": "cash_on_delivery",
+    }
+
+    def assert_checkout_blocked(self):
+        CartItem.objects.create(user=self.user, product=self.product, quantity=1)
+        self.client.post(reverse("place_order"), {**self.CHECKOUT_DATA, "shipping_method": self.shipping_method.pk})
+        self.assertFalse(Order.objects.exists())
+        self.product.refresh_from_db()
+        self.assertEqual(self.product.stock, 2)
+
+    def test_cannot_buy_cart_item_after_seller_is_suspended(self):
+        self.seller.is_suspended = True
+        self.seller.save()
+        self.assert_checkout_blocked()
+
+    def test_cannot_buy_cart_item_after_product_is_rejected(self):
+        self.product.approval_status = Product.REJECTED
+        self.product.save()
+        self.assert_checkout_blocked()
+
+    def test_order_email_failure_is_logged_not_raised(self):
+        from unittest import mock
+
+        self.user.email = "buyer@example.com"
+        self.user.save()
+        CartItem.objects.create(user=self.user, product=self.product, quantity=1)
+        with mock.patch("apps.orders.views.send_mail", side_effect=OSError("smtp down")), \
+                self.assertLogs("apps.orders.views", level="ERROR"), \
+                self.captureOnCommitCallbacks(execute=True):
+            response = self.client.post(
+                reverse("place_order"), {**self.CHECKOUT_DATA, "shipping_method": self.shipping_method.pk}
+            )
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(Order.objects.exists())

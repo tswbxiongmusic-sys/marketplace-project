@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
@@ -13,12 +15,23 @@ from apps.products.models import Product
 from .forms import CheckoutForm
 from .models import Coupon, Order, OrderItem, OrderShipment, ShippingMethod
 
+logger = logging.getLogger(__name__)
+
 
 def notify_order(order, message):
     from apps.accounts.models import Notification
     Notification.objects.create(user=order.user, message=message, link=f"/orders/my-orders/{order.pk}/")
     if order.user.email:
-        send_mail("ແຈ້ງເຕືອນຄຳສັ່ງຊື້", message, None, [order.user.email], fail_silently=True)
+        # Send after commit so a slow SMTP server never holds the order transaction
+        # open, and log failures instead of silently dropping them.
+        transaction.on_commit(lambda: _send_order_email(order, message))
+
+
+def _send_order_email(order, message):
+    try:
+        send_mail("ແຈ້ງເຕືອນຄຳສັ່ງຊື້", message, None, [order.user.email])
+    except Exception:
+        logger.exception("Failed to send order email for %s to %s", order.order_number, order.user.email)
 
 
 def group_items_by_seller(items):
@@ -127,9 +140,10 @@ def place_order(request):
 
         products = {
             product.id: product
-            for product in Product.objects.select_for_update().filter(
+            # published() also drops items whose product was rejected or whose
+            # seller was suspended after they went into the cart.
+            for product in Product.objects.published().select_for_update(of=("self",)).filter(
                 id__in=product_ids,
-                is_active=True,
             )
         }
 
